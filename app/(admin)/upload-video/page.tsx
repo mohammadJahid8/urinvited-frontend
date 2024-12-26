@@ -19,6 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useAppContext } from '@/lib/context';
+import api from '@/utils/axiosInstance';
+import { useRouter } from 'next/navigation';
 
 const videos = [
   {
@@ -28,144 +31,147 @@ const videos = [
     status: 'Pending',
     comments:
       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-    action: 'View',
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   },
 ];
 
 export default function VideoUpload() {
+  const { user } = useAppContext();
   const [files, setFiles] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  const [preview, setPreview] = useState();
+  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
-  // const { user } = useContext(UserContext);
   const [fileInfo, setFileInfo] = useState(null);
   const [thInfo, setThInfo] = useState(null);
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState('');
   const [email, setEmail] = useState('');
   const [canvaLink, setCanvaLink] = useState('');
   const [thumbnailKey, setThumbnailKey] = useState(Date.now());
   const [fileKey, setFileKey] = useState(Date.now());
+  const router = useRouter();
 
-  // const handleUpload = async (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
+  console.log({ date });
 
-  //   console.log(format(date, 'PPP'));
-  //   if (!files) {
-  //     return toast.error('Please upload a video!', {
-  //       position: 'top-center',
-  //     });
-  //   }
-  //   if (!date) {
-  //     return toast.error('Please select a date!', {
-  //       position: 'top-center',
-  //     });
-  //   }
-  //   if (!email) {
-  //     return toast.error('Please select a email!', {
-  //       position: 'top-center',
-  //     });
-  //   }
-  //   try {
-  //     setLoading(true);
+  const handleUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  //     const formData = new FormData();
-  //     formData.append('file', files);
-  //     formData.append('upload_preset', 'event-upload');
-  //     //dci603uj0
-  //     //dbpog1ckt
-  //     const response = await axios.post(
-  //       `https://api.cloudinary.com/v1_1/ddvrxtfbc/video/upload`,
-  //       formData,
-  //       {
-  //         headers: {
-  //           'Content-Type': 'multipart/form-data',
-  //         },
-  //       }
-  //     );
+    if (!files) {
+      return toast.error('Please upload a video!', {
+        position: 'top-center',
+      });
+    }
+    if (!date) {
+      return toast.error('Please select a date!', {
+        position: 'top-center',
+      });
+    }
+    if (!email) {
+      return toast.error('Please select a email!', {
+        position: 'top-center',
+      });
+    }
+    try {
+      setLoading(true);
 
-  //     const videourl = response?.data?.secure_url;
+      const formData = new FormData();
+      formData.append('file', files);
+      formData.append('upload_preset', 'event-upload');
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/ddvrxtfbc/video/upload`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
-  //     const payload = {
-  //       date: format(date, 'PPP'),
-  //       uploadedFor: email,
-  //       uploadedBy: user?._id,
-  //       url: videourl,
-  //       thumbnail,
-  //       canvaLink,
-  //     };
+      const videourl = response?.data?.secure_url;
 
-  //     const newFormData = new FormData();
+      console.log({ videourl });
 
-  //     for (const key in payload) {
-  //       if (Object.prototype.hasOwnProperty.call(payload, key)) {
-  //         newFormData.append(key, payload[key]);
-  //       }
-  //     }
+      const payload = {
+        eventDate: new Date(date).toISOString(),
+        userEmail: email,
+        uploadedBy: user?._id,
+        url: videourl,
+        thumbnail,
+        canvaLink,
+      };
 
-  //     console.log(newFormData);
+      const newFormData = new FormData();
 
-  //     console.log(payload);
+      for (const key in payload) {
+        if (Object.prototype.hasOwnProperty.call(payload, key)) {
+          newFormData.append(key, payload[key as keyof typeof payload]);
+        }
+      }
 
-  //     if (videourl) {
-  //       const promise = await axios.post(`/video/upload`, newFormData);
-  //       if (promise.status === 200) {
-  //         setFiles(null);
-  //         setPreview('');
-  //         setFileInfo('');
-  //         setLoading(false);
-  //         toast.success(`Video uploaded successfully!`);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setLoading(false);
-  //     return toast.error(
-  //       error.response.data.message || `Something went wrong!`,
-  //       {
-  //         position: 'top-center',
-  //       }
-  //     );
-  //   }
-  // };
+      console.log(newFormData);
 
-  // const handleFileDelete = async (e, type) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   try {
-  //     if (type === 'video') {
-  //       setFiles(null);
-  //       setPreview(null);
-  //       setFileInfo(null);
-  //       setFileKey(Date.now());
-  //     } else {
-  //       setThumbnail(null);
-  //       setThumbnailPreview(null);
-  //       setThInfo(null);
-  //       setThumbnailKey(Date.now());
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+      console.log(payload);
+
+      if (videourl) {
+        const promise = await api.post(`/video/upload`, newFormData);
+        if (promise.status === 200) {
+          router.push('/event-details');
+          setFiles(null);
+          setPreview(null);
+          setFileInfo(null);
+          setThumbnail(null);
+          setThumbnailPreview(null);
+          setThInfo(null);
+          setLoading(false);
+          toast.success(`Video uploaded successfully!`);
+        }
+      }
+    } catch (error: any) {
+      console.log(error);
+      setLoading(false);
+      return toast.error(
+        error.response.data.message || `Something went wrong!`,
+        {
+          position: 'top-center',
+        }
+      );
+    }
+  };
+
+  const handleFileDelete = async (e: any, type: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      if (type === 'video') {
+        setFiles(null);
+        setPreview(null);
+        setFileInfo(null);
+        setFileKey(Date.now());
+      } else {
+        setThumbnail(null);
+        setThumbnailPreview(null);
+        setThInfo(null);
+        setThumbnailKey(Date.now());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // console.log("thPrev", thumbnailPreview);
   // console.log("thumbnail", thumbnail);
 
   return (
-    <div className='max-w-3xl flex-1 space-y-4 p-4 md:p-8 pt-6'>
+    <div className='max-w-5xl flex-1 space-y-4'>
       <h1 className='text-xl font-semibold'>Upload Video</h1>
 
-      <form
-        // onSubmit={handleUpload}
-        className='space-y-4'
-      >
+      <form onSubmit={handleUpload} className='space-y-4'>
         <div>
           <Label>Enter user email address</Label>
 
           <Input
             type='email'
-            className='max-w-96'
+            className=''
             onChange={(e) => setEmail(e.target.value)}
             required
           />
@@ -175,11 +181,11 @@ export default function VideoUpload() {
           <Table>
             <TableHeader className='bg-gray-100'>
               <TableRow>
-                <TableHead className='w-[100px]'>Invoice</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead className='text-right'>Amount</TableHead>
-                <TableHead className='text-right'>Action</TableHead>
+                <TableHead className=''>Uploaded By</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Event Date</TableHead>
+                <TableHead className=''>Status</TableHead>
+                <TableHead className=''>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -190,8 +196,12 @@ export default function VideoUpload() {
                   </TableCell>
                   <TableCell>{video.user}</TableCell>
                   <TableCell>{video.eventDate}</TableCell>
-                  <TableCell className='text-right'>{video.status}</TableCell>
-                  <TableCell className='text-right'>{video.action}</TableCell>
+                  <TableCell className=''>{video.status}</TableCell>
+                  <TableCell className=''>
+                    <Button variant='outline' size='sm' href={video.url}>
+                      View video
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -217,7 +227,7 @@ export default function VideoUpload() {
             </video>
             <button
               className='absolute -top-2 -right-1 bg-white rounded-full border border-black p-1'
-              // onClick={(e) => handleFileDelete(e, 'video')}
+              onClick={(e) => handleFileDelete(e, 'video')}
             >
               <XIcon className='h-4 w-4 text-black ' />
             </button>
@@ -236,29 +246,28 @@ export default function VideoUpload() {
             fileInfo={thInfo}
             setFileInfo={setThInfo}
           />
-          {thumbnailPreview !== null && (
-            <div className='relative w-80'>
-              <img
-                src={thumbnailPreview}
-                alt='theme'
-                className='w-80 rounded-sm'
-              />
-              <button
-                className='absolute -top-2 -right-1 bg-white rounded-full border border-black p-1'
-                // onClick={(e) => handleFileDelete(e, 'image')}
-              >
-                <XIcon className='h-4 w-4 text-black ' />
-              </button>
-            </div>
-          )}
         </div>
-
+        {thumbnailPreview !== null && (
+          <div className='relative w-80'>
+            <img
+              src={thumbnailPreview}
+              alt='theme'
+              className='w-80 rounded-sm'
+            />
+            <button
+              className='absolute -top-2 -right-1 bg-white rounded-full border border-black p-1'
+              // onClick={(e) => handleFileDelete(e, 'image')}
+            >
+              <XIcon className='h-4 w-4 text-black ' />
+            </button>
+          </div>
+        )}
         <div>
           <Label>Enter canva edit link</Label>
 
           <Input
             type='url'
-            className='max-w-96'
+            className=''
             onChange={(e) => setCanvaLink(e.target.value)}
           />
         </div>
@@ -267,8 +276,8 @@ export default function VideoUpload() {
           <Label>Enter event date</Label>
           <Input
             type='date'
-            className='max-w-96'
-            // onChange={(e) => setDate(e.target.value)}
+            className=''
+            onChange={(e) => setDate(e.target.value)}
           />
         </div>
 

@@ -38,13 +38,19 @@ export default function Login() {
     try {
       const promise = await api.post(`/auth/login`, data);
       if (promise.status === 200) {
-        console.log(promise.data.data.accessToken);
-        window.localStorage.setItem('rmToken', promise.data.data.accessToken);
+        console.log(promise.data.data);
+        const accessToken = promise.data.data.accessToken;
+        const role = promise.data.data.role;
+        window.localStorage.setItem('rmToken', accessToken);
         setUserRefetch(!userRefetch);
         toast.success(`Logged in`, {
           position: 'top-center',
         });
-        router.push('/video-preview');
+        if (role === 'admin') {
+          router.push('/manage-events');
+        } else {
+          router.push('/events');
+        }
       }
     } catch (error: any) {
       console.log(error);

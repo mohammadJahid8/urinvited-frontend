@@ -16,7 +16,7 @@ import DateInput from './date-input';
 const RsvpForm = ({ form, fields }: { form: any; fields: any }) => {
   return (
     <div className='flex flex-col gap-6'>
-      <FormField
+      {/* <FormField
         control={form.control}
         name={`requestRsvps`}
         render={({ field }) => (
@@ -37,7 +37,7 @@ const RsvpForm = ({ form, fields }: { form: any; fields: any }) => {
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
       <FormField
         control={form.control}
         name={`isRsvpDueDateSet`}
@@ -63,7 +63,6 @@ const RsvpForm = ({ form, fields }: { form: any; fields: any }) => {
                       <FormControl>
                         <DateInput field={field} label='Pick a date' />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -93,7 +92,7 @@ const RsvpForm = ({ form, fields }: { form: any; fields: any }) => {
           </FormItem>
         )}
       />
-      <FormField
+      {/* <FormField
         control={form.control}
         name={`isAutoReminderSet`}
         render={({ field }) => (
@@ -133,7 +132,7 @@ const RsvpForm = ({ form, fields }: { form: any; fields: any }) => {
             )}
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   );
 };

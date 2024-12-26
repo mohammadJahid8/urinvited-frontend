@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import api from '@/utils/axiosInstance';
+import { redirect, usePathname } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,6 +20,9 @@ const ContextProvider = ({ children }: any) => {
 
   const [usersRefetch, setUsersRefetch] = useState(false);
   const [openEmailPreview, setOpenEmailPreview] = useState(false);
+
+  const pathname = usePathname();
+  console.log({ pathname });
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -56,6 +60,19 @@ const ContextProvider = ({ children }: any) => {
 
     getProfile();
   }, [userRefetch]);
+
+  if (isLoading)
+    return (
+      <div className='h-screen w-screen flex items-center justify-center'>
+        Loading...
+      </div>
+    );
+
+  const publicRoutes = ['/login', '/signup', '/preview'];
+
+  if (!user?.email && !publicRoutes.includes(pathname)) {
+    return redirect('/login');
+  }
 
   console.log({ user });
   const logout = () => {

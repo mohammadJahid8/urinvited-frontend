@@ -95,7 +95,7 @@ const GuestManagementForm = ({ form }: { form: any }) => {
           </FormItem>
         )}
       />
-      <FormField
+      {/* <FormField
         control={form.control}
         name={`trackAttendees`}
         render={({ field }) => (
@@ -114,9 +114,9 @@ const GuestManagementForm = ({ form }: { form: any }) => {
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
 
-      <FormField
+      {/* <FormField
         control={form.control}
         name={`sendReminderToAttendees`}
         render={({ field }) => (
@@ -154,9 +154,9 @@ const GuestManagementForm = ({ form }: { form: any }) => {
             )}
           </FormItem>
         )}
-      />
+      /> */}
 
-      <FormField
+      {/* <FormField
         control={form.control}
         name={`allowUpdateRsvpAfterSubmission`}
         render={({ field }) => (
@@ -175,7 +175,7 @@ const GuestManagementForm = ({ form }: { form: any }) => {
             <FormMessage />
           </FormItem>
         )}
-      />
+      /> */}
     </div>
   );
 };

@@ -16,6 +16,7 @@ export default function RootLayout({
   const links = [
     { href: '/manage-events', icon: CalendarCheck, label: 'Manage Events' },
     { href: '/upload-video', icon: Video, label: 'Upload Video' },
+    { href: '/videos', icon: Video, label: 'Videos' },
   ];
 
   const NavLinks = () => (

@@ -10,29 +10,53 @@ import useStore from '@/app/store/useStore';
 import { useCallback, useEffect, useState } from 'react';
 import RsvpForm from './rsvp-form';
 import GuestManagementForm from './guest-management-form';
+import api from '@/utils/axiosInstance';
+import { toast } from 'sonner';
 
 const EventDetails = () => {
   const { updateFormData, formData } = useStore();
+  const [hasEndDate, setHasEndDate] = useState(false);
   console.log({ formData });
 
   const schemaFields: Record<string, z.ZodTypeAny> = {
     // event details
-    hostedBy: z.string().optional(),
+    hostedBy: z.string().min(1, { message: 'Hosted by is required' }),
     events: z.array(
       z
         .object({
           title: z.string().min(1, { message: 'Title is required' }),
-          startDate: z.any().optional(),
+          startDate: z
+            .any()
+            .optional()
+            .transform((date) => {
+              if (!date) return undefined;
+              const parsedDate = new Date(date);
+              if (isNaN(parsedDate.getTime())) {
+                throw new Error('Invalid start date format');
+              }
+              return parsedDate.toISOString();
+            }),
+          inviteDetails: z.any().optional(),
           startTime: z.any().optional(),
           timeZone: z.any().optional(),
-          endDate: z.any().optional(),
+          endDate: z
+            .any()
+            .optional()
+            .transform((date) => {
+              if (!date) return undefined;
+              const parsedDate = new Date(date);
+              if (isNaN(parsedDate.getTime())) {
+                throw new Error('Invalid start date format');
+              }
+              return parsedDate.toISOString();
+            }),
           endTime: z.any().optional(),
           locationName: z.string().optional(),
           address: z.string().optional(),
           showGoogleMap: z.boolean().optional(),
           virtualPlatformName: z.string().optional(),
           virtualUrl: z.string().optional(),
-          when: z.enum(['startDateTime', 'toBeDetermined']),
+          when: z.enum(['startDateTime', 'tbd']),
           locationType: z.enum(['in-person', 'virtual']),
         })
         .superRefine((data, ctx) => {
@@ -59,6 +83,21 @@ const EventDetails = () => {
                 message: 'Time zone is required',
               });
             }
+          } else {
+            delete data.startDate;
+            delete data.startTime;
+            delete data.timeZone;
+
+            delete data.endDate;
+            delete data.endTime;
+          }
+
+          if (data.inviteDetails === true) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['inviteDetails'],
+              message: 'Invite details is required',
+            });
           }
 
           if (data.locationType === 'in-person') {
@@ -76,6 +115,9 @@ const EventDetails = () => {
                 message: 'Address is required',
               });
             }
+
+            delete data.virtualPlatformName;
+            delete data.virtualUrl;
           }
 
           if (data.locationType === 'virtual') {
@@ -93,38 +135,81 @@ const EventDetails = () => {
                 message: 'Virtual URL is required',
               });
             }
+
+            delete data.locationName;
+            delete data.address;
           }
         })
     ),
     // rsvps
-    requestRsvps: z.boolean().optional(),
+    // requestRsvps: z.boolean().optional(),
     isRsvpDueDateSet: z.boolean().optional(),
-    rsvpDueDate: z.any().optional(),
+    rsvpDueDate: z
+      .any()
+      .optional()
+      .transform((date) => {
+        if (!date) return undefined;
+        const parsedDate = new Date(date);
+        if (isNaN(parsedDate.getTime())) {
+          throw new Error('Invalid start date format');
+        }
+        return parsedDate.toISOString();
+      }),
     allowRsvpAfterDueDate: z.boolean().optional(),
-    isAutoReminderSet: z.boolean().optional(),
-    autoReminder: z.boolean().optional(),
+    // isAutoReminderSet: z.boolean().optional(),
+    // autoReminder: z.boolean().optional(),
+
     // guest management
     allowAdditionalAttendees: z.boolean().optional(),
-    additionalAttendees: z.number().optional(),
+    additionalAttendees: z.string().optional(),
 
     isMaximumCapacitySet: z.boolean().optional(),
-    maximumCapacity: z.number().optional(),
+    maximumCapacity: z.string().optional(),
 
-    trackAttendees: z.boolean().optional(),
+    // trackAttendees: z.boolean().optional(),
 
-    sendReminderToAttendees: z.boolean().optional(),
-    attendingReminderDate: z.any().optional(),
+    // sendReminderToAttendees: z.boolean().optional(),
+    // attendingReminderDate: z.any().optional(),
 
-    allowUpdateRsvpAfterSubmission: z.boolean().optional(),
+    // allowUpdateRsvpAfterSubmission: z.boolean().optional(),
   };
 
-  const formSchema = z.object(schemaFields);
+  const formSchema = z.object(schemaFields).superRefine((data, ctx) => {
+    if (data.isRsvpDueDateSet) {
+      if (!data.rsvpDueDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['rsvpDueDate'],
+          message: 'RSVP due date is required!',
+        });
+      }
+    }
+    if (data.allowAdditionalAttendees) {
+      if (!data.additionalAttendees || data.additionalAttendees.trim() === '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['additionalAttendees'],
+          message: 'Number of additional attendees is required!',
+        });
+      }
+    }
+    if (data.isMaximumCapacitySet) {
+      if (!data.maximumCapacity || data.maximumCapacity.trim() === '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['maximumCapacity'],
+          message: 'Maximum capacity is required!',
+        });
+      }
+    }
+  });
 
   const defaultValues = {
     hostedBy: '',
     events: [
       {
         title: '',
+        inviteDetails: true,
         startDate: undefined,
         startTime: undefined,
         timeZone: '',
@@ -139,20 +224,20 @@ const EventDetails = () => {
         locationType: 'in-person',
       },
     ],
-    requestRsvps: true,
+    // requestRsvps: true,
     isRsvpDueDateSet: true,
     rsvpDueDate: undefined,
     allowRsvpAfterDueDate: true,
-    autoReminder: false,
+    // autoReminder: false,
     // guest management
     allowAdditionalAttendees: true,
-    additionalAttendees: 1,
+    additionalAttendees: '1',
     isMaximumCapacitySet: true,
-    maximumCapacity: 1,
-    trackAttendees: true,
-    sendReminderToAttendees: true,
-    attendingReminderDate: undefined,
-    allowUpdateRsvpAfterSubmission: true,
+    maximumCapacity: '1',
+    // trackAttendees: true,
+    // sendReminderToAttendees: true,
+    // attendingReminderDate: undefined,
+    // allowUpdateRsvpAfterSubmission: true,
   };
 
   const form = useForm({
@@ -174,6 +259,8 @@ const EventDetails = () => {
           fields={fields}
           append={append}
           remove={remove}
+          hasEndDate={hasEndDate}
+          setHasEndDate={setHasEndDate}
         />
       ),
     },
@@ -203,8 +290,26 @@ const EventDetails = () => {
     [updateFormData, formData]
   );
 
-  const handleSubmit = (data: any) => {
-    console.log({ data });
+  const handleSubmit = async (data: any) => {
+    // console.log({ data });
+    data.userEmail = 'mohammadjahid0007@gmail.com';
+    try {
+      const promise = await api.patch(`/event/create`, data);
+      if (promise?.status === 200) {
+        toast.success(`Event details updated`, {
+          position: 'top-center',
+        });
+      }
+    } catch (error: any) {
+      console.error(error);
+
+      return toast.error(
+        error?.response?.data?.message || `Event details failed`,
+        {
+          position: 'top-center',
+        }
+      );
+    }
   };
 
   // console.log('form.watch', form.watch('events'));

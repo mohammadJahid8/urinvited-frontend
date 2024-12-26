@@ -32,14 +32,17 @@ const DetailsForm = ({
   fields,
   append,
   remove,
+  hasEndDate,
+  setHasEndDate,
 }: {
   form: any;
   fields: any;
   append: any;
   remove: any;
+  hasEndDate: boolean;
+  setHasEndDate: (value: boolean) => void;
 }) => {
   const [inviteDetails, setInviteDetails] = useState(false);
-  const [hasEndDate, setHasEndDate] = useState(false);
 
   return (
     <div className='flex flex-col gap-6'>
@@ -187,10 +190,6 @@ const EachEvent = ({ form, setHasEndDate, hasEndDate, index, remove }: any) => {
             <RadioGroup
               onValueChange={field.onChange}
               defaultValue={field.value}
-              // value={toBeDetermined ? 'toBeDetermined' : 'startDateTime'}
-              // onValueChange={(value) =>
-              //   setToBeDetermined(value === 'toBeDetermined')
-              // }
               className='mt-2 flex flex-col gap-4'
             >
               <div className='flex items-center gap-2'>
@@ -205,7 +204,7 @@ const EachEvent = ({ form, setHasEndDate, hasEndDate, index, remove }: any) => {
                   Start date and time
                 </Label>
               </div>
-              {field.value !== 'toBeDetermined' && (
+              {field.value !== 'tbd' && (
                 <div className='flex flex-col gap-2'>
                   <FormField
                     control={form.control}
@@ -254,7 +253,7 @@ const EachEvent = ({ form, setHasEndDate, hasEndDate, index, remove }: any) => {
               )}
 
               {/* Add End Date/Time or To Be Determined */}
-              {field.value !== 'toBeDetermined' && (
+              {field.value !== 'tbd' && (
                 <div className=''>
                   <button
                     type='button'
@@ -288,14 +287,8 @@ const EachEvent = ({ form, setHasEndDate, hasEndDate, index, remove }: any) => {
                 </div>
               )}
               <div className='flex items-center gap-2'>
-                <RadioGroupItem
-                  value='toBeDetermined'
-                  id={`toBeDetermined-${index}`}
-                />
-                <Label
-                  htmlFor={`toBeDetermined-${index}`}
-                  className='font-normal'
-                >
+                <RadioGroupItem value='tbd' id={`tbd-${index}`} />
+                <Label htmlFor={`tbd-${index}`} className='font-normal'>
                   To be determined
                 </Label>
               </div>

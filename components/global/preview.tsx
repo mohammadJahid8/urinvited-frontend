@@ -110,6 +110,8 @@ export default function Preview() {
                 when,
                 startDate,
                 startTime,
+                endDate,
+                endTime,
                 timeZone,
                 address,
                 locationName,
@@ -134,28 +136,46 @@ export default function Preview() {
                 </div>
 
                 {/* Event Details */}
-                {when !== 'toBeDetermined' && (
+                {(when !== 'tbd' ||
+                  virtualPlatformName ||
+                  virtualUrl ||
+                  address ||
+                  locationName) && (
                   <div className='space-y-4 text-center'>
                     <div className='border-t border-dashed border-gray-300 max-w-[300px] mx-auto w-full'></div>
 
-                    {(startDate || startTime) && when !== 'toBeDetermined' && (
-                      <div className='space-y-1'>
-                        <div className='flex items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
-                          <Calendar className='w-5 h-5 text-blue-600' />
-                          <span>
-                            {startDate &&
-                              format(new Date(startDate), 'MM/dd/yyyy')}{' '}
-                            {startTime &&
-                              startTime &&
-                              `| ${convertTime(startTime)}`}{' '}
-                            {timeZone && `| ${timeZone}`}
-                          </span>
+                    {(startDate ||
+                      startTime ||
+                      timeZone ||
+                      endDate ||
+                      endTime) &&
+                      when !== 'tbd' && (
+                        <div className='space-y-1'>
+                          <div className='flex items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
+                            <Calendar className='w-5 h-5 text-blue-600' />
+                            <span>
+                              {startDate &&
+                                format(new Date(startDate), 'MM/dd/yyyy')}{' '}
+                              {startTime &&
+                                startTime &&
+                                `| ${convertTime(startTime)}`}{' '}
+                              {endDate &&
+                                endDate &&
+                                `to ${format(
+                                  new Date(endDate),
+                                  'MM/dd/yyyy'
+                                )}`}{' '}
+                              {endTime &&
+                                endTime &&
+                                `| ${convertTime(endTime)}`}{' '}
+                              {timeZone && `| ${timeZone}`}
+                            </span>
+                          </div>
+                          <a href='#' className='text-blue-500 text-base'>
+                            Add to Calendar
+                          </a>
                         </div>
-                        <a href='#' className='text-blue-500 text-base'>
-                          Add to Calendar
-                        </a>
-                      </div>
-                    )}
+                      )}
 
                     {(address || locationName) &&
                       locationType === 'in-person' && (
@@ -173,6 +193,7 @@ export default function Preview() {
                           )}
                         </div>
                       )}
+
                     {(virtualPlatformName || virtualUrl) &&
                       locationType === 'virtual' && (
                         <div className='space-y-1'>
