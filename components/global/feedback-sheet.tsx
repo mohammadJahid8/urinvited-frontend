@@ -10,11 +10,16 @@ import { useState } from 'react';
 import CreateTicket from './create-ticket';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '../ui/card';
+import { toast } from 'sonner';
+import moment from 'moment';
 export function FeedbackSheet() {
-  const { openFeedback, setOpenFeedback } = useAppContext();
+  const { openFeedback, setOpenFeedback, event, downloadFile } =
+    useAppContext();
   const [currentTab, setCurrentTab] = useState<'message' | 'history'>(
     'message'
   );
+
+  const feedbacks = event?.video?.feedbacks;
 
   return (
     <Sheet open={openFeedback} onOpenChange={setOpenFeedback}>
@@ -49,47 +54,26 @@ export function FeedbackSheet() {
         </SheetHeader>
 
         <div className='h-full overflow-y-auto'>
-          {currentTab === 'message' && <MessageTab />}
-          {currentTab === 'history' && <HistoryTab />}
+          {currentTab === 'message' && <MessageTab feedbacks={feedbacks} />}
+          {currentTab === 'history' && (
+            <HistoryTab feedbacks={feedbacks} downloadFile={downloadFile} />
+          )}
         </div>
       </SheetContent>
     </Sheet>
   );
 }
 
-const HistoryTab = () => {
-  const [tickets, setTickets] = useState([
-    {
-      ticketId: '1002',
-      feedbackType: 'Image change request',
-      loggedOn: '10-27-2023',
-      feedback:
-        'Lorem ipsum dolor sit amet consectetur. Sapien facilisis praesent morbi et et. Pellentesque felis rhoncus neque eget eu a laoreet et nisl. ',
-      attachments: [{ name: 'Test image.png', url: '#' }],
-    },
-    {
-      ticketId: '1002',
-      feedbackType: 'Image change request',
-      loggedOn: '10-27-2023',
-      feedback:
-        'Lorem ipsum dolor sit amet consectetur. Sapien facilisis praesent morbi et et. Pellentesque felis rhoncus neque eget eu a laoreet et nisl. ',
-      attachments: [{ name: 'Test image.png', url: '#' }],
-    },
-    {
-      ticketId: '1002',
-      feedbackType: 'Image change request',
-      loggedOn: '10-27-2023',
-      feedback:
-        'Lorem ipsum dolor sit amet consectetur. Sapien facilisis praesent morbi et et. Pellentesque felis rhoncus neque eget eu a laoreet et nisl. ',
-      attachments: [{ name: 'Test image.png', url: '#' }],
-    },
-  ]);
-
+const HistoryTab = ({ feedbacks, downloadFile }: any) => {
   return (
     <div className='flex flex-col gap-2 p-4 mb-16'>
       <div className='flex flex-col gap-2'>
-        {tickets.map((ticket, index) => (
-          <FeedbackTicket key={index} {...ticket} />
+        {feedbacks.map((feedback: any, index: any) => (
+          <FeedbackTicket
+            key={index}
+            {...feedback}
+            downloadFile={downloadFile}
+          />
         ))}
       </div>
     </div>
@@ -97,11 +81,12 @@ const HistoryTab = () => {
 };
 
 export default function FeedbackTicket({
-  ticketId = '1002',
-  feedbackType = 'Image change request',
-  loggedOn = '10-27-2023',
-  feedback = 'Lorem ipsum dolor sit amet consectetur. Sapien facilisis praesent morbi et et. Pellentesque felis rhoncus neque eget eu a laoreet et nisl. ',
-  attachments = [{ name: 'Test image.png', url: '#' }],
+  _id,
+  feedbackType,
+  createdAt,
+  feedback,
+  attachment,
+  downloadFile,
 }: any) {
   return (
     <Card className=''>
@@ -109,14 +94,17 @@ export default function FeedbackTicket({
         <div className='flex items-start justify-between'>
           <div className='space-y-4 flex-1'>
             <div className='grid grid-cols-[120px,1fr] gap-2 items-center'>
-              <span className='text-sm text-muted-foreground'>Ticket Id:</span>
+              <span className='text-sm text-muted-foreground'>Ticket ID:</span>
               <div className='flex items-center gap-2'>
-                <span>{ticketId}</span>
+                <span className='uppercase'>{_id.slice(-6)}...</span>
                 <Button
                   variant='ghost'
                   size='icon'
                   className='h-6 w-6'
-                  onClick={() => navigator.clipboard.writeText(ticketId)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(_id);
+                    toast.success('Copied to clipboard');
+                  }}
                 >
                   <Copy className='h-4 w-4 text-blue-500' />
                 </Button>
@@ -132,24 +120,30 @@ export default function FeedbackTicket({
 
             <div className='grid grid-cols-[120px,1fr] gap-2 items-center'>
               <span className='text-sm text-muted-foreground'>Logged On</span>
-              <span>{loggedOn}</span>
+              <span>{moment(createdAt).format('DD-MM-YYYY')}</span>
             </div>
 
             <div className='grid grid-cols-[120px,1fr] gap-2'>
               <span className='text-sm text-muted-foreground'>Feedback</span>
-              <p className='text-sm'>{feedback}</p>
+              <div
+                className='text-sm'
+                dangerouslySetInnerHTML={{ __html: feedback }}
+              />
             </div>
 
-            {attachments && attachments.length > 0 && (
+            {attachment && (
               <div className='grid grid-cols-[120px,1fr] gap-2'>
                 <span className='text-sm text-muted-foreground'>
-                  Attachments :
+                  Attachment :
                 </span>
-                <div className='flex items-center gap-2 bg-blue-50 rounded-md p-2'>
-                  <span className='text-sm text-blue-500'>
-                    {attachments[0].name}
-                  </span>
-                  <Button variant='ghost' size='icon' className='h-6 w-6'>
+                <div className='flex items-center gap-2 bg-blue-50 rounded-md p-2 w-max'>
+                  <span className='text-sm text-blue-500'>file</span>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-6 w-6'
+                    onClick={() => downloadFile(attachment, attachment)}
+                  >
                     <Download className='h-4 w-4' />
                   </Button>
                 </div>
@@ -157,29 +151,40 @@ export default function FeedbackTicket({
             )}
           </div>
 
-          <Button
+          {/* <Button
             variant='outline'
             size='sm'
             className='text-primary bg-primary/10'
           >
             Open
-          </Button>
+          </Button> */}
         </div>
       </CardContent>
     </Card>
   );
 }
 
-const MessageTab = () => {
+const MessageTab = ({ feedbacks }: any) => {
   const [openCreateTicket, setOpenCreateTicket] = useState(false);
   return (
     <>
       <div className='flex flex-col gap-2 bg-gray-50 p-4'>
         <p className='text-sm text-muted-foreground'>
-          Submit up to 3 tickets for revisions and feedback (0/3)
+          Submit up to 3 tickets for revisions and feedback ({feedbacks.length}
+          /3)
         </p>
         <Button
-          onClick={() => setOpenCreateTicket(true)}
+          onClick={() => {
+            if (feedbacks.length >= 3) {
+              return toast.error(
+                'You have reached the maximum number of tickets',
+                {
+                  position: 'top-center',
+                }
+              );
+            }
+            setOpenCreateTicket(true);
+          }}
           size='sm'
           className='bg-primary text-white w-max'
         >
@@ -206,12 +211,12 @@ const MessageTab = () => {
 
       <div className='mt-auto border-t p-4 absolute bottom-0 w-full bg-background'>
         <div className='flex items-center gap-2'>
-          <Button variant='ghost' size='icon' className='h-8 w-8'>
+          {/* <Button variant='ghost' size='icon' className='h-8 w-8'>
             <Smile className='h-4 w-4' />
           </Button>
           <Button variant='ghost' size='icon' className='h-8 w-8'>
             <Paperclip className='h-4 w-4' />
-          </Button>
+          </Button> */}
           <div className='relative flex-1'>
             <input
               placeholder='Write message'

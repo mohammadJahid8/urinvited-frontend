@@ -10,11 +10,13 @@ const Auth = ({
   subtitle,
   children,
   type,
+  querySuffix,
 }: {
   title: string;
   subtitle: string;
   children: React.ReactNode;
   type: string;
+  querySuffix?: string;
 }) => {
   const { handleResendOTP } = useAppContext();
   const params = useSearchParams();
@@ -94,7 +96,7 @@ const Auth = ({
                           <p className='px-8 text-center text-sm text-muted-foreground'>
                             Don&apos;t have an account?{' '}
                             <Link
-                              href='/signup'
+                              href={`/signup${querySuffix}`}
                               className='underline underline-offset-4 hover:text-primary'
                             >
                               Signup now
@@ -105,7 +107,7 @@ const Auth = ({
                         <p className='px-8 text-center text-sm text-muted-foreground'>
                           Already have an account?{' '}
                           <Link
-                            href='/login'
+                            href={`/login${querySuffix}`}
                             className='underline underline-offset-4 hover:text-primary'
                           >
                             Login now

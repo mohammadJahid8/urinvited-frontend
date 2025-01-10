@@ -7,7 +7,7 @@ import Auth from '@/components/auth/auth';
 import AuthForm from '@/components/auth/auth-form';
 import api from '@/utils/axiosInstance';
 import { useAppContext } from '@/lib/context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 const loginFields = [
   {
     name: 'email',
@@ -32,7 +32,10 @@ const loginFields = [
 
 export default function Login() {
   const router = useRouter();
-  const { userRefetch, setUserRefetch } = useAppContext();
+  const { refetchUser } = useAppContext();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
+  const querySuffix = queryString ? `?${queryString}` : '';
 
   const handleSubmit = async (data: any) => {
     try {
@@ -42,14 +45,19 @@ export default function Login() {
         const accessToken = promise.data.data.accessToken;
         const role = promise.data.data.role;
         window.localStorage.setItem('rmToken', accessToken);
-        setUserRefetch(!userRefetch);
+        refetchUser();
         toast.success(`Logged in`, {
           position: 'top-center',
         });
+
+        if (querySuffix) {
+          return router.push(`/video-preview${querySuffix}`);
+        }
+
         if (role === 'admin') {
-          router.push('/manage-events');
+          return router.push('/manage-events');
         } else {
-          router.push('/events');
+          return router.push('/events');
         }
       }
     } catch (error: any) {
@@ -62,7 +70,7 @@ export default function Login() {
   };
 
   return (
-    <Auth title={'Login'} subtitle={' '} type='login'>
+    <Auth title={'Login'} subtitle={' '} type='login' querySuffix={querySuffix}>
       <AuthForm
         inputFields={loginFields}
         onSubmit={handleSubmit}

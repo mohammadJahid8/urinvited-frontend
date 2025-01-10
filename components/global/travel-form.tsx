@@ -6,10 +6,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Editor } from '@tinymce/tinymce-react';
-
-import { Button } from '../ui/button';
-import { Plus, Trash2 } from 'lucide-react';
 
 const TravelForm = ({ form }: { form: any }) => {
   return (
@@ -29,7 +25,7 @@ const TravelForm = ({ form }: { form: any }) => {
       />
       <FormField
         control={form.control}
-        name={`link`}
+        name={`travelSourceLink`}
         render={({ field }) => (
           <FormItem className='flex flex-col gap-2 space-y-0'>
             <FormLabel className='font-bold'>Link</FormLabel>

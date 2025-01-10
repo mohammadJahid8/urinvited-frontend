@@ -30,8 +30,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
-export function DataTable({ columns, data }: any) {
+export function DataTable({ columns, data, statusFilter }: any) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -82,32 +89,72 @@ export function DataTable({ columns, data }: any) {
           }
           className='max-w-sm'
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='ml-auto'>
-              Columns <ChevronDown className='ml-2 h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className='capitalize'
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* <select
+          value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
+          onChange={(event) =>
+            table.getColumn('status')?.setFilterValue(event.target.value)
+          }
+          className='max-w-sm'
+        >
+          <option value=''>All</option>
+          <option value='Pending'>Pending</option>
+          <option value='Approved'>Approved</option>
+          <option value='Rejected'>Rejected</option>
+        </select> */}
+
+        {/* custom filter */}
+        <div className='flex items-center gap-2 ml-auto'>
+          {statusFilter && (
+            <Select
+              value={
+                (table.getColumn('status')?.getFilterValue() as string) ?? ''
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn('status')
+                  ?.setFilterValue(value === 'All' ? '' : value)
+              }
+            >
+              <SelectTrigger className='w-[180px] ml-4'>
+                <SelectValue placeholder='Select status' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='All'>All</SelectItem>
+                <SelectItem value='Pending'>Pending</SelectItem>
+                <SelectItem value='Approved'>Approved</SelectItem>
+                <SelectItem value='Rejected'>Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* default filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' className='ml-auto'>
+                Columns <ChevronDown className='ml-2 h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className='capitalize'
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className='rounded-md border'>
         <Table>
@@ -130,7 +177,7 @@ export function DataTable({ columns, data }: any) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table?.getRowModel()?.rows?.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

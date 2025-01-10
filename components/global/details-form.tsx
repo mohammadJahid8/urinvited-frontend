@@ -1,5 +1,4 @@
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -9,7 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Editor } from '@tinymce/tinymce-react';
 import { Switch } from '../ui/switch';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Select,
   SelectTrigger,
@@ -24,8 +23,16 @@ import { Plus, Trash2 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Label } from '../ui/label';
 import DateInput from './date-input';
+import LocationMap from './location-map';
+import LocationInput from './location-input';
 
-const timeZones = ['Indian Standard Time', 'GMT', 'UTC', 'EST', 'PST'];
+const timeZones = [
+  { value: 'IST', label: 'Indian Standard Time' },
+  { value: 'GMT', label: 'GMT' },
+  { value: 'UTC', label: 'UTC' },
+  { value: 'EST', label: 'EST' },
+  { value: 'PST', label: 'PST' },
+];
 
 const DetailsForm = ({
   form,
@@ -34,6 +41,8 @@ const DetailsForm = ({
   remove,
   hasEndDate,
   setHasEndDate,
+  selectedLocation,
+  setSelectedLocation,
 }: {
   form: any;
   fields: any;
@@ -41,11 +50,15 @@ const DetailsForm = ({
   remove: any;
   hasEndDate: boolean;
   setHasEndDate: (value: boolean) => void;
+  selectedLocation: any;
+  setSelectedLocation: (value: any) => void;
 }) => {
   const [inviteDetails, setInviteDetails] = useState(false);
 
+  console.log('selectedLocation', selectedLocation);
+
   return (
-    <div className='flex flex-col gap-6'>
+    <div className='flex flex-col gap-6' key={form.watch('events.0.timeZone')}>
       <FormField
         control={form.control}
         name='hostedBy'
@@ -70,6 +83,9 @@ const DetailsForm = ({
           key={index}
           index={index}
           remove={remove}
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+          event={event}
         />
       ))}
 
@@ -103,7 +119,16 @@ const DetailsForm = ({
 
 export default DetailsForm;
 
-const EachEvent = ({ form, setHasEndDate, hasEndDate, index, remove }: any) => {
+const EachEvent = ({
+  form,
+  setHasEndDate,
+  hasEndDate,
+  index,
+  remove,
+  selectedLocation,
+  setSelectedLocation,
+  event,
+}: any) => {
   return (
     <>
       <FormField
@@ -232,14 +257,14 @@ const EachEvent = ({ form, setHasEndDate, hasEndDate, index, remove }: any) => {
                       name={`events.${index}.timeZone`}
                       render={({ field }) => (
                         <FormItem className='w-full'>
-                          <Select onValueChange={field.onChange}>
+                          <Select onValueChange={field.onChange} {...field}>
                             <SelectTrigger>
                               <SelectValue placeholder='Select time zone' />
                             </SelectTrigger>
                             <SelectContent>
                               {timeZones.map((tz) => (
-                                <SelectItem key={tz} value={tz}>
-                                  {tz}
+                                <SelectItem key={tz.value} value={tz.value}>
+                                  {tz.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -325,12 +350,40 @@ const EachEvent = ({ form, setHasEndDate, hasEndDate, index, remove }: any) => {
                     render={({ field }) => (
                       <FormItem className='w-full'>
                         <FormControl>
-                          <Input placeholder='Location Name' {...field} />
+                          {/* <Input placeholder='Location Name' {...field}    /> */}
+                          <LocationInput
+                            setSelectedLocation={setSelectedLocation}
+                            field={field}
+                            form={form}
+                            index={index}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  {/* <input
+                    type='hidden'
+                    {...form.register(`events.${index}.latLng`)}
+                    value={JSON.stringify(selectedLocation)}
+                  /> */}
+                  <FormField
+                    control={form.control}
+                    name={`events.${index}.latLng`}
+                    render={({ field }) => (
+                      <FormItem className='w-full'>
+                        {console.log({ field })}
+                        <FormControl>
+                          <Input type='hidden' {...field} />
+                        </FormControl>
+                        {field.value?.lat && field.value?.lng && (
+                          <LocationMap selectedLocation={field.value} />
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name={`events.${index}.address`}

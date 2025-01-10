@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { toast } from 'sonner';
 import Auth from '@/components/auth/auth';
 import AuthForm from '@/components/auth/auth-form';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppContext } from '@/lib/context';
 import api from '@/utils/axiosInstance';
 const registerFields = [
@@ -58,19 +58,22 @@ const registerFields = [
 
 export default function Signup() {
   const router = useRouter();
-  const { userRefetch, setUserRefetch } = useAppContext();
+  const { refetchUser } = useAppContext();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
+  const querySuffix = queryString ? `?${queryString}` : '';
 
   const handleSubmit = async (data: any) => {
     try {
       const promise = await api.post(`/user/signup`, data);
       if (promise?.status === 200) {
         window.localStorage.setItem('rmToken', promise?.data?.data ?? '');
-        setUserRefetch(!userRefetch);
+        refetchUser();
         setTimeout(() => {
           toast.success(`Signed up`, {
             position: 'top-center',
           });
-          router.push('/login');
+          router.push(`/login${querySuffix}`);
         }, 1000);
       }
     } catch (error: any) {
@@ -83,7 +86,12 @@ export default function Signup() {
   };
 
   return (
-    <Auth title={'Signup'} subtitle={' '} type='signup'>
+    <Auth
+      title={'Signup'}
+      subtitle={' '}
+      type='signup'
+      querySuffix={querySuffix}
+    >
       <AuthForm
         inputFields={registerFields}
         onSubmit={handleSubmit}

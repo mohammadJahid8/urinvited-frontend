@@ -6,9 +6,7 @@ const PublicLayout = ({ children }: any) => {
       <Navbar />
       {/* <VideoPreviewNav /> */}
 
-      <div className='h-[calc(100vh-64px)] overflow-y-auto p-10'>
-        {children}
-      </div>
+      <div className='h-[calc(100vh-64px)] overflow-y-auto'>{children}</div>
     </div>
   );
 };

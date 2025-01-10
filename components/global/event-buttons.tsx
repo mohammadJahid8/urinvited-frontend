@@ -1,19 +1,32 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '../ui/button';
 
 export default function EventButtons() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
 
   const buttons = [
-    { name: 'details', label: 'Event Details', path: 'event-details' },
-    { name: 'customization', label: 'Customization', path: 'customization' },
+    {
+      name: 'details',
+      label: 'Event Details',
+      path: 'event-details',
+      href: `event-details?id=${id}`,
+    },
+    {
+      name: 'customization',
+      label: 'Customization',
+      path: 'customization',
+      href: `customization?id=${id}`,
+    },
     {
       name: 'additionalFeatures',
       label: 'Additional features',
       path: 'additional-features',
+      href: `additional-features?id=${id}`,
     },
   ];
 
@@ -29,7 +42,7 @@ export default function EventButtons() {
               : 'bg-white text-gray-700 hover:bg-gray-100'
           }`}
           onClick={() => {
-            router.push(button.path);
+            router.push(button.href);
           }}
         >
           {button.label}

@@ -45,7 +45,7 @@ const DetailsCustomizationForm = ({ form }: { form: any }) => {
           <FormItem className='flex flex-col gap-2 space-y-0'>
             <FormLabel className='font-bold'>Heading Font</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Heading Font' />
                 </SelectTrigger>
@@ -71,7 +71,7 @@ const DetailsCustomizationForm = ({ form }: { form: any }) => {
             <FormLabel className='font-bold'>Date/Time/Location Font</FormLabel>
 
             <FormControl>
-              <Select onValueChange={field.onChange}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Date/Time/Location Font' />
                 </SelectTrigger>
@@ -97,7 +97,7 @@ const DetailsCustomizationForm = ({ form }: { form: any }) => {
             <FormLabel className='font-bold'>Description Font</FormLabel>
 
             <FormControl>
-              <Select onValueChange={field.onChange}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Description Font' />
                 </SelectTrigger>

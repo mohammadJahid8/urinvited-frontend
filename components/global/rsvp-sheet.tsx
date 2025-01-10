@@ -25,12 +25,13 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { useAppContext } from '@/lib/context';
 
 type RSVPOption = 'yes' | 'no' | 'decide-later';
 
 export default function RSVPSheet() {
   const [rsvpOption, setRsvpOption] = useState<RSVPOption | null>('yes');
-
+  const { openRSVP, setOpenRSVP } = useAppContext();
   const [totalGuests, setTotalGuests] = useState<string>('1');
   const [guests, setGuests] = useState([
     { id: '1', name: 'Kushboo R', isAdult: true },
@@ -79,13 +80,7 @@ export default function RSVPSheet() {
   };
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        {/* <Button variant="outline">RSVP Now</Button> */}
-        <Button className='max-w-[172px] w-full py-2 mt-2 text-white'>
-          RSVP Now
-        </Button>
-      </SheetTrigger>
+    <Sheet open={openRSVP} onOpenChange={setOpenRSVP}>
       <SheetContent className='w-full sm:max-w-[485px] overflow-y-auto p-0'>
         <div className='relative p-6'>
           <SheetHeader className='space-y-4'>

@@ -21,7 +21,7 @@ const loginFields = [
 
 export default function ResetPassword() {
   const router = useRouter();
-  const { userRefetch, setUserRefetch } = useAppContext();
+  const { refetchUser } = useAppContext();
 
   const params = useSearchParams();
   const email = params.get('email');
@@ -31,7 +31,7 @@ export default function ResetPassword() {
     try {
       const promise = await api.post(`/auth/reset-password`, data);
       if (promise.status === 200) {
-        setUserRefetch(!userRefetch);
+        refetchUser();
         toast.success(
           `Password reset successful. Login with your new password`,
           {

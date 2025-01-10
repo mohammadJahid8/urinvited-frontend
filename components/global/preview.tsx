@@ -3,7 +3,6 @@ import {
   Share2,
   Heart,
   Plane,
-  Building2,
   Calendar,
   MapPin,
   Hotel,
@@ -11,13 +10,18 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-import Link from 'next/link';
 import useStore from '@/app/store/useStore';
 import Image from 'next/image';
 import React from 'react';
 import { format, parse } from 'date-fns';
 import { cn } from '@/lib/utils';
 import RSVPSheet from './rsvp-sheet';
+import api from '@/utils/axiosInstance';
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
+
+import moment from 'moment';
+import { useAppContext } from '@/lib/context';
 
 const convertTime = (timeString: string) => {
   // Parse the time string into a Date object
@@ -26,43 +30,89 @@ const convertTime = (timeString: string) => {
   return format(time, 'hh:mm a');
 };
 
-export default function Preview() {
+export default function Preview({ className }: any) {
   const { formData } = useStore();
-  const eventDetails = formData?.eventDetails;
+  const { setOpenRSVP, event, isEventLoading } = useAppContext();
+
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+
+  if (isEventLoading) {
+    return <div>Loading...</div>;
+  }
+
+  const eventDetails = formData?.eventDetails || event?.eventDetails;
+  const customization = formData?.customization || event?.customization;
+  const additionalFeatures =
+    formData?.additionalFeatures || event?.additionalFeatures;
+
+  console.log({ eventDetails, customization, additionalFeatures });
+
   const events = eventDetails?.events;
-  const hostedBy = eventDetails?.hostedBy;
+  const hostedBy = event?.hostedBy;
+  const requestRsvps = eventDetails?.requestRsvps;
   const rsvpDueDate = eventDetails?.rsvpDueDate;
   const isRsvpDueDateSet = eventDetails?.isRsvpDueDateSet;
+  const allowRsvpAfterDueDate = eventDetails?.allowRsvpAfterDueDate;
+  const allowAdditionalAttendees = eventDetails?.allowAdditionalAttendees;
+  const additionalAttendees = eventDetails?.additionalAttendees;
+  const maximumCapacity = eventDetails?.maximumCapacity;
 
-  const customization = formData?.customization;
-  const eventLogo = customization?.eventLogo
-    ? URL.createObjectURL(customization.eventLogo)
-    : null;
-  const themeBackgroundImage = customization?.themeBackgroundImage
-    ? URL.createObjectURL(customization.themeBackgroundImage)
-    : 'https://i.ibb.co/hV7nmSc/5628-Anyoh-and-Eugene-s-little-man-baby-shower-static.jpg';
-  const footerBackgroundImage = customization?.footerBackgroundImage
-    ? URL.createObjectURL(customization.footerBackgroundImage)
-    : null;
-  const thumbnailImage = customization?.thumbnailImage
-    ? URL.createObjectURL(customization.thumbnailImage)
-    : null;
-  console.log({
-    eventDetails,
-    eventLogo,
-    themeBackgroundImage,
-    footerBackgroundImage,
-    thumbnailImage,
-  });
+  const isEventLogoEnabled = customization?.isEventLogoEnabled;
+  const isThemeBackgroundImageEnabled =
+    customization?.isThemeBackgroundImageEnabled;
+  const isFooterBackgroundImageEnabled =
+    customization?.isFooterBackgroundImageEnabled;
+  const isThumbnailImageEnabled = customization?.isThumbnailImageEnabled;
+  const textColour = customization?.textColour;
+  const headingFont = customization?.headingFont;
+  const dateTimeLocationFont = customization?.dateTimeLocationFont;
+  const descriptionFont = customization?.descriptionFont;
+  const buttonFont = customization?.buttonFont;
+  const buttonText = customization?.buttonText;
+  const buttonColour = customization?.buttonColour;
+  const buttonFormat = customization?.buttonFormat;
+  const isAddToCalendar = customization?.isAddToCalendar;
+  const reactToEvent = customization?.reactToEvent;
+  const shareEvent = customization?.shareEvent;
+  // const commentOnEvent = customization?.commentOnEvent;
+
+  const registry = additionalFeatures?.registry;
+  const accommodation = additionalFeatures?.accommodation;
+  const travelSource = additionalFeatures?.travelSource;
+  const travelSourceLink = additionalFeatures?.travelSourceLink;
+
+  const createImageUrl = (image: any) =>
+    typeof image === 'string'
+      ? image
+      : image
+      ? URL.createObjectURL(image)
+      : null;
+
+  const eventLogo = createImageUrl(customization?.eventLogo);
+  const themeBackgroundImage = createImageUrl(
+    customization?.themeBackgroundImage
+  );
+  const footerBackgroundImage = createImageUrl(
+    customization?.footerBackgroundImage
+  );
+  const thumbnailImage =
+    createImageUrl(customization?.thumbnailImage) ||
+    event?.video?.videos[event?.video?.videos?.length - 1]?.thumbnail;
+
+  const videoUrl = event?.video?.videos[event?.video?.videos?.length - 1]?.url;
+
   return (
     <div
-      className={cn('bg-cover bg-center bg-no-repeat')}
-      style={{ background: themeBackgroundImage! }}
+      className={cn('bg-cover bg-center bg-no-repeat p-10', className)}
+      style={{
+        backgroundImage: themeBackgroundImage
+          ? `url(${themeBackgroundImage})`
+          : 'none',
+      }}
       key={themeBackgroundImage}
     >
       <div className=''>
-        {/* Logo */}
-
         {/* Video Section */}
         <div className='relative max-w-[300px] mx-auto rounded-lg shadow-lg overflow-hidden'>
           <video
@@ -72,32 +122,38 @@ export default function Preview() {
             playsInline
             controls
           >
-            <source src='/preview-video.mp4' type='video/mp4' />
+            <source src={videoUrl} type='video/mp4' />
             Your browser does not support the video tag.
           </video>
 
           <div className='absolute top-3 right-3 bg-white text-black text-sm font-medium px-2 py-1 rounded-lg shadow-md'>
             <div className='text-center'>
-              <p>15</p>
-              <span>May</span>
+              <p>{moment(eventDetails?.events?.[0]?.startDate).format('DD')}</p>
+              <span>
+                {moment(eventDetails?.events?.[0]?.startDate).format('MMM')}
+              </span>
             </div>
           </div>
 
           <div className='flex gap-6 bg-white/80 backdrop-blur-md px-4 rounded-b-lg shadow-md'>
-            <Button
-              variant='special'
-              className='flex items-center gap-2 text-gray-700 hover:text-black'
-            >
-              <Share2 className='size-4' />
-              Share Invite
-            </Button>
-            <Button
-              variant='special'
-              className='flex items-center gap-2 text-gray-700 hover:text-black'
-            >
-              <Heart className='size-4' />
-              Reaction
-            </Button>
+            {shareEvent && (
+              <Button
+                variant='special'
+                className='flex items-center gap-2 text-gray-700 hover:text-black'
+              >
+                <Share2 className='size-4' />
+                Share Event
+              </Button>
+            )}
+            {reactToEvent && (
+              <Button
+                variant='special'
+                className='flex items-center gap-2 text-gray-700 hover:text-black'
+              >
+                <Heart className='size-4' />
+                Reaction
+              </Button>
+            )}
           </div>
         </div>
 
@@ -119,6 +175,7 @@ export default function Preview() {
                 virtualPlatformName,
                 virtualUrl,
                 showGoogleMap,
+                latLng,
               }: any,
               index: number
             ) => (
@@ -142,7 +199,7 @@ export default function Preview() {
                   address ||
                   locationName) && (
                   <div className='space-y-4 text-center'>
-                    <div className='border-t border-dashed border-gray-300 max-w-[300px] mx-auto w-full'></div>
+                    <Border />
 
                     {(startDate ||
                       startTime ||
@@ -171,9 +228,11 @@ export default function Preview() {
                               {timeZone && `| ${timeZone}`}
                             </span>
                           </div>
-                          <a href='#' className='text-blue-500 text-base'>
-                            Add to Calendar
-                          </a>
+                          {isAddToCalendar && (
+                            <a href='#' className='text-blue-500 text-base'>
+                              Add to Calendar
+                            </a>
+                          )}
                         </div>
                       )}
 
@@ -187,7 +246,10 @@ export default function Preview() {
                             </span>
                           </div>
                           {showGoogleMap && (
-                            <a href='#' className='text-blue-500 text-base'>
+                            <a
+                              href={`https://www.google.com/maps?q=${latLng?.lat},${latLng?.lng}`}
+                              className='text-blue-500 text-base'
+                            >
                               View Map
                             </a>
                           )}
@@ -213,7 +275,7 @@ export default function Preview() {
                         </div>
                       )}
 
-                    <div className='border-t border-dashed border-gray-300 max-w-[300px] mx-auto w-full'></div>
+                    <Border />
                   </div>
                 )}
               </React.Fragment>
@@ -226,36 +288,63 @@ export default function Preview() {
             </p>
           )}
 
-          {/* RSVP Button */}
-          {/* {isRsvpDueDateSet && rsvpDueDate && ( */}
           <div className='text-center'>
-            {/* <p className='text-sm text-gray-500'>
-              RSVP by {format(new Date(rsvpDueDate), 'MM/dd/yyyy')}
-            </p> */}
+            {isRsvpDueDateSet && rsvpDueDate && (
+              <>
+                <Border />
+                <p className='text-sm text-gray-500 pt-4'>
+                  RSVP by {format(new Date(rsvpDueDate), 'MM/dd/yyyy')}
+                </p>
+              </>
+            )}
+            {requestRsvps && (
+              <Button
+                className={cn(
+                  'max-w-[172px] w-full py-2 mt-2 text-white',
+                  buttonFormat === 'rounded' && 'rounded-full'
+                )}
+                style={{
+                  backgroundColor: buttonColour,
+                }}
+                onClick={() => setOpenRSVP(true)}
+              >
+                {buttonText || 'RSVP Now'}
+              </Button>
+            )}
             <RSVPSheet />
           </div>
-          {/* )} */}
 
           {/* Gift Section */}
-          <div className='p-4 bg-gray-50 shadow-sm text-center space-y-4'>
-            <img src='/gift.svg' alt='Gift' className='mx-auto h-10' />
-            <h2 className='text-xl font-bold'>
-              Choose a Gift for the Celebration
-            </h2>
-            <p className='text-sm text-gray-500'>
-              Hi [Invitee&apos;s Name], feel free to pick a gift from the link
-              below if you&apos;d like. Your presence is the best gift!
-            </p>
-            <Button
-              variant='outline'
-              className='max-w-[172px] w-full py-2 mt-2 border rounded-lg text-blue-600 border-blue-600 hover:bg-blue-100'
-            >
-              Shop Gifts
-            </Button>
-          </div>
+          {registry &&
+            registry.map((item: any, index: number) => (
+              <div
+                className='p-4 bg-gray-50 shadow-sm text-center space-y-4'
+                key={index}
+              >
+                <img src='/gift.svg' alt='Gift' className='mx-auto h-10' />
+                <h2 className='text-xl font-bold'>{item.title}</h2>
+                <div
+                  className='text-sm text-gray-500'
+                  dangerouslySetInnerHTML={{ __html: item.description }}
+                />
+                {item.url && (
+                  <Button
+                    href={item.url}
+                    target='_blank'
+                    variant='outline'
+                    className={cn(
+                      'max-w-[172px] w-full py-2 mt-2 border rounded-lg text-blue-600 border-blue-600 hover:bg-blue-100',
+                      buttonFormat === 'rounded' && 'rounded-full'
+                    )}
+                  >
+                    Shop Gifts
+                  </Button>
+                )}
+              </div>
+            ))}
 
           {/* Custom Section */}
-          <div className='space-y-4 text-center'>
+          {/* <div className='space-y-4 text-center'>
             <h2 className='text-xl font-bold'>Custom Title</h2>
             <p className='text-sm text-gray-600'>
               Lorem ipsum dolor sit amet consectetur. Sapien facilisis praesent
@@ -268,21 +357,51 @@ export default function Preview() {
             >
               Custom Button
             </Button>
-          </div>
+          </div> */}
 
           {/* Footer Icons */}
-          <div className='flex justify-center gap-8 py-4 bg-gray-50 shadow-sm items-center'>
-            <div className='flex items-center gap-1'>
-              <Car className='w-6 h-6 text-blue-600' />
-              <span className='text-sm text-gray-700'>Travel</span>
+          {(accommodation || travelSource) && (
+            <div className='flex flex-col justify-center gap-4 py-4 bg-gray-50 shadow-sm items-center'>
+              {travelSource && (
+                <Button
+                  href={travelSourceLink}
+                  target='_blank'
+                  variant='special'
+                  className='flex items-center gap-1 text-gray-700 hover:text-black hover:underline'
+                >
+                  <Car className='w-6 h-6 text-blue-600' />
+                  <span className='text-sm text-gray-700'>{travelSource}</span>
+                </Button>
+              )}
+
+              {accommodation?.length > 0 &&
+                accommodation.map(
+                  (item: any, index: number) =>
+                    item?.accommodationName && (
+                      <>
+                        <div
+                          className='flex flex-col items-center gap-1'
+                          key={index}
+                        >
+                          <div className='flex items-center gap-1'>
+                            <Hotel className='w-6 h-6 text-blue-600' />
+                            <span className='text-sm text-gray-700'>
+                              {item.accommodationName}, {item.location}
+                            </span>
+                          </div>
+
+                          <div
+                            className='text-sm text-gray-700'
+                            dangerouslySetInnerHTML={{ __html: item.note }}
+                          />
+                        </div>
+                      </>
+                    )
+                )}
             </div>
-            <div className='flex items-center gap-1'>
-              <Hotel className='w-6 h-6 text-blue-600' />
-              <span className='text-sm text-gray-700'>Accommodation</span>
-            </div>
-          </div>
+          )}
         </div>
-        {footerBackgroundImage && (
+        {footerBackgroundImage && isFooterBackgroundImageEnabled && (
           <Image
             src={footerBackgroundImage}
             alt='Footer'
@@ -292,7 +411,7 @@ export default function Preview() {
           />
         )}
         <div className='p-4 flex justify-center'>
-          {eventLogo && (
+          {eventLogo && isEventLogoEnabled && (
             <img src={eventLogo} alt='Event Logo' width={150} height={100} />
           )}
         </div>
@@ -300,3 +419,9 @@ export default function Preview() {
     </div>
   );
 }
+
+const Border = () => {
+  return (
+    <div className='border-t border-dashed border-gray-300 max-w-[300px] mx-auto w-full'></div>
+  );
+};

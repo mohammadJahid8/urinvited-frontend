@@ -12,11 +12,27 @@ import RsvpForm from './rsvp-form';
 import GuestManagementForm from './guest-management-form';
 import api from '@/utils/axiosInstance';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAppContext } from '@/lib/context';
+import LoadingOverlay from './loading-overlay';
 
 const EventDetails = () => {
   const { updateFormData, formData } = useStore();
   const [hasEndDate, setHasEndDate] = useState(false);
-  console.log({ formData });
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  const { refetchEvents, event, isEventLoading, refetchEvent } =
+    useAppContext();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<any>({
+    lat: null,
+    lng: null,
+  });
+  const eventDetails = event?.eventDetails?.events;
+
+  // console.log({ formData });
 
   const schemaFields: Record<string, z.ZodTypeAny> = {
     // event details
@@ -58,6 +74,7 @@ const EventDetails = () => {
           virtualUrl: z.string().optional(),
           when: z.enum(['startDateTime', 'tbd']),
           locationType: z.enum(['in-person', 'virtual']),
+          latLng: z.any().optional(),
         })
         .superRefine((data, ctx) => {
           // Conditional validation for startDate
@@ -93,12 +110,20 @@ const EventDetails = () => {
           }
 
           if (data.inviteDetails === true) {
-            ctx.addIssue({
-              code: 'custom',
-              path: ['inviteDetails'],
-              message: 'Invite details is required',
-            });
+            if (typeof data.inviteDetails !== 'string') {
+              ctx.addIssue({
+                code: 'custom',
+                path: ['inviteDetails'],
+                message: 'Invite details is required',
+              });
+            } else {
+              delete data.inviteDetails;
+            }
           }
+          // else {
+          //   console.log('inviteDetails', data.inviteDetails);
+          //   delete data.inviteDetails;
+          // }
 
           if (data.locationType === 'in-person') {
             if (!data.locationName) {
@@ -142,7 +167,7 @@ const EventDetails = () => {
         })
     ),
     // rsvps
-    // requestRsvps: z.boolean().optional(),
+    requestRsvps: z.boolean().optional(),
     isRsvpDueDateSet: z.boolean().optional(),
     rsvpDueDate: z
       .any()
@@ -204,36 +229,43 @@ const EventDetails = () => {
     }
   });
 
+  // console.log({ eventDetails });
+
   const defaultValues = {
-    hostedBy: '',
-    events: [
-      {
-        title: '',
-        inviteDetails: true,
-        startDate: undefined,
-        startTime: undefined,
-        timeZone: '',
-        endDate: undefined,
-        endTime: undefined,
-        locationName: '',
-        address: '',
-        showGoogleMap: false,
-        virtualPlatformName: '',
-        virtualUrl: '',
-        when: 'startDateTime',
-        locationType: 'in-person',
-      },
-    ],
-    // requestRsvps: true,
-    isRsvpDueDateSet: true,
-    rsvpDueDate: undefined,
-    allowRsvpAfterDueDate: true,
+    hostedBy: event?.hostedBy || '',
+    events:
+      eventDetails?.length > 0
+        ? eventDetails
+        : [
+            {
+              title: '',
+              inviteDetails: true,
+              startDate: undefined,
+              startTime: undefined,
+              timeZone: '',
+              endDate: undefined,
+              endTime: undefined,
+              locationName: '',
+              address: '',
+              showGoogleMap: false,
+              virtualPlatformName: '',
+              virtualUrl: '',
+              when: 'startDateTime',
+              locationType: 'in-person',
+              latLng: undefined,
+            },
+          ],
+    requestRsvps: event?.eventDetails?.requestRsvps || true,
+    isRsvpDueDateSet: event?.eventDetails?.isRsvpDueDateSet || true,
+    rsvpDueDate: event?.eventDetails?.rsvpDueDate || undefined,
+    allowRsvpAfterDueDate: event?.eventDetails?.allowRsvpAfterDueDate || true,
     // autoReminder: false,
     // guest management
-    allowAdditionalAttendees: true,
-    additionalAttendees: '1',
-    isMaximumCapacitySet: true,
-    maximumCapacity: '1',
+    allowAdditionalAttendees:
+      event?.eventDetails?.allowAdditionalAttendees || true,
+    additionalAttendees: event?.eventDetails?.additionalAttendees || '1',
+    isMaximumCapacitySet: event?.eventDetails?.isMaximumCapacitySet || true,
+    maximumCapacity: event?.eventDetails?.maximumCapacity || '1',
     // trackAttendees: true,
     // sendReminderToAttendees: true,
     // attendingReminderDate: undefined,
@@ -245,12 +277,25 @@ const EventDetails = () => {
     defaultValues,
   });
 
+  useEffect(() => {
+    if (
+      event &&
+      event?.eventDetails &&
+      event?.eventDetails?.events?.length > 0
+    ) {
+      form.reset({
+        ...event,
+        ...event?.eventDetails,
+      });
+    }
+  }, [event, form.reset]);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'events',
   });
 
-  const eventDetails = [
+  const eventDetailsComponent = [
     {
       trigger: 'Event Details',
       content: (
@@ -261,6 +306,8 @@ const EventDetails = () => {
           remove={remove}
           hasEndDate={hasEndDate}
           setHasEndDate={setHasEndDate}
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
         />
       ),
     },
@@ -290,15 +337,37 @@ const EventDetails = () => {
     [updateFormData, formData]
   );
 
+  console.log('form.formState.isDirty', form.formState.isDirty);
+
   const handleSubmit = async (data: any) => {
-    // console.log({ data });
-    data.userEmail = 'mohammadjahid0007@gmail.com';
+    if (!form.formState.isDirty) {
+      return router.push(`/customization?id=${id}`);
+    }
+    setIsSubmitting(true);
+
+    const { hostedBy, ...eventDetails } = data;
+
+    const payload: any = {
+      hostedBy,
+      eventDetails,
+    };
+
+    if (id) {
+      payload.eventId = id;
+    }
+
+    console.log('payload', payload);
+
     try {
-      const promise = await api.patch(`/event/create`, data);
+      const promise = await api.patch(`/event/create`, payload);
       if (promise?.status === 200) {
         toast.success(`Event details updated`, {
           position: 'top-center',
         });
+        refetchEvents();
+        refetchEvent();
+        router.push(`/customization?id=${id}`);
+        setIsSubmitting(false);
       }
     } catch (error: any) {
       console.error(error);
@@ -312,21 +381,21 @@ const EventDetails = () => {
     }
   };
 
-  // console.log('form.watch', form.watch('events'));
-
   useEffect(() => {
     const subscription = form.watch((value) => {
-      console.log({ value });
       onChange(value);
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
 
+  if (isEventLoading) return <div>Loading...</div>;
+
   return (
     <Form {...form}>
+      {isSubmitting && <LoadingOverlay />}
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <div className='flex flex-col gap-6'>
-          <EventAccordion items={eventDetails} />
+          <EventAccordion items={eventDetailsComponent} />
           <EventAccordion items={rsvps} />
           <EventAccordion items={guestManagement} />
           <BottomButtons />

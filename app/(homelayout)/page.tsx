@@ -6,15 +6,20 @@ import { redirect } from 'next/navigation';
 const Home: React.FC = () => {
   const { user } = useAppContext();
 
+  // check if the url has any query params
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryString = urlParams.toString();
+  const querySuffix = queryString ? `?${queryString}` : '';
+
   if (user?.role === 'admin') {
-    return redirect('/manage-events');
+    return redirect(`/manage-events${querySuffix}`);
   }
 
   if (user?.role === 'user') {
-    return redirect('/events');
+    return redirect(`/events${querySuffix}`);
   }
 
-  return redirect('/login');
+  return redirect(`/login${querySuffix}`);
 };
 
 export default Home;

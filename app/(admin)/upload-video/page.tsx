@@ -95,9 +95,9 @@ export default function VideoUpload() {
         eventDate: new Date(date).toISOString(),
         userEmail: email,
         uploadedBy: user?._id,
-        url: videourl,
-        thumbnail,
         canvaLink,
+        thumbnail,
+        url: videourl,
       };
 
       const newFormData = new FormData();
@@ -108,14 +108,14 @@ export default function VideoUpload() {
         }
       }
 
-      console.log(newFormData);
+      // console.log(newFormData);
 
-      console.log(payload);
+      // console.log({payload});
 
       if (videourl) {
         const promise = await api.post(`/video/upload`, newFormData);
         if (promise.status === 200) {
-          router.push('/event-details');
+          router.push(`/event-details?id=${promise.data.data.eventId}`);
           setFiles(null);
           setPreview(null);
           setFileInfo(null);

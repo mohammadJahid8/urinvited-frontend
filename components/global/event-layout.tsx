@@ -17,8 +17,8 @@ const EventLayout = ({ children }: any) => {
 
             <div className='px-4'>{children}</div>
           </div>
-          <div className='p-4 h-screen overflow-y-auto bg-gray-100 pt-48'>
-            <Preview />
+          <div className='h-screen overflow-y-auto bg-gray-100'>
+            <Preview className='pt-48' />
           </div>
         </div>
       ) : (

@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 
 import api from '@/utils/axiosInstance';
-import { redirect, usePathname } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { redirect, usePathname, useSearchParams } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -12,17 +13,17 @@ export function useAppContext() {
 }
 
 const ContextProvider = ({ children }: any) => {
-  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [openFeedback, setOpenFeedback] = useState(false);
-  const [userRefetch, setUserRefetch] = useState(false);
 
-  const [usersRefetch, setUsersRefetch] = useState(false);
   const [openEmailPreview, setOpenEmailPreview] = useState(false);
+  const [openRSVP, setOpenRSVP] = useState(false);
 
   const pathname = usePathname();
-  console.log({ pathname });
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  const queryString = searchParams.toString();
+  const querySuffix = queryString ? `?${queryString}` : '';
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -40,26 +41,50 @@ const ContextProvider = ({ children }: any) => {
     skills: '',
   });
 
-  useEffect(() => {
-    const getProfile = async () => {
-      setIsLoading(true);
-
+  const {
+    isLoading,
+    refetch: refetchUser,
+    data: user,
+  } = useQuery({
+    queryKey: [`user`],
+    queryFn: async () => {
       try {
-        const promise = await api.get(`/user/profile`);
-
-        setUser(promise.data.data);
-        setIsLoading(false);
+        const response = await api.get(`/user/profile`);
+        return response?.data?.data;
       } catch (error: any) {
         console.log(error);
-        setIsLoading(false);
         if (error.response.data.message === 'Invalid Token!') {
           localStorage.removeItem('rmToken');
         }
       }
-    };
+    },
+  });
 
-    getProfile();
-  }, [userRefetch]);
+  const {
+    isLoading: isEventsLoading,
+    refetch: refetchEvents,
+    data: events,
+  } = useQuery({
+    queryKey: [`events`, user?.email],
+    queryFn: async () => {
+      const response = await api.get(`/event`);
+      return response?.data?.data;
+    },
+  });
+
+  const {
+    isLoading: isEventLoading,
+    refetch: refetchEvent,
+    data: event,
+  } = useQuery({
+    queryKey: [`event`, id],
+    queryFn: async () => {
+      const response = await api.get(`/event/${id}`);
+      return response?.data?.data;
+    },
+  });
+
+  console.log('event', event);
 
   if (isLoading)
     return (
@@ -70,21 +95,23 @@ const ContextProvider = ({ children }: any) => {
 
   const publicRoutes = ['/login', '/signup', '/preview'];
 
+  console.log('pathname', pathname);
+
   if (!user?.email && !publicRoutes.includes(pathname)) {
-    return redirect('/login');
+    return redirect(`/login${querySuffix}`);
   }
 
-  console.log({ user });
+  // console.log({ user });
   const logout = () => {
     window.localStorage.removeItem('rmToken');
-    setUser({});
+    refetchUser();
   };
 
   const handleResendOTP = async (data: any) => {
     try {
       const promise = await api.post(`/auth/forgot-password`, data);
       if (promise.status === 200) {
-        setUserRefetch(!userRefetch);
+        refetchUser();
         toast.success(`OTP sent to your email.`, {
           position: 'top-center',
         });
@@ -95,12 +122,33 @@ const ContextProvider = ({ children }: any) => {
     }
   };
 
+  const downloadFile = async (file: any, name: any) => {
+    try {
+      const response = await fetch(file);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Revoke the object URL to release memory
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download file:', error);
+    }
+  };
+
   const authInfo = {
     isLoading,
-    userRefetch,
-    setUserRefetch,
-    setIsLoading,
     user,
+    refetchUser,
     loading,
     setLoading,
     logout,
@@ -111,6 +159,15 @@ const ContextProvider = ({ children }: any) => {
     openEmailPreview,
     setOpenEmailPreview,
     handleResendOTP,
+    events,
+    isEventsLoading,
+    refetchEvents,
+    openRSVP,
+    setOpenRSVP,
+    event,
+    isEventLoading,
+    refetchEvent,
+    downloadFile,
   };
 
   return (

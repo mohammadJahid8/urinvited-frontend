@@ -19,7 +19,7 @@ const loginFields = [
 ];
 
 export default function ForgotPassword() {
-  const { userRefetch, setUserRefetch } = useAppContext();
+  const { refetchUser } = useAppContext();
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('qemail');
@@ -31,7 +31,7 @@ export default function ForgotPassword() {
         email: email,
       });
       if (promise.status === 200) {
-        setUserRefetch(!userRefetch);
+        refetchUser();
         toast.success(`OTP verified successfully.`, {
           position: 'top-center',
         });

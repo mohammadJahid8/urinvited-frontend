@@ -13,10 +13,25 @@ import AddImages from './add-images';
 import DetailsCustomizationForm from './details-customization-form';
 import ButtonCustomizationForm from './button-customization-form';
 import GuestEngagementForm from './guest-engagement';
+import api from '@/utils/axiosInstance';
+import { toast } from 'sonner';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useAppContext } from '@/lib/context';
+import LoadingOverlay from './loading-overlay';
+import { useQuery } from '@tanstack/react-query';
 
 const Customization = () => {
   const { updateFormData, formData } = useStore();
-  console.log({ formData });
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { refetchEvents, refetchEvent, event, isEventLoading } =
+    useAppContext();
+
+  const customization = event?.customization;
+  console.log(customization?.buttonFormat);
 
   const schemaFields: Record<string, z.ZodTypeAny> = {
     isEventLogoEnabled: z.boolean().optional(),
@@ -44,37 +59,34 @@ const Customization = () => {
   const formSchema = z.object(schemaFields);
 
   const defaultValues = {
-    isEventLogoEnabled: true,
-    eventLogo: null,
-    isThemeBackgroundImageEnabled: true,
-    themeBackgroundImage: null,
-    isFooterBackgroundImageEnabled: true,
-    footerBackgroundImage: null,
-    isThumbnailImageEnabled: true,
-    thumbnailImage: null,
-    textColour: '#000000',
-    headingFont: 'Lato',
-    dateTimeLocationFont: 'Lato',
-    descriptionFont: 'Lato',
-    buttonFont: 'Lato',
-    buttonText: 'RSVP',
-    buttonColour: '#000000',
-    buttonFormat: 'rectangular',
-    isAddToCalendar: true,
-    reactToEvent: true,
-    shareEvent: true,
-    commentOnEvent: true,
+    isEventLogoEnabled: customization?.isEventLogoEnabled || true,
+    eventLogo: customization?.eventLogo || null,
+    isThemeBackgroundImageEnabled:
+      customization?.isThemeBackgroundImageEnabled || true,
+    themeBackgroundImage: customization?.themeBackgroundImage || null,
+    isFooterBackgroundImageEnabled:
+      customization?.isFooterBackgroundImageEnabled || true,
+    footerBackgroundImage: customization?.footerBackgroundImage || null,
+    isThumbnailImageEnabled: customization?.isThumbnailImageEnabled || true,
+    thumbnailImage: customization?.thumbnailImage || null,
+    textColour: customization?.textColour || '#000000',
+    headingFont: customization?.headingFont || 'Lato',
+    dateTimeLocationFont: customization?.dateTimeLocationFont || 'Lato',
+    descriptionFont: customization?.descriptionFont || 'Lato',
+    buttonFont: customization?.buttonFont || 'Lato',
+    buttonText: customization?.buttonText || 'RSVP',
+    buttonColour: customization?.buttonColour || '#000000',
+    buttonFormat: customization?.buttonFormat || 'rectangular',
+    isAddToCalendar: customization?.isAddToCalendar || true,
+    reactToEvent: customization?.reactToEvent || true,
+    shareEvent: customization?.shareEvent || true,
+    commentOnEvent: customization?.commentOnEvent || true,
   };
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
-
-  // const { fields, append, remove } = useFieldArray({
-  //   control: form.control,
-  //   name: 'events',
-  // });
 
   const addImages = [
     {
@@ -112,11 +124,68 @@ const Customization = () => {
     [updateFormData, formData]
   );
 
-  const handleSubmit = (data: any) => {
-    console.log({ data });
+  console.log('form.formState.isDirty', form.formState.isDirty);
+
+  const handleSubmit = async (data: any) => {
+    if (!form.formState.isDirty) {
+      return router.push(`/additional-features?id=${id}`);
+    }
+    setIsSubmitting(true);
+
+    const {
+      eventLogo,
+      themeBackgroundImage,
+      footerBackgroundImage,
+      thumbnailImage,
+    } = data;
+
+    const formData = new FormData();
+    if (typeof eventLogo === 'object') {
+      formData.append('eventLogo', eventLogo);
+    }
+    if (typeof themeBackgroundImage === 'object') {
+      formData.append('themeBackgroundImage', themeBackgroundImage);
+    }
+    if (typeof footerBackgroundImage === 'object') {
+      formData.append('footerBackgroundImage', footerBackgroundImage);
+    }
+    if (typeof thumbnailImage === 'object') {
+      formData.append('thumbnailImage', thumbnailImage);
+    }
+    formData.append('data', JSON.stringify(data));
+
+    try {
+      const promise = await api.patch(`/event/customization/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (promise?.status === 200) {
+        toast.success(`Event customization updated`, {
+          position: 'top-center',
+        });
+        refetchEvents();
+        refetchEvent();
+        router.push(`/additional-features?id=${id}`);
+        setIsSubmitting(false);
+      }
+    } catch (error: any) {
+      console.error(error);
+
+      return toast.error(
+        error?.response?.data?.message || `Event customization failed`,
+        {
+          position: 'top-center',
+        }
+      );
+    }
   };
 
-  // console.log('form.watch', form.watch('events'));
+  useEffect(() => {
+    if (customization) {
+      form.reset(customization);
+    }
+  }, [customization, form.reset]);
 
   useEffect(() => {
     const subscription = form.watch((value) => {
@@ -128,6 +197,7 @@ const Customization = () => {
 
   return (
     <Form {...form}>
+      {isSubmitting && <LoadingOverlay />}
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <div className='flex flex-col gap-6'>
           <EventAccordion items={addImages} />

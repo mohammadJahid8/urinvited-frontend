@@ -1,5 +1,4 @@
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -8,24 +7,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Editor } from '@tinymce/tinymce-react';
-import { Switch } from '../ui/switch';
-import { useEffect, useState } from 'react';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select';
-import { Checkbox } from '../ui/checkbox';
 
 import { Button } from '../ui/button';
 import { Plus, Trash2 } from 'lucide-react';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { Label } from '../ui/label';
-import DateInput from './date-input';
-
-const timeZones = ['Indian Standard Time', 'GMT', 'UTC', 'EST', 'PST'];
 
 const GiftRegistryForm = ({
   form,
@@ -140,7 +124,7 @@ const EachGiftRegistry = ({ form, index, remove, registry }: any) => {
 
       <FormField
         control={form.control}
-        name={`registry.${index}.title`}
+        name={`registry.${index}.url`}
         render={({ field }) => (
           <FormItem className='flex flex-col gap-2 space-y-0'>
             <FormLabel className='font-bold'>URL</FormLabel>

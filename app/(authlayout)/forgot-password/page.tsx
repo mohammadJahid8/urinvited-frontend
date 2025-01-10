@@ -20,14 +20,14 @@ const loginFields = [
 ];
 
 export default function ForgotPassword() {
-  const { userRefetch, setUserRefetch } = useAppContext();
+  const { refetchUser } = useAppContext();
   const router = useRouter();
 
   const handleSubmit = async (data: any) => {
     try {
       const promise = await api.post(`/auth/forgot-password`, data);
       if (promise.status === 200) {
-        setUserRefetch(!userRefetch);
+        refetchUser();
         toast.success(`Reset password link sent to your email.`, {
           position: 'top-center',
         });
