@@ -93,7 +93,7 @@ const ContextProvider = ({ children }: any) => {
       </div>
     );
 
-  const publicRoutes = ['/login', '/signup', '/preview'];
+  const publicRoutes = ['/login', '/signup', '/event'];
 
   console.log('pathname', pathname);
 

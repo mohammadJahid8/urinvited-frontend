@@ -30,7 +30,7 @@ const convertTime = (timeString: string) => {
   return format(time, 'hh:mm a');
 };
 
-export default function Preview({ className }: any) {
+export default function Event({ className }: any) {
   const { formData } = useStore();
   const { setOpenRSVP, event, isEventLoading } = useAppContext();
 

@@ -1,10 +1,10 @@
-import Preview from '@/components/global/preview';
+import Event from '@/components/global/event';
 import React from 'react';
 
 const PublicPreviewPage = () => {
   return (
     <div>
-      <Preview />
+      <Event />
     </div>
   );
 };

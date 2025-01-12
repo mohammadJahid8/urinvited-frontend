@@ -192,13 +192,14 @@ function EventCard({
               </Button>
 
               <Button
-                href={`/preview?id=${id}`}
+                href={`/event?id=${id}`}
                 variant='outline'
                 className='text-gray-700 flex-grow md:flex-grow-0'
               >
-                View Invite
+                View Event
               </Button>
               <Button
+                href={`/share/${id}`}
                 variant='outline'
                 size='icon'
                 className='flex-grow md:flex-grow-0'

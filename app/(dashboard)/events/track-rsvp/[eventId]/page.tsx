@@ -267,7 +267,7 @@ function Heading({
           variant='outline'
           className='text-primary font-normal hover:no-underline border-primary'
         >
-          View Invite
+          View Event
         </Button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -11,36 +11,67 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { UserCircle, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import GroupGuestModal from './group-guest-modal';
 
-interface Guest {
-  id: string;
-  name: string;
-  contact: string;
-}
-
-export default function GuestList() {
-  const [guests, setGuests] = useState<Guest[]>([]);
-  const [newGuest, setNewGuest] = useState({ name: '', contact: '' });
-  const [rows, setRows] = useState(2); // Number of empty input rows to show
+export default function GuestList({ emails }: { emails: string[] }) {
+  const [guests, setGuests] = useState<any[]>([]);
   const [openGroupModal, setOpenGroupModal] = useState(false);
+  const [guestIndex, setGuestIndex] = useState<number>(0);
 
-  const handleAddGuest = (index: number) => {
-    if (!newGuest.name || !newGuest.contact) return;
+  const handleOpenGroupModal = (index: number) => {
+    setOpenGroupModal(true);
+    setGuestIndex(index);
+  };
 
-    const guest: Guest = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: newGuest.name,
-      contact: newGuest.contact,
-    };
+  useEffect(() => {
+    setGuests((prevGuests) => {
+      const newGuests = emails
+        .filter((email) => !prevGuests.some((guest) => guest.email === email))
+        .map((email, index) => ({
+          id: prevGuests.length + index,
+          name: '',
+          phone: '',
+          email,
+          isAdded: false,
+        }));
+      return [...prevGuests, ...newGuests];
+    });
+  }, [emails]);
 
-    setGuests([...guests, guest]);
-    setNewGuest({ name: '', contact: '' });
+  const handleAddGuest = (guest: any) => {
+    setGuests(
+      guests.map((g) => ({
+        ...g,
+        isAdded: g.id === guest.id ? true : g.isAdded,
+      }))
+    );
+  };
+
+  const handleRemoveGuest = (id: number) => {
+    setGuests(
+      guests.map((g) => ({
+        ...g,
+        isAdded: g.id === id ? false : g.isAdded,
+      }))
+    );
+  };
+
+  console.log({ guests });
+
+  const handleAddGroupGuests = (data: any) => {
+    setGuests((prev) => {
+      const newGuests = [...prev];
+      newGuests[guestIndex].extraGuests = data;
+      return newGuests;
+    });
   };
 
   const handleAddRow = () => {
-    setRows(rows + 1);
+    setGuests((prev) => [
+      ...prev,
+      { id: prev.length + 1, name: '', phone: '', email: '', isAdded: false },
+    ]);
   };
 
   return (
@@ -63,25 +94,36 @@ export default function GuestList() {
           </TableRow>
         </TableHeader>
         <TableBody className='rounded-b-lg border'>
-          {Array.from({ length: rows }).map((_, index) => (
-            <TableRow key={index}>
+          {guests.map((guest, index) => (
+            <TableRow key={guest.id}>
               <TableCell className='border-r'>
                 <Input
                   placeholder='Enter name'
-                  value={index === 0 ? newGuest.name : ''}
+                  value={guest.name}
                   onChange={(e) =>
-                    index === 0 &&
-                    setNewGuest({ ...newGuest, name: e.target.value })
+                    setGuests(
+                      guests.map((guest, i) => ({
+                        ...guest,
+                        name: i === index ? e.target.value : guest.name,
+                      }))
+                    )
                   }
                 />
               </TableCell>
               <TableCell className='border-r'>
                 <Input
                   placeholder='Enter Phone or Email address'
-                  value={index === 0 ? newGuest.contact : ''}
+                  value={guest.phone || guest.email}
                   onChange={(e) =>
-                    index === 0 &&
-                    setNewGuest({ ...newGuest, contact: e.target.value })
+                    setGuests(
+                      guests.map((guest, i) => ({
+                        ...guest,
+                        [guest.phone ? 'phone' : 'email']:
+                          i === index
+                            ? e.target.value
+                            : guest[guest.phone ? 'phone' : 'email'],
+                      }))
+                    )
                   }
                 />
               </TableCell>
@@ -90,17 +132,28 @@ export default function GuestList() {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => setOpenGroupModal(true)}
+                    onClick={() => handleOpenGroupModal(guest.id)}
                   >
                     <Users className='w-5 h-5 text-blue-500' />
                   </Button>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => handleAddGuest(index)}
-                  >
-                    Add
-                  </Button>
+                  {!guest.isAdded && (
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => handleAddGuest(guest)}
+                    >
+                      Add
+                    </Button>
+                  )}
+                  {guest.isAdded && (
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => handleRemoveGuest(guest.id)}
+                    >
+                      Remove
+                    </Button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
@@ -116,7 +169,7 @@ export default function GuestList() {
         + Add Guests
       </Button>
 
-      {guests.length > 0 && (
+      {guests.some((guest) => guest.isAdded) && (
         <div className='mt-8'>
           <h2 className='text-lg font-semibold mb-4'>Added Guests</h2>
           <Table>
@@ -127,12 +180,14 @@ export default function GuestList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {guests.map((guest) => (
-                <TableRow key={guest.id}>
-                  <TableCell>{guest.name}</TableCell>
-                  <TableCell>{guest.contact}</TableCell>
-                </TableRow>
-              ))}
+              {guests
+                .filter((guest) => guest.isAdded)
+                .map((guest) => (
+                  <TableRow key={guest.id}>
+                    <TableCell>{guest.name}</TableCell>
+                    <TableCell>{guest.phone || guest.email}</TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </div>
@@ -140,7 +195,9 @@ export default function GuestList() {
       <GroupGuestModal
         open={openGroupModal}
         onOpenChange={setOpenGroupModal}
-        onAddGuests={() => {}}
+        onAddGuests={handleAddGroupGuests}
+        // @ts-ignore
+        extraGuests={guests?.[guestIndex]?.extraGuests}
       />
     </div>
   );

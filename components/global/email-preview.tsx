@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Editor } from '@tinymce/tinymce-react';
+import Event from './event';
 
 export function EmailPreview() {
   const { openEmailPreview, setOpenEmailPreview } = useAppContext();
@@ -69,7 +70,7 @@ export function EmailPreview() {
           </div>
         </div>
 
-        <Preview data={data} />
+        <Event data={data} />
 
         <div className='mt-auto border-t p-4 absolute bottom-0 w-full bg-background'>
           <div className='flex items-center justify-end gap-2'>

@@ -7,10 +7,12 @@ import GuestList from './guest-list';
 import { EmailPreview } from './email-preview';
 import { useAppContext } from '@/lib/context';
 
-const AddGuests = () => {
+const AddGuests = ({ id }: { id: string }) => {
   const { setOpenEmailPreview } = useAppContext();
   const [emails, setEmails] = React.useState<string[]>([]);
   const [focused, setFocused] = React.useState(false);
+
+  console.log({ emails });
   return (
     <div className='w-full max-w-full sm:max-w-[900px] mx-auto bg-white rounded-lg overflow-hidden shadow-sm border'>
       <div className='bg-gray-100 p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center'>
@@ -59,7 +61,7 @@ const AddGuests = () => {
         </div>
 
         <div className='space-y-2'>
-          <GuestList />
+          <GuestList emails={emails} />
         </div>
       </div>
       <EmailPreview />

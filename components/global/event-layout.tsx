@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import Preview from './preview';
+import Event from './event';
 import EventButtons from './event-buttons';
 import { usePathname } from 'next/navigation';
 
@@ -18,7 +18,7 @@ const EventLayout = ({ children }: any) => {
             <div className='px-4'>{children}</div>
           </div>
           <div className='h-screen overflow-y-auto bg-gray-100'>
-            <Preview className='pt-48' />
+            <Event className='pt-48' />
           </div>
         </div>
       ) : (

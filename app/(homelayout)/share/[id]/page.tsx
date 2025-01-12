@@ -1,10 +1,10 @@
 import Share from '@/components/global/share';
 import React from 'react';
 
-const SharePage = () => {
+const SharePage = ({ params }: { params: { id: string } }) => {
   return (
     <div className=''>
-      <Share />
+      <Share id={params.id} />
     </div>
   );
 };

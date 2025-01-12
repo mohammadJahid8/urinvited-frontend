@@ -184,14 +184,19 @@ const AdditionalFeatures = () => {
   console.log('form.formState.isDirty', form.formState.isDirty);
 
   const handleSubmit = async (data: any) => {
+    const path = user?.role === 'admin' ? '/manage-events' : '/share';
+
     if (!form.formState.isDirty) {
-      return router.push(`/manage-events`);
+      return router.push(path);
     }
-    const isUserConfirmed = window.confirm(
-      'Are you sure? User will be notified.'
-    );
-    if (!isUserConfirmed) {
-      return;
+
+    if (user?.role === 'admin') {
+      const isUserConfirmed = window.confirm(
+        'Are you sure? User will be notified.'
+      );
+      if (!isUserConfirmed) {
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -221,7 +226,7 @@ const AdditionalFeatures = () => {
         });
         refetchEvents();
         refetchEvent();
-        router.push(`/manage-events`);
+        router.push(path);
         setIsSubmitting(false);
       }
     } catch (error: any) {

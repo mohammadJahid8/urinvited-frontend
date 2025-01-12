@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,71 +11,79 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { UserCircle, Circle, Trash2, Baby, User } from 'lucide-react';
 
-interface Guest {
-  id: string;
-  name: string;
-}
-
-interface GuestDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onAddGuests: (guests: Guest[]) => void;
-}
+import { Trash2, Baby, User, Users } from 'lucide-react';
 
 export default function GroupGuestModal({
   open,
   onOpenChange,
   onAddGuests,
-}: GuestDialogProps) {
-  const [totalGuests, setTotalGuests] = useState('2');
-  const [guests, setGuests] = useState<Guest[]>([
-    { id: '1', name: '' },
-    { id: '2', name: '' },
+  extraGuests,
+}: any) {
+  // console.log('extraGuests', extraGuests);
+  const [totalGuests, setTotalGuests] = useState(2);
+  const [guests, setGuests] = useState<any[]>([
+    { id: '1', name: '', isAdult: true },
+    { id: '2', name: '', isAdult: false },
   ]);
 
+  useEffect(() => {
+    console.log('extraGuests', extraGuests);
+    if (extraGuests && extraGuests.length > 0) {
+      setGuests(extraGuests);
+      setTotalGuests(extraGuests.length);
+    } else {
+      setGuests([
+        { id: '1', name: '', isAdult: true },
+        { id: '2', name: '', isAdult: false },
+      ]);
+      setTotalGuests(2);
+    }
+  }, [extraGuests]);
+
   const handleTotalGuestsChange = (value: string) => {
-    setTotalGuests(value);
+    setTotalGuests(parseInt(value));
     const newCount = parseInt(value);
-    if (newCount > guests.length) {
+    if (newCount > guests?.length) {
       // Add more guest inputs
       const additionalGuests = Array.from(
-        { length: newCount - guests.length },
+        { length: newCount - guests?.length },
         (_, index) => ({
-          id: (guests.length + index + 1).toString(),
+          id: (guests?.length + index + 1).toString(),
           name: '',
+          isAdult: true,
         })
       );
       setGuests([...guests, ...additionalGuests]);
     } else {
       // Remove excess guest inputs
-      setGuests(guests.slice(0, newCount));
+      setGuests(guests?.slice(0, newCount));
     }
   };
 
   const handleGuestNameChange = (id: string, name: string) => {
     setGuests(
-      guests.map((guest) => (guest.id === id ? { ...guest, name } : guest))
+      guests?.map((guest) => (guest.id === id ? { ...guest, name } : guest))
     );
   };
 
   const handleDeleteGuest = (id: string) => {
-    setGuests(guests.filter((guest) => guest.id !== id));
-    setTotalGuests(guests.length - 1 + '');
+    setGuests(guests?.filter((guest) => guest.id !== id));
+    setTotalGuests(guests?.length - 1);
   };
 
   const handleAddGuests = () => {
     onAddGuests(guests);
     onOpenChange(false);
   };
+
+  const handleGuestTypeChange = (id: string, isAdult: boolean) => {
+    setGuests(
+      guests?.map((guest) => (guest.id === id ? { ...guest, isAdult } : guest))
+    );
+  };
+
+  console.log('guestsguests', guests);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -87,28 +95,35 @@ export default function GroupGuestModal({
         <div className='grid gap-4 py-4'>
           <div className='grid grid-cols-4 items-center gap-4'>
             <span className='text-sm'>Total Guests</span>
-            <Select value={totalGuests} onValueChange={handleTotalGuestsChange}>
-              <SelectTrigger className='col-span-3'>
-                <SelectValue placeholder='Select number of guests' />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 10 }, (_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()}>
-                    {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              type='number'
+              value={totalGuests}
+              onChange={(e) => handleTotalGuestsChange(e.target.value)}
+              min='1'
+              max='10'
+              className='col-span-3'
+              placeholder='Enter number of guests'
+            />
           </div>
 
           <div className='space-y-4'>
             <span className='text-sm font-medium'>Guest Details</span>
-            {guests.map((guest) => (
+            {guests?.map((guest) => (
               <div key={guest.id} className='flex items-center gap-2'>
-                <Button variant='outline' size='sm'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => handleGuestTypeChange(guest.id, true)}
+                  className={guest.isAdult ? 'bg-primary/10 text-primary' : ''}
+                >
                   <User className='w-5 h-5' />
                 </Button>
-                <Button variant='outline' size='sm'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => handleGuestTypeChange(guest.id, false)}
+                  className={!guest.isAdult ? 'bg-primary/10 text-primary' : ''}
+                >
                   <Baby className='w-5 h-5' />
                 </Button>
                 <Input
@@ -123,7 +138,7 @@ export default function GroupGuestModal({
                   variant='ghost'
                   size='icon'
                   onClick={() => handleDeleteGuest(guest.id)}
-                  disabled={guests.length === 1}
+                  disabled={guests?.length === 1}
                 >
                   <Trash2 className='h-4 w-4 text-red-500' />
                 </Button>
@@ -135,14 +150,21 @@ export default function GroupGuestModal({
           <Button
             type='button'
             variant='outline'
-            onClick={() => onOpenChange(false)}
+            onClick={() => {
+              onOpenChange(false);
+              setGuests([
+                { id: '1', name: '', isAdult: true },
+                { id: '2', name: '', isAdult: false },
+              ]);
+              setTotalGuests(2);
+            }}
           >
-            Close
+            Clear
           </Button>
           <Button
             type='button'
             onClick={handleAddGuests}
-            disabled={guests.some((guest) => !guest.name.trim())}
+            disabled={guests?.some((guest) => !guest.name.trim())}
           >
             Add Guests
           </Button>

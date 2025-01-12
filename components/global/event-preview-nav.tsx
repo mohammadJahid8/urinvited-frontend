@@ -22,7 +22,7 @@ export default function EventPreviewNav() {
         {isAdmin ? 'Back to Dashboard' : 'Back to Video'}
       </Link>
       <Button
-        href={`/preview${querySuffix}`}
+        href={`/event${querySuffix}`}
         className='bg-[#4A61FF] hover:bg-[#4338CA] px-6'
       >
         Preview

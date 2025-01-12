@@ -9,12 +9,19 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import Image from 'next/image';
+import { shareUrl } from '@/lib/shareUrl';
+import { toast } from 'sonner';
 
-const ShareSocial = () => {
-  const shareUrl = 'https://xyz@xyz.com/event/0410';
-
+const ShareSocial = ({ id }: { id: string }) => {
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
+    navigator.clipboard
+      .writeText(shareUrl(id))
+      .then(() => {
+        toast.success('Link copied to clipboard!');
+      })
+      .catch(() => {
+        toast.error('Failed to copy link.');
+      });
   };
   return (
     <div className='w-full max-w-full sm:max-w-[900px] mx-auto bg-white rounded-lg overflow-hidden shadow-sm border'>
@@ -32,32 +39,53 @@ const ShareSocial = () => {
               src: '/linkedin.svg',
               alt: 'Share on LinkedIn',
               name: 'LinkedIn',
+              url: `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl(
+                id
+              )}&title=testing&summary=testing&source=LinkedIn`,
             },
             {
               src: '/facebook.svg',
               alt: 'Share on Facebook',
               name: 'Facebook',
+              url: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl(
+                id
+              )}`,
             },
-            { src: '/x.svg', alt: 'Share on Twitter', name: 'Twitter' },
+            {
+              src: '/x.svg',
+              alt: 'Share on Twitter',
+              name: 'Twitter',
+              url: `https://x.com/share?url=${shareUrl(id)}`,
+            },
             {
               src: '/whatsapp.svg',
               alt: 'Share on WhatsApp',
               name: 'WhatsApp',
+              url: `https://wa.me/?text=${shareUrl(id)}`,
             },
-            { src: '/gmail.svg', alt: 'Share via Gmail', name: 'Gmail' },
+            {
+              src: '/gmail.svg',
+              alt: 'Share via Gmail',
+              name: 'Gmail',
+              url: `mailto:?subject=testing&body=${shareUrl(id)}`,
+            },
             {
               src: '/gmail.svg',
               alt: 'Share on Instagram',
               name: 'Instagram',
+              url: `https://www.instagram.com/share?url=${shareUrl(id)}`,
             },
             {
               src: '/messenger.svg',
               alt: 'Share on Messenger',
               name: 'Messenger',
+              url: `https://www.messenger.com/new?text=${shareUrl(id)}`,
             },
           ].map((item, index) => (
             <Button
               key={index}
+              href={item.url}
+              target='_blank'
               variant='outline'
               className='p-2 h-auto bg-gray-50 flex items-center gap-2 px-4 sm:px-8'
             >
@@ -72,7 +100,7 @@ const ShareSocial = () => {
             Share link
           </label>
           <div className='flex flex-col sm:flex-row gap-2'>
-            <Input value={shareUrl} readOnly className='flex-grow' />
+            <Input value={shareUrl(id)} readOnly className='flex-grow' />
             <Button onClick={handleCopyLink} className='whitespace-nowrap'>
               Copy link
             </Button>
