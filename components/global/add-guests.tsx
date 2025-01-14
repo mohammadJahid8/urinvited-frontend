@@ -8,18 +8,19 @@ import { EmailPreview } from './email-preview';
 import { useAppContext } from '@/lib/context';
 
 const AddGuests = ({ id }: { id: string }) => {
-  const { setOpenEmailPreview } = useAppContext();
+  const { setOpenEmailPreview, guests } = useAppContext();
   const [emails, setEmails] = React.useState<string[]>([]);
-  const [focused, setFocused] = React.useState(false);
 
-  console.log({ emails });
+  const addedGuests =
+    guests.filter((guest: any) => guest.isConfirmed).length || 0;
+
   return (
     <div className='w-full max-w-full sm:max-w-[900px] mx-auto bg-white rounded-lg overflow-hidden shadow-sm border'>
       <div className='bg-gray-100 p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center'>
         <h2 className='text-lg sm:text-xl font-bold'>Add guest</h2>
         <div className='flex items-center gap-2'>
           <p className='text-sm sm:text-base text-gray-600 font-medium'>
-            Total guests added: 0
+            Total guests added: {addedGuests}
           </p>
           <Button
             variant='outline'
@@ -39,14 +40,20 @@ const AddGuests = ({ id }: { id: string }) => {
               setEmails(_emails);
             }}
             autoFocus={true}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
+            // onFocus={() => setFocused(true)}
+            // onBlur={() => setFocused(false)}
             className='h-16 sm:h-20 overflow-y-auto text-sm'
             getLabel={(email, index, removeEmail) => {
               return (
                 <div data-tag key={index}>
                   <div data-tag-item>{email}</div>
-                  <span data-tag-handle onClick={() => removeEmail(index)}>
+                  <span
+                    data-tag-handle
+                    onClick={() => {
+                      removeEmail(index);
+                      setEmails(emails.filter((_, i) => i !== index));
+                    }}
+                  >
                     ×
                   </span>
                 </div>

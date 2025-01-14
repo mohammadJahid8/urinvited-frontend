@@ -1,3 +1,4 @@
 export function shareUrl(id: string) {
-  return `${window.location.origin}/event?id=${id}`;
+  // return `https://www.eventify.co.za/event/${id}`;
+  return `${window.location.origin}/event/${id}`;
 }

@@ -7,15 +7,57 @@ import { useAppContext } from '@/lib/context';
 import { cn } from '@/lib/utils';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import { Editor } from '@tinymce/tinymce-react';
-import Event from './event';
+import { Textarea } from '../ui/textarea';
+import api from '@/utils/axiosInstance';
+import { toast } from 'sonner';
 
 export function EmailPreview() {
-  const { openEmailPreview, setOpenEmailPreview } = useAppContext();
-  const [data, setData] = React.useState({
-    subject: '',
-    body: '',
-  });
+  const {
+    openEmailPreview,
+    setOpenEmailPreview,
+    emailData,
+    setEmailData,
+    user,
+  } = useAppContext();
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSendTestEmail = async () => {
+    if (!emailData.subject) {
+      return toast.error(`Please fill subject`, {
+        position: 'top-center',
+      });
+    }
+    if (!emailData.body) {
+      return toast.error(`Please fill body`, {
+        position: 'top-center',
+      });
+    }
+
+    try {
+      setLoading(true);
+      const promise = await api.post(`/share/send-mail`, {
+        to: user?.email,
+        subject: emailData.subject,
+        body: emailData.body,
+      });
+      if (promise?.status === 200) {
+        toast.success(`Test email sent`, {
+          position: 'top-center',
+        });
+      }
+    } catch (error: any) {
+      console.error(error);
+
+      return toast.error(
+        error?.response?.data?.message || `Test email failed`,
+        {
+          position: 'top-center',
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Sheet open={openEmailPreview} onOpenChange={setOpenEmailPreview}>
@@ -29,8 +71,10 @@ export function EmailPreview() {
               className={cn(
                 'border-primary text-primary w-max bg-primary/10 mr-10'
               )}
+              onClick={handleSendTestEmail}
+              disabled={loading}
             >
-              Send Test Email
+              {loading ? 'Sending...' : 'Send Test Email'}
             </Button>
           </div>
         </SheetHeader>
@@ -40,37 +84,26 @@ export function EmailPreview() {
             <Label>Subject</Label>
             <Input
               placeholder='Enter Subject'
-              value={data.subject}
-              onChange={(e) => setData({ ...data, subject: e.target.value })}
+              value={emailData.subject}
+              onChange={(e) =>
+                setEmailData({ ...emailData, subject: e.target.value })
+              }
             />
           </div>
           <div className='flex flex-col gap-2'>
             <Label>Body</Label>
-            <Editor
-              apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY as string}
-              value={data.body}
-              init={{
-                height: 150,
-                menubar: false,
-                branding: false,
-                statusbar: false,
-                plugins: [
-                  'advlist autolink lists link image charmap print preview anchor',
-                  'searchreplace visualblocks code fullscreen',
-                  'insertdatetime media table paste code help wordcount',
-                  'fontsize textcolor',
-                ],
-                toolbar:
-                  'undo redo | formatselect fontselect fontfamily fontsize | bold italic backcolor forecolor | \
-                  alignleft aligncenter alignright alignjustify | \
-                  bullist numlist outdent indent | removeformat | help',
-              }}
-              onEditorChange={(content) => setData({ ...data, body: content })}
+            <Textarea
+              className='w-full h-32 p-2 border rounded'
+              placeholder='Enter Body'
+              value={emailData.body}
+              onChange={(e) =>
+                setEmailData({ ...emailData, body: e.target.value })
+              }
             />
           </div>
         </div>
 
-        <Event data={data} />
+        <Preview data={emailData} />
 
         <div className='mt-auto border-t p-4 absolute bottom-0 w-full bg-background'>
           <div className='flex items-center justify-end gap-2'>
@@ -80,7 +113,12 @@ export function EmailPreview() {
             >
               Cancel
             </Button>
-            <Button>Send Email</Button>
+            <Button
+              disabled={loading}
+              onClick={() => setOpenEmailPreview(false)}
+            >
+              Save Email
+            </Button>
           </div>
         </div>
       </SheetContent>
@@ -95,7 +133,7 @@ const Preview = ({ data }: { data: { subject: string; body: string } }) => {
       <div dangerouslySetInnerHTML={{ __html: data.body }}></div>
 
       <div className='bg-gray-50 p-8 '>
-        <h1 className='text-2xl font-bold'>LOGO</h1>
+        <h1 className='text-2xl font-bold'>URINVITED</h1>
       </div>
     </div>
   );

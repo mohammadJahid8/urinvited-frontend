@@ -2,7 +2,12 @@
 
 import api from '@/utils/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { redirect, usePathname, useSearchParams } from 'next/navigation';
+import {
+  redirect,
+  useParams,
+  usePathname,
+  useSearchParams,
+} from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -21,10 +26,17 @@ const ContextProvider = ({ children }: any) => {
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const paramsId = searchParams.get('id');
+  const { id: urlId } = useParams();
+  const id = paramsId || urlId;
   const queryString = searchParams.toString();
   const querySuffix = queryString ? `?${queryString}` : '';
 
+  const [guests, setGuests] = useState<any[]>([]);
+  const [emailData, setEmailData] = useState({
+    subject: '',
+    body: '',
+  });
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -97,7 +109,11 @@ const ContextProvider = ({ children }: any) => {
 
   console.log('pathname', pathname);
 
-  if (!user?.email && !publicRoutes.includes(pathname)) {
+  if (
+    !user?.email &&
+    !publicRoutes.includes(pathname) &&
+    !pathname.startsWith('/event/')
+  ) {
     return redirect(`/login${querySuffix}`);
   }
 
@@ -168,6 +184,10 @@ const ContextProvider = ({ children }: any) => {
     isEventLoading,
     refetchEvent,
     downloadFile,
+    guests,
+    setGuests,
+    emailData,
+    setEmailData,
   };
 
   return (

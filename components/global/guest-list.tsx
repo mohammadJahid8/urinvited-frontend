@@ -11,11 +11,13 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Trash2, Users } from 'lucide-react';
 import GroupGuestModal from './group-guest-modal';
+import { useAppContext } from '@/lib/context';
+import { toast } from 'sonner';
 
 export default function GuestList({ emails }: { emails: string[] }) {
-  const [guests, setGuests] = useState<any[]>([]);
+  const { guests, setGuests } = useAppContext();
   const [openGroupModal, setOpenGroupModal] = useState(false);
   const [guestIndex, setGuestIndex] = useState<number>(0);
 
@@ -23,44 +25,66 @@ export default function GuestList({ emails }: { emails: string[] }) {
     setOpenGroupModal(true);
     setGuestIndex(index);
   };
+  console.log({ emails });
 
   useEffect(() => {
-    setGuests((prevGuests) => {
+    setGuests((prevGuests: any) => {
       const newGuests = emails
-        .filter((email) => !prevGuests.some((guest) => guest.email === email))
+        .filter(
+          (email) => !prevGuests.some((guest: any) => guest.email === email)
+        )
         .map((email, index) => ({
-          id: prevGuests.length + index,
+          guestId: prevGuests.length + index,
           name: '',
           phone: '',
           email,
-          isAdded: false,
+          isConfirmed: false,
+          fromEmail: true,
         }));
-      return [...prevGuests, ...newGuests];
+
+      const updatedGuests = prevGuests.filter((guest: any) =>
+        emails.includes(guest.email)
+      );
+
+      return [...updatedGuests, ...newGuests];
     });
   }, [emails]);
 
-  const handleAddGuest = (guest: any) => {
+  const handleConfirm = (guest: any) => {
+    console.log('handleConfirm', guest);
+    if (!guest.email && !guest.phone) {
+      return toast.error('Please enter a valid email or phone number');
+    }
+
+    if (!guest.name) {
+      return toast.error('Please enter a valid name');
+    }
+
     setGuests(
-      guests.map((g) => ({
+      guests.map((g: any) => ({
         ...g,
-        isAdded: g.id === guest.id ? true : g.isAdded,
+        isConfirmed: g.guestId === guest.guestId ? true : g.isConfirmed,
       }))
     );
   };
 
   const handleRemoveGuest = (id: number) => {
     setGuests(
-      guests.map((g) => ({
+      guests.map((g: any) => ({
         ...g,
-        isAdded: g.id === id ? false : g.isAdded,
+        isConfirmed: g.guestId === id ? false : g.isConfirmed,
       }))
     );
+  };
+
+  const handleDeleteGuest = (id: number) => {
+    setGuests(guests.filter((g: any) => g.guestId !== id));
   };
 
   console.log({ guests });
 
   const handleAddGroupGuests = (data: any) => {
-    setGuests((prev) => {
+    setGuests((prev: any) => {
       const newGuests = [...prev];
       newGuests[guestIndex].extraGuests = data;
       return newGuests;
@@ -68,9 +92,15 @@ export default function GuestList({ emails }: { emails: string[] }) {
   };
 
   const handleAddRow = () => {
-    setGuests((prev) => [
+    setGuests((prev: any) => [
       ...prev,
-      { id: prev.length + 1, name: '', phone: '', email: '', isAdded: false },
+      {
+        guestId: prev.length + 1,
+        name: '',
+        phone: '',
+        email: '',
+        isConfirmed: false,
+      },
     ]);
   };
 
@@ -94,15 +124,15 @@ export default function GuestList({ emails }: { emails: string[] }) {
           </TableRow>
         </TableHeader>
         <TableBody className='rounded-b-lg border'>
-          {guests.map((guest, index) => (
-            <TableRow key={guest.id}>
+          {guests.map((guest: any, index: number) => (
+            <TableRow key={guest.guestId}>
               <TableCell className='border-r'>
                 <Input
                   placeholder='Enter name'
                   value={guest.name}
                   onChange={(e) =>
                     setGuests(
-                      guests.map((guest, i) => ({
+                      guests.map((guest: any, i: number) => ({
                         ...guest,
                         name: i === index ? e.target.value : guest.name,
                       }))
@@ -114,17 +144,27 @@ export default function GuestList({ emails }: { emails: string[] }) {
                 <Input
                   placeholder='Enter Phone or Email address'
                   value={guest.phone || guest.email}
-                  onChange={(e) =>
-                    setGuests(
-                      guests.map((guest, i) => ({
-                        ...guest,
-                        [guest.phone ? 'phone' : 'email']:
-                          i === index
-                            ? e.target.value
-                            : guest[guest.phone ? 'phone' : 'email'],
-                      }))
-                    )
-                  }
+                  disabled={guest.fromEmail}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.includes('@')) {
+                      setGuests(
+                        guests.map((guest: any, i: number) => ({
+                          ...guest,
+                          email: i === index ? value : guest.email,
+                          phone: i === index ? '' : guest.phone,
+                        }))
+                      );
+                    } else {
+                      setGuests(
+                        guests.map((guest: any, i: number) => ({
+                          ...guest,
+                          email: i === index ? '' : guest.email,
+                          phone: i === index ? value : guest.phone,
+                        }))
+                      );
+                    }
+                  }}
                 />
               </TableCell>
               <TableCell>
@@ -132,24 +172,31 @@ export default function GuestList({ emails }: { emails: string[] }) {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => handleOpenGroupModal(guest.id)}
+                    onClick={() => handleDeleteGuest(guest.guestId)}
                   >
-                    <Users className='w-5 h-5 text-blue-500' />
+                    <Trash2 className='w-5 h-5 text-red-500' />
                   </Button>
-                  {!guest.isAdded && (
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => handleOpenGroupModal(guest.guestId)}
+                  >
+                    <Users className='w-5 h-5 text-primary' />
+                  </Button>
+                  {!guest.isConfirmed && (
                     <Button
                       variant='outline'
                       size='sm'
-                      onClick={() => handleAddGuest(guest)}
+                      onClick={() => handleConfirm(guest)}
                     >
-                      Add
+                      Confirm
                     </Button>
                   )}
-                  {guest.isAdded && (
+                  {guest.isConfirmed && (
                     <Button
                       variant='outline'
                       size='sm'
-                      onClick={() => handleRemoveGuest(guest.id)}
+                      onClick={() => handleRemoveGuest(guest.guestId)}
                     >
                       Remove
                     </Button>
@@ -169,7 +216,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
         + Add Guests
       </Button>
 
-      {guests.some((guest) => guest.isAdded) && (
+      {guests.some((guest: any) => guest.isConfirmed) && (
         <div className='mt-8'>
           <h2 className='text-lg font-semibold mb-4'>Added Guests</h2>
           <Table>
@@ -181,9 +228,9 @@ export default function GuestList({ emails }: { emails: string[] }) {
             </TableHeader>
             <TableBody>
               {guests
-                .filter((guest) => guest.isAdded)
-                .map((guest) => (
-                  <TableRow key={guest.id}>
+                .filter((guest: any) => guest.isConfirmed)
+                .map((guest: any) => (
+                  <TableRow key={guest.guestId}>
                     <TableCell>{guest.name}</TableCell>
                     <TableCell>{guest.phone || guest.email}</TableCell>
                   </TableRow>

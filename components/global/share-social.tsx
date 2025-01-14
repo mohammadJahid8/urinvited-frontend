@@ -107,7 +107,7 @@ const ShareSocial = ({ id }: { id: string }) => {
           </div>
         </div>
 
-        <div className='space-y-1 sm:space-y-2'>
+        {/* <div className='space-y-1 sm:space-y-2'>
           <label className='text-sm sm:text-base font-semibold'>
             Download As
           </label>
@@ -126,7 +126,7 @@ const ShareSocial = ({ id }: { id: string }) => {
               Download
             </Button>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

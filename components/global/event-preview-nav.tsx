@@ -3,14 +3,16 @@ import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { useAppContext } from '@/lib/context';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 
 export default function EventPreviewNav() {
   const { user } = useAppContext();
+  const { id: urlId } = useParams();
   const searchParams = useSearchParams();
+  const paramsId = searchParams.get('id');
+  const id = paramsId || urlId;
   const queryString = searchParams.toString();
   const querySuffix = queryString ? `?${queryString}` : '';
-  const id = searchParams.get('id');
   const isAdmin = user?.role === 'admin';
   return (
     <header className='flex h-14 items-center justify-between border-b px-4 shadow-md bg-white'>
@@ -22,7 +24,7 @@ export default function EventPreviewNav() {
         {isAdmin ? 'Back to Dashboard' : 'Back to Video'}
       </Link>
       <Button
-        href={`/event${querySuffix}`}
+        href={`/event/${id}?preview=true`}
         className='bg-[#4A61FF] hover:bg-[#4338CA] px-6'
       >
         Preview
