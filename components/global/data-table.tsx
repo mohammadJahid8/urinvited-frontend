@@ -89,18 +89,6 @@ export function DataTable({ columns, data, statusFilter }: any) {
           }
           className='max-w-sm'
         />
-        {/* <select
-          value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('status')?.setFilterValue(event.target.value)
-          }
-          className='max-w-sm'
-        >
-          <option value=''>All</option>
-          <option value='Pending'>Pending</option>
-          <option value='Approved'>Approved</option>
-          <option value='Rejected'>Rejected</option>
-        </select> */}
 
         {/* custom filter */}
         <div className='flex items-center gap-2 ml-auto'>

@@ -5,17 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAppContext } from '@/lib/context';
 import moment from 'moment';
+import daysLeft from '@/utils/daysLeft';
 
 export default function ManageEvents({ title }: { title: string }) {
   const { events, isEventsLoading, user } = useAppContext();
   console.log({ events });
-
-  const daysLeft = (date: any) => {
-    const startDate = moment(date);
-    const today = moment();
-    const diff = startDate.diff(today, 'days');
-    return diff >= 0 ? `${diff} days left` : `${Math.abs(diff)} days ago`;
-  };
 
   return (
     <div className=''>

@@ -212,7 +212,7 @@ export default function Event({ className }: any) {
                             <Calendar className='w-5 h-5 text-blue-600' />
                             <span>
                               {startDate &&
-                                format(new Date(startDate), 'MM/dd/yyyy')}{' '}
+                                format(new Date(startDate), 'dd/MM/yyyy')}{' '}
                               {startTime &&
                                 startTime &&
                                 `| ${convertTime(startTime)}`}{' '}
@@ -293,7 +293,7 @@ export default function Event({ className }: any) {
               <>
                 <Border />
                 <p className='text-sm text-gray-500 pt-4'>
-                  RSVP by {format(new Date(rsvpDueDate), 'MM/dd/yyyy')}
+                  RSVP by {format(new Date(rsvpDueDate), 'dd MMMM yyyy')}
                 </p>
               </>
             )}

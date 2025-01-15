@@ -53,6 +53,8 @@ const ContextProvider = ({ children }: any) => {
     skills: '',
   });
 
+  console.log('idid', id);
+
   const {
     isLoading,
     refetch: refetchUser,

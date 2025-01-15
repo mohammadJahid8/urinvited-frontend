@@ -26,31 +26,52 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/lib/context';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import moment from 'moment';
 import { toast } from 'sonner';
+import api from '@/utils/axiosInstance';
+import { useQuery } from '@tanstack/react-query';
+import daysLeft from '@/utils/daysLeft';
 
-type RSVPOption = 'yes' | 'no' | 'decide-later';
-
-const daysLeft = (date: any) => {
-  const startDate = moment(date);
-  const today = moment();
-  const diff = startDate.diff(today, 'days');
-  return diff >= 0 ? `${diff} days left` : `${Math.abs(diff)} days ago`;
-};
+type RSVPOption = 'yes' | 'no' | 'maybe';
 
 export default function RSVPSheet() {
   const searchParams = useSearchParams();
   const name = searchParams.get('n');
   const email = searchParams.get('e');
+  const { id } = useParams();
   const [rsvpStatus, setRsvpStatus] = useState<RSVPOption | null>('yes');
   const { openRSVP, setOpenRSVP, event } = useAppContext();
   const [totalGuests, setTotalGuests] = useState<string>('1');
   const [specialMessage, setSpecialMessage] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const {
+    isLoading: isRsvpLoading,
+    refetch: refetchRsvp,
+    data: rsvp,
+  } = useQuery({
+    queryKey: [`rsvp`, id, email],
+    queryFn: async () => {
+      const response = await api.get(`/rsvp/${id}?contact=${email}`);
+      return response?.data?.data;
+    },
+  });
+
+  console.log('rsvp', rsvp);
+
+  useEffect(() => {
+    if (rsvp) {
+      setRsvpStatus(rsvp?.rsvpStatus || 'yes');
+      setSpecialMessage(rsvp?.message || '');
+    }
+  }, [rsvp]);
+
+  const rsvpGuests = rsvp?.guests;
 
   const [guests, setGuests] = useState<any[]>([
     {
-      id: '1',
+      guestId: '1',
       name: name || '',
       isAdult: true,
       email: email || '',
@@ -62,22 +83,26 @@ export default function RSVPSheet() {
   const allowAdditionalAttendees = eventData?.allowAdditionalAttendees;
 
   useEffect(() => {
-    setGuests([
-      {
-        id: '1',
-        name: name || '',
-        isAdult: true,
-        email: email || '',
-      },
-      ...(allowAdditionalAttendees
-        ? Array.from({ length: additionalAttendees }, (_, index) => ({
-            id: String(Date.now() + index + 1),
-            name: '',
-            isAdult: true,
-          }))
-        : []),
-    ]);
-  }, [additionalAttendees, name, email, allowAdditionalAttendees]);
+    if (rsvpGuests) {
+      setGuests(rsvpGuests);
+    } else {
+      setGuests([
+        {
+          guestId: '1',
+          name: name || '',
+          isAdult: true,
+          email: email || '',
+        },
+        ...(allowAdditionalAttendees
+          ? Array.from({ length: additionalAttendees }, (_, index) => ({
+              guestId: String(Date.now() + index + 1),
+              name: '',
+              isAdult: true,
+            }))
+          : []),
+      ]);
+    }
+  }, [additionalAttendees, name, email, allowAdditionalAttendees, rsvpGuests]);
 
   const eventName = eventData?.events?.[0]?.title;
   const hostName = event?.hostedBy;
@@ -102,50 +127,31 @@ export default function RSVPSheet() {
     message
   )}&location=${encodeURIComponent(eventLocation)}`;
 
-  // const handleTotalGuestsChange = (value: string) => {
-  //   const total = parseInt(value);
-  //   setTotalGuests(value);
-
-  //   if (total > guests.length) {
-  //     // Add new guest slots
-  //     const newGuests = [...guests];
-  //     for (let i = guests.length; i < total; i++) {
-  //       newGuests.push({
-  //         id: String(Date.now() + i),
-  //         name: '',
-  //         isAdult: true,
-  //       });
-  //     }
-  //     setGuests(newGuests);
-  //   } else if (total < guests.length) {
-  //     // Remove extra guest slots but keep the first one (Kushboo R)
-  //     setGuests(guests.slice(0, Math.max(1, total)));
-  //   }
-  // };
-
-  const handleGuestNameChange = (id: string, name: string) => {
-    setGuests(
-      guests.map((guest: any) => (guest.id === id ? { ...guest, name } : guest))
-    );
-  };
-
-  const handleRemoveGuest = (id: string) => {
-    if (guests.length > 1) {
-      // Prevent removing the first guest
-      setGuests(guests.filter((guest: any) => guest.id !== id));
-      setTotalGuests(String(parseInt(totalGuests) - 1));
-    }
-  };
-
-  const handleGuestTypeChange = (id: string, isAdult: boolean) => {
+  const handleGuestNameChange = (guestId: string, name: string) => {
     setGuests(
       guests.map((guest: any) =>
-        guest.id === id ? { ...guest, isAdult } : guest
+        guest.guestId === guestId ? { ...guest, name } : guest
       )
     );
   };
 
-  const handleConfirmRsvp = () => {
+  const handleRemoveGuest = (guestId: string) => {
+    if (guests.length > 1) {
+      // Prevent removing the first guest
+      setGuests(guests.filter((guest: any) => guest.guestId !== guestId));
+      setTotalGuests(String(parseInt(totalGuests) - 1));
+    }
+  };
+
+  const handleGuestTypeChange = (guestId: string, isAdult: boolean) => {
+    setGuests(
+      guests.map((guest: any) =>
+        guest.guestId === guestId ? { ...guest, isAdult } : guest
+      )
+    );
+  };
+
+  const handleConfirmRsvp = async () => {
     if (!allowRsvpAfterDueDate) {
       return toast.error('RSVP is not allowed after the due date', {
         position: 'top-center',
@@ -158,7 +164,37 @@ export default function RSVPSheet() {
       });
     }
 
-    console.log({ rsvpStatus, guests, specialMessage });
+    const payload = {
+      rsvpStatus,
+      guests,
+      message: specialMessage,
+      contact: email,
+      name,
+      event: id,
+    };
+
+    console.log({ payload });
+
+    try {
+      setLoading(true);
+      const promise = await api.post(`/rsvp`, payload);
+      if (promise?.status === 200) {
+        toast.success(`RSVP submitted successfully`, {
+          position: 'top-center',
+        });
+      }
+    } catch (error: any) {
+      console.error(error);
+
+      return toast.error(
+        error?.response?.data?.message || `RSVP submission failed`,
+        {
+          position: 'top-center',
+        }
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -210,7 +246,7 @@ export default function RSVPSheet() {
             <div className='space-y-4'>
               <h4 className='font-medium'>Are you going?</h4>
               <div className='flex gap-4'>
-                {['yes', 'no', 'decide-later'].map((option) => (
+                {['yes', 'no', 'maybe'].map((option) => (
                   <Button
                     key={option}
                     variant={'outline'}
@@ -253,13 +289,16 @@ export default function RSVPSheet() {
                     <Label>Guest Details</Label>
                     <div className='space-y-2'>
                       {guests.map((guest: any, index: number) => (
-                        <div key={guest.id} className='flex items-center gap-2'>
+                        <div
+                          key={guest.guestId}
+                          className='flex items-center gap-2'
+                        >
                           <div className='flex items-center gap-2'>
                             <Button
                               variant='outline'
                               size='sm'
                               onClick={() =>
-                                handleGuestTypeChange(guest.id, true)
+                                handleGuestTypeChange(guest.guestId, true)
                               }
                               // disabled={guest.id === '1'}
                               className={cn(
@@ -272,7 +311,7 @@ export default function RSVPSheet() {
                               variant='outline'
                               size='sm'
                               onClick={() =>
-                                handleGuestTypeChange(guest.id, false)
+                                handleGuestTypeChange(guest.guestId, false)
                               }
                               // disabled={guest.id === '1'}
                               className={cn(
@@ -284,9 +323,12 @@ export default function RSVPSheet() {
                           </div>
                           <Input
                             value={guest.name}
-                            disabled={guest.id === '1'}
+                            disabled={guest.guestId === '1'}
                             onChange={(e) =>
-                              handleGuestNameChange(guest.id, e.target.value)
+                              handleGuestNameChange(
+                                guest.guestId,
+                                e.target.value
+                              )
                             }
                             placeholder='Guest name'
                           />
@@ -294,8 +336,8 @@ export default function RSVPSheet() {
                           <Button
                             variant='ghost'
                             size='icon'
-                            disabled={guest.id === '1'}
-                            onClick={() => handleRemoveGuest(guest.id)}
+                            disabled={guest.guestId === '1'}
+                            onClick={() => handleRemoveGuest(guest.guestId)}
                             className='text-destructive hover:text-destructive hover:bg-destructive/10'
                           >
                             <Trash2 className='h-4 w-4' />
@@ -307,7 +349,7 @@ export default function RSVPSheet() {
                 </div>
               </>
             )}
-            {/* {rsvpOption === 'decide-later' && (
+            {/* {rsvpOption === 'maybe' && (
               <p className='text-sm text-muted-foreground bg-red-50 px-3 py-2 rounded-full text-center'>
                 We will send a reminder message after 3 days.
               </p>
@@ -321,12 +363,16 @@ export default function RSVPSheet() {
         </div>
         <SheetFooter className='flex gap-4 pt-4 sticky bottom-0 w-full bg-white px-6 py-4 border-t border-gray-200'>
           <SheetClose asChild>
-            <Button variant='outline' className='flex-1'>
+            <Button variant='outline' className='flex-1' disabled={loading}>
               Cancel
             </Button>
           </SheetClose>
-          <Button className='flex-1' onClick={handleConfirmRsvp}>
-            Confirm
+          <Button
+            className='flex-1'
+            onClick={handleConfirmRsvp}
+            disabled={loading}
+          >
+            {loading ? 'Submitting...' : 'Confirm'}
           </Button>
         </SheetFooter>
       </SheetContent>
