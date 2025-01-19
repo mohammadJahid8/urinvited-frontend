@@ -34,7 +34,8 @@ const AdditionalFeatures = () => {
       z.object({
         title: z.string().optional(),
         description: z.string().optional(),
-        url: z.string().url().optional(),
+        url: z.string().optional(),
+        buttonText: z.string().optional(),
       })
     ),
     accommodation: z.array(
@@ -55,7 +56,7 @@ const AdditionalFeatures = () => {
     //   })
     // ),
     travelSource: z.string().optional(),
-    travelSourceLink: z.string().url().optional(),
+    travelSourceLink: z.string().optional(),
   };
 
   const formSchema = z.object(schemaFields);
@@ -69,6 +70,7 @@ const AdditionalFeatures = () => {
               title: '',
               description: '',
               url: '',
+              buttonText: '',
             },
           ],
     // customFields:
@@ -184,7 +186,7 @@ const AdditionalFeatures = () => {
   console.log('form.formState.isDirty', form.formState.isDirty);
 
   const handleSubmit = async (data: any) => {
-    const path = user?.role === 'admin' ? '/manage-events' : '/share';
+    const path = user?.role === 'admin' ? '/manage-events' : `/share/${id}`;
 
     if (!form.formState.isDirty) {
       return router.push(path);

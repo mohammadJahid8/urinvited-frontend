@@ -139,6 +139,19 @@ const EachGiftRegistry = ({ form, index, remove, registry }: any) => {
           </FormItem>
         )}
       />
+      <FormField
+        control={form.control}
+        name={`registry.${index}.buttonText`}
+        render={({ field }) => (
+          <FormItem className='flex flex-col gap-2 space-y-0'>
+            <FormLabel className='font-bold'>Button Text</FormLabel>
+            <FormControl>
+              <Input type='text' placeholder='E.g., Gift Registry' {...field} />
+            </FormControl>
+            <FormMessage className='mt-0' />
+          </FormItem>
+        )}
+      />
     </>
   );
 };

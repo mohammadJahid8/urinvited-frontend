@@ -147,6 +147,9 @@ export default function Event({ className }: any) {
   }&details=${encodeURIComponent(
     eventDetails?.events?.[0]?.inviteDetails
   )}&location=${encodeURIComponent(eventDetails?.events?.[0]?.locationName)}`;
+
+  console.log({ textColour });
+
   return (
     <div
       className={cn('bg-cover bg-center bg-no-repeat p-10', className)}
@@ -159,8 +162,8 @@ export default function Event({ className }: any) {
     >
       <div className=''>
         {/* Video Section */}
-        <div className='relative max-w-[300px] mx-auto rounded-lg shadow-lg overflow-hidden'>
-          {videoUrl && (
+        {videoUrl && (
+          <div className='relative max-w-[300px] mx-auto rounded-lg shadow-lg overflow-hidden'>
             <video
               className='w-full h-[450px] object-cover'
               poster={thumbnailImage || ''}
@@ -171,49 +174,51 @@ export default function Event({ className }: any) {
               <source src={videoUrl} type='video/mp4' />
               Your browser does not support the video tag.
             </video>
-          )}
 
-          <div className='absolute top-3 right-3 bg-white text-black text-sm font-medium px-2 py-1 rounded-lg shadow-md'>
-            <div className='text-center'>
-              <p>{moment(eventDetails?.events?.[0]?.startDate).format('DD')}</p>
-              <span>
-                {moment(eventDetails?.events?.[0]?.startDate).format('MMM')}
-              </span>
+            <div className='absolute top-3 right-3 bg-white text-black text-sm font-medium px-2 py-1 rounded-lg shadow-md'>
+              <div className='text-center'>
+                <p>
+                  {moment(eventDetails?.events?.[0]?.startDate).format('DD')}
+                </p>
+                <span>
+                  {moment(eventDetails?.events?.[0]?.startDate).format('MMM')}
+                </span>
+              </div>
+            </div>
+
+            <div className='flex gap-6 bg-white/80 backdrop-blur-md px-4 rounded-b-lg shadow-md'>
+              {shareEvent && (
+                <Button
+                  onClick={handleCopyLink}
+                  variant='special'
+                  className='flex items-center gap-2 text-gray-700 hover:text-black'
+                >
+                  <Share2 className='size-4' />
+                  Share Event
+                </Button>
+              )}
+              {reactToEvent && (
+                <>
+                  <PickEmoji onChange={onIconSelect}>
+                    <Button
+                      variant='special'
+                      className='flex items-center gap-2 text-gray-700 hover:text-black'
+                    >
+                      {reaction ? (
+                        <span className='text-3xl'>{reaction}</span>
+                      ) : (
+                        <>
+                          <Heart className='size-4' />
+                          Reaction
+                        </>
+                      )}
+                    </Button>
+                  </PickEmoji>
+                </>
+              )}
             </div>
           </div>
-
-          <div className='flex gap-6 bg-white/80 backdrop-blur-md px-4 rounded-b-lg shadow-md'>
-            {shareEvent && (
-              <Button
-                onClick={handleCopyLink}
-                variant='special'
-                className='flex items-center gap-2 text-gray-700 hover:text-black'
-              >
-                <Share2 className='size-4' />
-                Share Event
-              </Button>
-            )}
-            {reactToEvent && (
-              <>
-                <PickEmoji onChange={onIconSelect}>
-                  <Button
-                    variant='special'
-                    className='flex items-center gap-2 text-gray-700 hover:text-black'
-                  >
-                    {reaction ? (
-                      <span className='text-3xl'>{reaction}</span>
-                    ) : (
-                      <>
-                        <Heart className='size-4' />
-                        Reaction
-                      </>
-                    )}
-                  </Button>
-                </PickEmoji>
-              </>
-            )}
-          </div>
-        </div>
+        )}
 
         <div className='bg-white max-w-[720px] mx-auto w-full shadow-md rounded-lg space-y-6 mt-10 p-8'>
           {events?.map(
@@ -239,7 +244,10 @@ export default function Event({ className }: any) {
             ) => (
               <React.Fragment key={index}>
                 <div className='text-center space-y-4'>
-                  <h1 className='text-4xl font-semibold text-gray-800'>
+                  <h1
+                    className='text-4xl font-semibold text-gray-800'
+                    style={{ color: textColour }}
+                  >
                     {title}
                   </h1>
                   {typeof inviteDetails === 'string' && (
@@ -266,7 +274,10 @@ export default function Event({ className }: any) {
                       endTime) &&
                       when !== 'tbd' && (
                         <div className='space-y-1'>
-                          <div className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
+                          <div
+                            className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'
+                            style={{ color: textColour }}
+                          >
                             <Calendar className='w-5 h-5 text-blue-600' />
                             <span>
                               {startDate &&
@@ -301,7 +312,10 @@ export default function Event({ className }: any) {
                     {(address || locationName) &&
                       locationType === 'in-person' && (
                         <div className='space-y-1'>
-                          <div className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
+                          <div
+                            className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'
+                            style={{ color: textColour }}
+                          >
                             <MapPin className='w-5 h-5 text-blue-600' />
                             <span>
                               {address}, {locationName}
@@ -321,7 +335,10 @@ export default function Event({ className }: any) {
                     {(virtualPlatformName || virtualUrl) &&
                       locationType === 'virtual' && (
                         <div className='space-y-1'>
-                          <div className='flex items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
+                          <div
+                            className='flex items-center justify-center gap-2 text-lg text-gray-700 font-semibold'
+                            style={{ color: textColour }}
+                          >
                             <Plane className='w-5 h-5 text-blue-600' />
                             <span>{virtualPlatformName}</span>
                           </div>
@@ -345,7 +362,10 @@ export default function Event({ className }: any) {
           )}
 
           {hostedBy && (
-            <p className='text-xl text-gray-500 text-center'>
+            <p
+              className='text-xl text-gray-500 text-center'
+              style={{ color: textColour }}
+            >
               Hosted By: {hostedBy}
             </p>
           )}
@@ -354,7 +374,10 @@ export default function Event({ className }: any) {
             {isRsvpDueDateSet && rsvpDueDate && (
               <>
                 <Border />
-                <p className='text-sm text-gray-500 pt-4'>
+                <p
+                  className='text-sm text-gray-500 pt-4'
+                  style={{ color: textColour }}
+                >
                   RSVP by {format(new Date(rsvpDueDate), 'dd MMMM yyyy')}
                 </p>
               </>
@@ -390,7 +413,9 @@ export default function Event({ className }: any) {
                 key={index}
               >
                 <img src='/gift.svg' alt='Gift' className='mx-auto h-10' />
-                <h2 className='text-xl font-bold'>{item.title}</h2>
+                <h2 className='text-xl font-bold' style={{ color: textColour }}>
+                  {item.title}
+                </h2>
                 <div
                   className='text-sm text-gray-500'
                   dangerouslySetInnerHTML={{ __html: item.description }}
@@ -405,7 +430,7 @@ export default function Event({ className }: any) {
                       buttonFormat === 'rounded' && 'rounded-full'
                     )}
                   >
-                    Shop Gifts
+                    {item.buttonText || 'Shop Gifts'}
                   </Button>
                 )}
               </div>
@@ -453,7 +478,10 @@ export default function Event({ className }: any) {
                         >
                           <div className='flex sm:flex-row flex-col items-center justify-center gap-1 text-center'>
                             <Hotel className='w-6 h-6 text-blue-600' />
-                            <span className='text-sm text-gray-700'>
+                            <span
+                              className='text-sm text-gray-700'
+                              style={{ color: textColour }}
+                            >
                               {item.accommodationName}, {item.location}
                             </span>
                           </div>
