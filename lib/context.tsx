@@ -53,8 +53,6 @@ const ContextProvider = ({ children }: any) => {
     skills: '',
   });
 
-  console.log('idid', id);
-
   const {
     isLoading,
     refetch: refetchUser,
@@ -93,12 +91,22 @@ const ContextProvider = ({ children }: any) => {
   } = useQuery({
     queryKey: [`event`, id],
     queryFn: async () => {
-      const response = await api.get(`/event/${id}`);
-      return response?.data?.data;
+      if (id) {
+        const response = await api.get(`/event/${id}`);
+        return response?.data?.data;
+      }
     },
   });
 
-  console.log('event', event);
+  const { refetch: refetchShare, data: share } = useQuery({
+    queryKey: [`share`, id],
+    queryFn: async () => {
+      if (id) {
+        const response = await api.get(`/share/${id}`);
+        return response?.data?.data;
+      }
+    },
+  });
 
   if (isLoading)
     return (
@@ -109,8 +117,6 @@ const ContextProvider = ({ children }: any) => {
 
   const publicRoutes = ['/login', '/signup', '/event'];
 
-  console.log('pathname', pathname);
-
   if (
     !user?.email &&
     !publicRoutes.includes(pathname) &&
@@ -119,10 +125,10 @@ const ContextProvider = ({ children }: any) => {
     return redirect(`/login${querySuffix}`);
   }
 
-  // console.log({ user });
   const logout = () => {
     window.localStorage.removeItem('rmToken');
     refetchUser();
+    redirect('/login');
   };
 
   const handleResendOTP = async (data: any) => {
@@ -163,7 +169,19 @@ const ContextProvider = ({ children }: any) => {
     }
   };
 
+  const calculateConfirmedGuests = (guests: any) =>
+    guests.reduce(
+      (total: any, guest: any) =>
+        guest.isConfirmed
+          ? total + 1 + (guest?.extraGuests?.length || 0)
+          : total,
+      0
+    );
+
+  const totalGuestAdded = calculateConfirmedGuests(guests);
+
   const authInfo = {
+    totalGuestAdded,
     isLoading,
     user,
     refetchUser,
@@ -190,6 +208,8 @@ const ContextProvider = ({ children }: any) => {
     setGuests,
     emailData,
     setEmailData,
+    share,
+    refetchShare,
   };
 
   return (

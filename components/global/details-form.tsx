@@ -55,8 +55,6 @@ const DetailsForm = ({
 }) => {
   const [inviteDetails, setInviteDetails] = useState(false);
 
-  console.log('selectedLocation', selectedLocation);
-
   return (
     <div className='flex flex-col gap-6' key={form.watch('events.0.timeZone')}>
       <FormField
@@ -373,7 +371,6 @@ const EachEvent = ({
                     name={`events.${index}.latLng`}
                     render={({ field }) => (
                       <FormItem className='w-full'>
-                        {console.log({ field })}
                         <FormControl>
                           <Input type='hidden' {...field} />
                         </FormControl>

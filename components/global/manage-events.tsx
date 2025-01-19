@@ -6,16 +6,50 @@ import { Input } from '@/components/ui/input';
 import { useAppContext } from '@/lib/context';
 import moment from 'moment';
 import daysLeft from '@/utils/daysLeft';
+import { useMemo, useState } from 'react';
+import statusCounts from '@/utils/statusCount';
 
 export default function ManageEvents({ title }: { title: string }) {
-  const { events, isEventsLoading, user } = useAppContext();
-  console.log({ events });
+  const { events, isEventsLoading, user, statusCountsData } = useAppContext();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
+
+  const filteredEvents = events?.filter((event: any) => {
+    const eventTitle = event?.eventDetails?.events?.[0]?.title?.toLowerCase();
+    const eventDate = moment(
+      event?.eventDetails?.events?.[0]?.startDate
+    ).format('MM/DD/YYYY');
+    return (
+      eventTitle?.includes(searchTerm.toLowerCase()) ||
+      eventDate.includes(searchTerm)
+    );
+  });
+
+  const upcomingEvents = filteredEvents?.filter((event: any) => {
+    const eventDate = moment(event?.eventDetails?.events?.[0]?.startDate);
+    return eventDate.isAfter(moment());
+  });
+
+  const pastEvents = filteredEvents?.filter((event: any) => {
+    const eventDate = moment(event?.eventDetails?.events?.[0]?.startDate);
+    return eventDate.isBefore(moment());
+  });
+
+  const eventsToDisplay =
+    activeTab === 'upcoming'
+      ? upcomingEvents
+      : activeTab === 'past'
+      ? pastEvents
+      : filteredEvents;
 
   return (
     <div className=''>
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6'>
         <h1 className='text-xl font-semibold'>{title}</h1>
-        <Button className='bg-primary text-white w-full md:w-auto'>
+        <Button
+          href='/event-details'
+          className='bg-primary text-white w-full md:w-auto'
+        >
           Create Event
         </Button>
       </div>
@@ -25,18 +59,38 @@ export default function ManageEvents({ title }: { title: string }) {
         <div className='flex flex-wrap gap-2 w-full md:w-auto'>
           <Button
             variant='outline'
-            className='bg-primary/10 text-primary border-primary flex-grow md:flex-grow-0'
+            className={`${
+              activeTab === 'all' ? 'bg-primary/10 text-primary' : ''
+            } border-primary flex-grow md:flex-grow-0`}
+            onClick={() => setActiveTab('all')}
           >
-            Upcoming Events (2)
+            All Events ({events?.length || 0})
           </Button>
-          <Button variant='outline' className='flex-grow md:flex-grow-0'>
-            Past Events (2)
+          <Button
+            variant='outline'
+            className={`${
+              activeTab === 'upcoming' ? 'bg-primary/10 text-primary' : ''
+            } border-primary flex-grow md:flex-grow-0`}
+            onClick={() => setActiveTab('upcoming')}
+          >
+            Upcoming Events ({upcomingEvents?.length || 0})
+          </Button>
+          <Button
+            variant='outline'
+            className={`${
+              activeTab === 'past' ? 'bg-primary/10 text-primary' : ''
+            } flex-grow md:flex-grow-0`}
+            onClick={() => setActiveTab('past')}
+          >
+            Past Events ({pastEvents?.length || 0})
           </Button>
         </div>
         <div className='relative w-full md:w-[300px]'>
           <Input
             placeholder='Search events by name or date...'
             className='pl-8 pr-4 py-2 w-full border rounded-md'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <Search className='absolute left-2.5 top-2.5 h-5 w-5 text-gray-400' />
         </div>
@@ -44,8 +98,8 @@ export default function ManageEvents({ title }: { title: string }) {
 
       {/* Event Cards */}
       <div className='space-y-4'>
-        {events?.length > 0 &&
-          events?.map((event: any, index: any) => (
+        {eventsToDisplay?.length > 0 ? (
+          eventsToDisplay?.map((event: any, index: any) => (
             <EventCard
               key={index}
               id={event._id}
@@ -57,27 +111,19 @@ export default function ManageEvents({ title }: { title: string }) {
               startTime={event?.eventDetails?.events?.[0]?.startTime}
               location={`${event?.eventDetails?.events?.[0]?.locationName}, ${event?.eventDetails?.events?.[0]?.address}`}
               inviteDetails={event?.eventDetails?.events?.[0]?.inviteDetails}
-              stats={{
-                invited: 100,
-                attending: 40,
-                notAttending: 10,
-                maybe: 50,
-              }}
+              invited={event?.share?.guests?.length || 0}
+              rsvps={event?.rsvps}
               daysLeft={daysLeft(event?.eventDetails?.events?.[0]?.startDate)}
               video={event?.video}
               isAdmin={user?.role === 'admin'}
             />
-          ))}
+          ))
+        ) : (
+          <div className='text-center text-gray-500'>No events found.</div>
+        )}
       </div>
     </div>
   );
-}
-
-interface EventStats {
-  invited: number;
-  attending: number;
-  notAttending: number;
-  maybe: number;
 }
 
 interface EventCardProps {
@@ -87,11 +133,12 @@ interface EventCardProps {
   startTime: string;
   location: string;
   inviteDetails: string;
-  stats: EventStats;
+  invited: number;
   daysLeft: string;
   hasEvent: boolean;
   video: any;
   isAdmin: boolean;
+  rsvps: any;
 }
 
 function EventCard({
@@ -101,20 +148,21 @@ function EventCard({
   startTime,
   location,
   inviteDetails,
-  stats,
+  invited,
   daysLeft,
   hasEvent,
   video,
   isAdmin,
+  rsvps,
 }: EventCardProps) {
-  console.log({ video, isAdmin });
-
   const isVideoPending = video?.status === 'Pending';
 
   const path =
     !isAdmin && isVideoPending
       ? `/video-preview?id=${id}`
       : `/event-details?id=${id}`;
+
+  const statusCountsData = useMemo(() => statusCounts(rsvps), [rsvps]);
 
   return (
     <div className=''>
@@ -155,21 +203,25 @@ function EventCard({
             <>
               <div className='flex items-center gap-2'>
                 <span className='text-sm text-gray-500'>Invited</span>
-                <span className='text-sm font-medium'>{stats.invited}</span>
+                <span className='text-sm font-medium'>{invited}</span>
               </div>
               <div className='flex items-center gap-2'>
                 <span className='text-sm text-gray-500'>Attending</span>
-                <span className='text-sm font-medium'>{stats.attending}</span>
+                <span className='text-sm font-medium'>
+                  {statusCountsData.yes}
+                </span>
               </div>
               <div className='flex items-center gap-2'>
                 <span className='text-sm text-gray-500'>Not Attending</span>
                 <span className='text-sm font-medium'>
-                  {stats.notAttending}
+                  {statusCountsData.no}
                 </span>
               </div>
               <div className='flex items-center gap-2'>
                 <span className='text-sm text-gray-500'>May be</span>
-                <span className='text-sm font-medium'>{stats.maybe}</span>
+                <span className='text-sm font-medium'>
+                  {statusCountsData.maybe}
+                </span>
               </div>
             </>
           )}

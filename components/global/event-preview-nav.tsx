@@ -10,14 +10,18 @@ export default function EventPreviewNav() {
   const { id: urlId } = useParams();
   const searchParams = useSearchParams();
   const paramsId = searchParams.get('id');
-  const id = paramsId || urlId;
+  const id = urlId || paramsId;
   const queryString = searchParams.toString();
   const querySuffix = queryString ? `?${queryString}` : '';
   const isAdmin = user?.role === 'admin';
   return (
     <header className='flex h-14 items-center justify-between border-b px-4 shadow-md bg-white'>
       <Link
-        href={isAdmin ? '/manage-events' : `/video-preview${querySuffix}`}
+        href={
+          isAdmin
+            ? '/manage-events'
+            : `/video-preview${querySuffix || '?id=' + id}`
+        }
         className='flex items-center gap-1 text-base font-semibold text-[#2E333B] hover:text-[#4A61FF]'
       >
         <ChevronLeft className='h-6 w-6' />

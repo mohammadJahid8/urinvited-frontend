@@ -20,45 +20,14 @@ import {
   Loader2,
 } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useAppContext } from '@/lib/context';
 import daysLeft from '@/utils/daysLeft';
 import moment from 'moment';
-import { useQuery } from '@tanstack/react-query';
-import api from '@/utils/axiosInstance';
 import GuestsTable from './guests-table';
 
-const exampleGuests = [
-  {
-    name: 'Emma Williams',
-    email: 'emma.williams123@gmail.com',
-    rsvpStatus: 'Attending',
-    adults: 1,
-    children: 1,
-    message: "So excited to join the celebration! I'm definitely...",
-  },
-  {
-    name: 'Daniel Henry Wilson',
-    email: 'fbaker@icloud.com',
-    rsvpStatus: 'Attending',
-    adults: 2,
-    children: 1,
-    message: "Can't wait!❤️",
-  },
-  {
-    name: 'Evelyn Lewis',
-    email: '798 568 8725',
-    rsvpStatus: 'Not Attending',
-    adults: 0,
-    children: 0,
-    message: 'Lorem ipsum dolor sit amet, consectetur adipi...',
-  },
-  // Add more guests as needed
-];
-
 const TrackRsvp = () => {
-  const { event } = useAppContext();
+  const { event, isEventLoading } = useAppContext();
   const eventData = event?.eventDetails;
   const eventTitle = eventData?.events?.[0]?.title;
   const eventDaysLeft = daysLeft(eventData?.events?.[0]?.startDate);
@@ -68,17 +37,9 @@ const TrackRsvp = () => {
   const startTime = moment(eventData?.events?.[0]?.startTime, 'HH:mm').format(
     'h:mm A'
   );
+
   const eventId = event?._id;
-
-  const { isLoading: isRsvpLoading, data: rsvps } = useQuery({
-    queryKey: [`rsvps`, eventId],
-    queryFn: async () => {
-      const response = await api.get(`/rsvp/event/${eventId}`);
-      return response?.data?.data;
-    },
-  });
-
-  console.log({ rsvps });
+  const rsvps = event?.rsvps;
 
   return (
     <div className='flex flex-col gap-4'>
@@ -90,7 +51,7 @@ const TrackRsvp = () => {
         eventId={eventId}
       />
 
-      {isRsvpLoading ? (
+      {isEventLoading ? (
         <div className='flex items-center justify-center h-screen'>
           <Loader2 className='h-4 w-4 animate-spin' />
         </div>

@@ -51,8 +51,6 @@ export default function VideoUpload() {
   const [fileKey, setFileKey] = useState(Date.now());
   const router = useRouter();
 
-  console.log({ date });
-
   const handleUpload = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -89,8 +87,6 @@ export default function VideoUpload() {
 
       const videourl = response?.data?.secure_url;
 
-      console.log({ videourl });
-
       const payload = {
         eventDate: new Date(date).toISOString(),
         userEmail: email,
@@ -107,10 +103,6 @@ export default function VideoUpload() {
           newFormData.append(key, payload[key as keyof typeof payload]);
         }
       }
-
-      // console.log(newFormData);
-
-      // console.log({payload});
 
       if (videourl) {
         const promise = await api.post(`/video/upload`, newFormData);
@@ -157,9 +149,6 @@ export default function VideoUpload() {
       console.log(error);
     }
   };
-
-  // console.log("thPrev", thumbnailPreview);
-  // console.log("thumbnail", thumbnail);
 
   return (
     <div className='max-w-5xl flex-1 space-y-4'>

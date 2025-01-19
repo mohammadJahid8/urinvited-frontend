@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
-import { Trash2, Baby, User, Users } from 'lucide-react';
+import { Trash2, Baby, User } from 'lucide-react';
+import { useAppContext } from '@/lib/context';
 
 export default function GroupGuestModal({
   open,
@@ -20,36 +20,59 @@ export default function GroupGuestModal({
   onAddGuests,
   extraGuests,
 }: any) {
-  // console.log('extraGuests', extraGuests);
-  const [totalGuests, setTotalGuests] = useState(2);
-  const [guests, setGuests] = useState<any[]>([
-    { id: '1', name: '', isAdult: true },
-    { id: '2', name: '', isAdult: false },
-  ]);
+  const { event } = useAppContext();
+
+  const eventData = event?.eventDetails;
+  const additionalAttendees = eventData?.additionalAttendees;
+  const allowAdditionalAttendees = eventData?.allowAdditionalAttendees;
+
+  const [guests, setGuests] = useState<any[]>([]);
+
+  const extraGuestsLength = extraGuests?.length || 0;
 
   useEffect(() => {
-    console.log('extraGuests', extraGuests);
-    if (extraGuests && extraGuests.length > 0) {
-      setGuests(extraGuests);
-      setTotalGuests(extraGuests.length);
-    } else {
-      setGuests([
-        { id: '1', name: '', isAdult: true },
-        { id: '2', name: '', isAdult: false },
-      ]);
-      setTotalGuests(2);
-    }
-  }, [extraGuests]);
+    setGuests([
+      ...(extraGuestsLength < additionalAttendees
+        ? [
+            ...(extraGuests || []),
+            ...Array.from(
+              { length: additionalAttendees - extraGuestsLength },
+              (_, index) => ({
+                guestId: String(Date.now() + index + 1),
+                name: '',
+                isAdult: true,
+              })
+            ),
+          ]
+        : extraGuests || []),
+    ]);
+  }, [
+    additionalAttendees,
+    allowAdditionalAttendees,
+    extraGuests,
+    extraGuestsLength,
+    open,
+  ]);
+
+  // useEffect(() => {
+  //   if (extraGuests && extraGuests.length > 0) {
+  //     setGuests(extraGuests);
+  //   } else {
+  //     setGuests([
+  //       { id: '1', name: '', isAdult: true },
+  //       { id: '2', name: '', isAdult: false },
+  //     ]);
+  //   }
+  // }, [extraGuests]);
 
   const handleTotalGuestsChange = (value: string) => {
-    setTotalGuests(parseInt(value));
     const newCount = parseInt(value);
     if (newCount > guests?.length) {
       // Add more guest inputs
       const additionalGuests = Array.from(
         { length: newCount - guests?.length },
         (_, index) => ({
-          id: (guests?.length + index + 1).toString(),
+          guestId: (guests?.length + index + 1).toString(),
           name: '',
           isAdult: true,
         })
@@ -63,13 +86,14 @@ export default function GroupGuestModal({
 
   const handleGuestNameChange = (id: string, name: string) => {
     setGuests(
-      guests?.map((guest) => (guest.id === id ? { ...guest, name } : guest))
+      guests?.map((guest) =>
+        guest.guestId === id ? { ...guest, name } : guest
+      )
     );
   };
 
   const handleDeleteGuest = (id: string) => {
-    setGuests(guests?.filter((guest) => guest.id !== id));
-    setTotalGuests(guests?.length - 1);
+    setGuests(guests?.filter((guest) => guest.guestId !== id));
   };
 
   const handleAddGuests = () => {
@@ -79,15 +103,15 @@ export default function GroupGuestModal({
 
   const handleGuestTypeChange = (id: string, isAdult: boolean) => {
     setGuests(
-      guests?.map((guest) => (guest.id === id ? { ...guest, isAdult } : guest))
+      guests?.map((guest) =>
+        guest.guestId === id ? { ...guest, isAdult } : guest
+      )
     );
   };
 
-  console.log('guestsguests', guests);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[560px]'>
+      <DialogContent className='sm:max-w-[560px] max-h-[90vh] overflow-y-auto'>
         <DialogHeader className='text-left'>
           <DialogTitle>Add Guests</DialogTitle>
           <DialogDescription>Add guests to your event.</DialogDescription>
@@ -97,10 +121,11 @@ export default function GroupGuestModal({
             <span className='text-sm'>Total Guests</span>
             <Input
               type='number'
-              value={totalGuests}
+              value={guests?.length}
               onChange={(e) => handleTotalGuestsChange(e.target.value)}
               min='1'
               max='10'
+              disabled={true}
               className='col-span-3'
               placeholder='Enter number of guests'
             />
@@ -109,11 +134,11 @@ export default function GroupGuestModal({
           <div className='space-y-4'>
             <span className='text-sm font-medium'>Guest Details</span>
             {guests?.map((guest) => (
-              <div key={guest.id} className='flex items-center gap-2'>
+              <div key={guest.guestId} className='flex items-center gap-2'>
                 <Button
                   variant='outline'
                   size='sm'
-                  onClick={() => handleGuestTypeChange(guest.id, true)}
+                  onClick={() => handleGuestTypeChange(guest.guestId, true)}
                   className={guest.isAdult ? 'bg-primary/10 text-primary' : ''}
                 >
                   <User className='w-5 h-5' />
@@ -121,7 +146,7 @@ export default function GroupGuestModal({
                 <Button
                   variant='outline'
                   size='sm'
-                  onClick={() => handleGuestTypeChange(guest.id, false)}
+                  onClick={() => handleGuestTypeChange(guest.guestId, false)}
                   className={!guest.isAdult ? 'bg-primary/10 text-primary' : ''}
                 >
                   <Baby className='w-5 h-5' />
@@ -129,7 +154,7 @@ export default function GroupGuestModal({
                 <Input
                   value={guest.name}
                   onChange={(e) =>
-                    handleGuestNameChange(guest.id, e.target.value)
+                    handleGuestNameChange(guest.guestId, e.target.value)
                   }
                   placeholder='Enter guest name'
                   className='flex-1'
@@ -137,7 +162,7 @@ export default function GroupGuestModal({
                 <Button
                   variant='ghost'
                   size='icon'
-                  onClick={() => handleDeleteGuest(guest.id)}
+                  onClick={() => handleDeleteGuest(guest.guestId)}
                   disabled={guests?.length === 1}
                 >
                   <Trash2 className='h-4 w-4 text-red-500' />
@@ -152,11 +177,7 @@ export default function GroupGuestModal({
             variant='outline'
             onClick={() => {
               onOpenChange(false);
-              setGuests([
-                { id: '1', name: '', isAdult: true },
-                { id: '2', name: '', isAdult: false },
-              ]);
-              setTotalGuests(2);
+              setGuests([]);
             }}
           >
             Clear
@@ -164,7 +185,7 @@ export default function GroupGuestModal({
           <Button
             type='button'
             onClick={handleAddGuests}
-            disabled={guests?.some((guest) => !guest.name.trim())}
+            disabled={guests?.every((guest) => !guest.name.trim())}
           >
             Add Guests
           </Button>

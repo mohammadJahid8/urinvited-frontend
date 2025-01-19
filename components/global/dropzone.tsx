@@ -25,9 +25,7 @@ function Dropzone({
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(e);
     const { files } = e.dataTransfer;
-    console.log(files);
     handleFiles(files);
   };
 

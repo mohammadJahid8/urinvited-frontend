@@ -212,7 +212,6 @@ const AdditionalFeatures = () => {
     try {
       const promise = await api.patch(`/event/create`, payload);
       if (promise?.status === 200) {
-        console.log('promise', promise.data.data);
         const isUserNotified = promise?.data?.data?.isUserNotified;
         const isAdmin = user?.role === 'admin';
         if (!isUserNotified && isAdmin) {
@@ -255,7 +254,6 @@ const AdditionalFeatures = () => {
 
   useEffect(() => {
     const subscription = form.watch((value) => {
-      console.log({ value });
       onChange(value);
     });
     return () => subscription.unsubscribe();

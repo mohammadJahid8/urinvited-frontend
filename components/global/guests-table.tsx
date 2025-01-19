@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Mail, Eye, ArrowUpDown, Download } from 'lucide-react';
+import { Mail, Eye, ArrowUpDown, Download, Trash2 } from 'lucide-react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -35,6 +35,9 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GuestDetailsDialog from './guest-details';
+import statusCounts from '@/utils/statusCount';
+import DeleteGuest from './delete-guest';
+import { AddGuestModal } from './add-guest-modal';
 
 type Guest = {
   _id: string;
@@ -54,25 +57,25 @@ type Guest = {
 };
 
 const columns: ColumnDef<Guest>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='Select all'
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: 'select',
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={table.getIsAllPageRowsSelected()}
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label='Select all'
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label='Select row'
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     accessorKey: 'name',
     header: ({ column }) => {
@@ -154,6 +157,7 @@ const columns: ColumnDef<Guest>[] = [
           {/* <Button size='icon' variant='ghost'>
             <Mail className='h-4 w-4' />
           </Button> */}
+          <DeleteGuest row={row.original} />
           <GuestDetailsDialog guest={row.original} />
         </div>
       );
@@ -168,17 +172,10 @@ export default function GuestsTable({ data }: { data: Guest[] }) {
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+
   const [statusFilter, setStatusFilter] = React.useState('all');
 
-  const statusCounts = React.useMemo(() => {
-    return {
-      all: data?.length,
-      yes: data?.filter((guest) => guest.rsvpStatus === 'yes').length,
-      no: data?.filter((guest) => guest.rsvpStatus === 'no').length,
-      maybe: data?.filter((guest) => guest.rsvpStatus === 'maybe').length,
-    };
-  }, []);
+  const statusCountsData = React.useMemo(() => statusCounts(data), [data]);
 
   React.useEffect(() => {
     if (statusFilter === 'all') {
@@ -206,12 +203,11 @@ export default function GuestsTable({ data }: { data: Guest[] }) {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
     },
   });
 
@@ -303,7 +299,7 @@ export default function GuestsTable({ data }: { data: Guest[] }) {
             <Button variant='outline' size='icon' onClick={downloadCSV}>
               <Download className='h-4 w-4' />
             </Button>
-            <Button>Add Guest</Button>
+            <AddGuestModal />
           </div>
         </div>
       </CardHeader>
@@ -311,15 +307,17 @@ export default function GuestsTable({ data }: { data: Guest[] }) {
         <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 py-4'>
           <Tabs value={statusFilter} onValueChange={setStatusFilter}>
             <TabsList className='flex items-center justify-start flex-wrap h-auto space-y-1 w-full'>
-              <TabsTrigger value='all'>All ({statusCounts.all})</TabsTrigger>
+              <TabsTrigger value='all'>
+                All ({statusCountsData.all})
+              </TabsTrigger>
               <TabsTrigger value='yes'>
-                Attending ({statusCounts.yes})
+                Attending ({statusCountsData.yes})
               </TabsTrigger>
               <TabsTrigger value='no'>
-                Not Attending ({statusCounts.no})
+                Not Attending ({statusCountsData.no})
               </TabsTrigger>
               <TabsTrigger value='maybe'>
-                Maybe ({statusCounts.maybe})
+                Maybe ({statusCountsData.maybe})
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -383,10 +381,6 @@ export default function GuestsTable({ data }: { data: Guest[] }) {
           </Table>
         </div>
         <div className='flex flex-col sm:flex-row items-center justify-end gap-4 py-4'>
-          <div className='flex-1 text-sm text-muted-foreground text-center sm:text-left'>
-            {table.getFilteredSelectedRowModel().rows.length} of{' '}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
           <div className='flex gap-2'>
             <Button
               variant='outline'

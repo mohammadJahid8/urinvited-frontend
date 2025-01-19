@@ -31,7 +31,6 @@ const Customization = () => {
     useAppContext();
 
   const customization = event?.customization;
-  console.log(customization?.buttonFormat);
 
   const schemaFields: Record<string, z.ZodTypeAny> = {
     isEventLogoEnabled: z.boolean().optional(),
@@ -189,7 +188,6 @@ const Customization = () => {
 
   useEffect(() => {
     const subscription = form.watch((value) => {
-      console.log({ value });
       onChange(value);
     });
     return () => subscription.unsubscribe();

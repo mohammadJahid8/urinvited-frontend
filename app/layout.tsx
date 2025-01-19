@@ -26,7 +26,7 @@ export default async function RootLayout({
   };
 }>) {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang='en'>
       <body className={`${inter.className}`}>
         <Provider>
           {children} <Toaster />

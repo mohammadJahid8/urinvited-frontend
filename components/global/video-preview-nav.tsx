@@ -51,7 +51,7 @@ export default function VideoPreviewNav() {
   };
 
   return (
-    <header className='flex h-14 items-center justify-between border-b bg-white px-4 shadow-sm'>
+    <header className='flex sm:flex-row flex-col sm:h-14 sm:py-0 py-3 gap-2 sm:gap-0 sm:items-center justify-between border-b bg-white px-4 shadow-sm'>
       <p
         className='flex items-center gap-1 text-base font-semibold text-[#2E333B] cursor-pointer'
         onClick={() => router.push(isAdmin ? '/manage-events' : '/events')}
@@ -59,7 +59,7 @@ export default function VideoPreviewNav() {
         <ArrowLeft className='h-4 w-4' /> Back to events
       </p>
 
-      <div className='flex items-center gap-4'>
+      <div className='flex flex-wrap items-center gap-4'>
         {/* <div className='flex items-center rounded-lg mr-10 gap-2'>
           <Button
             variant={activeView === 'Desktop' ? 'secondary' : 'ghost'}
@@ -84,7 +84,7 @@ export default function VideoPreviewNav() {
         <Button
           onClick={() => downloadFile(videoData?.url, 'download')}
           variant='outline'
-          className='flex items-center gap-2 border-primary text-primary'
+          className='flex items-center gap-2 border-primary text-primary sm:text-sm text-xs px-2 sm:px-4'
         >
           Download
         </Button>
@@ -112,7 +112,7 @@ export default function VideoPreviewNav() {
         <Button
           onClick={() => setOpenFeedback(true)}
           variant='outline'
-          className='text-primary border-primary'
+          className='text-primary border-primary sm:text-sm text-xs px-2 sm:px-4'
         >
           Suggest Feedback
         </Button>
@@ -122,7 +122,7 @@ export default function VideoPreviewNav() {
         {event?.video?.status === 'Pending' ? (
           <Button
             disabled={isLoading}
-            className='bg-[#4A61FF] text-white hover:bg-[#4338CA]'
+            className='bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4'
             onClick={handleApprove}
           >
             {isLoading ? 'Approving...' : 'Yes, I Approve'}
@@ -130,7 +130,7 @@ export default function VideoPreviewNav() {
         ) : (
           <Button
             href={`/event-details?id=${event?._id}`}
-            className='bg-[#4A61FF] text-white hover:bg-[#4338CA]'
+            className='bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4'
           >
             Event Details
           </Button>

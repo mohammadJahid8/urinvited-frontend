@@ -16,8 +16,6 @@ export default function Share({ id }: { id: string }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  console.log({ event });
-
   const hostName = event?.hostedBy;
 
   const handleShareEvent = async () => {
@@ -43,7 +41,7 @@ export default function Share({ id }: { id: string }) {
         toast.success(`Event shared successfully`, {
           position: 'top-center',
         });
-        router.push(path);
+        // router.push(path);
       }
     } catch (error: any) {
       console.error(error);

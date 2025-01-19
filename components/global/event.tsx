@@ -9,19 +9,21 @@ import {
   Car,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 import useStore from '@/app/store/useStore';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { format, parse } from 'date-fns';
 import { cn } from '@/lib/utils';
 import RSVPSheet from './rsvp-sheet';
 import api from '@/utils/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 
 import moment from 'moment';
 import { useAppContext } from '@/lib/context';
+import { toast } from 'sonner';
+import { shareUrl } from '@/lib/shareUrl';
+import PickEmoji from './emoji-picker';
 
 const convertTime = (timeString: string) => {
   // Parse the time string into a Date object
@@ -33,9 +35,32 @@ const convertTime = (timeString: string) => {
 export default function Event({ className }: any) {
   const { formData } = useStore();
   const { setOpenRSVP, event, isEventLoading } = useAppContext();
+  const [reaction, setReaction] = useState('');
 
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const urlId = searchParams.get('id');
+  const name = searchParams.get('n');
+  const email = searchParams.get('e');
+  const { id: paramsId } = useParams();
+  const id = urlId || paramsId;
+
+  const {
+    isLoading: isRsvpLoading,
+    refetch: refetchRsvp,
+    data: rsvp,
+  } = useQuery({
+    queryKey: [`rsvp`, id, email],
+    queryFn: async () => {
+      const response = await api.get(`/rsvp/${id}?contact=${email}`);
+      return response?.data?.data;
+    },
+  });
+
+  useEffect(() => {
+    if (rsvp) {
+      setReaction(rsvp?.reaction || '');
+    }
+  }, [rsvp]);
 
   if (isEventLoading) {
     return <div>Loading...</div>;
@@ -45,8 +70,6 @@ export default function Event({ className }: any) {
   const customization = formData?.customization || event?.customization;
   const additionalFeatures =
     formData?.additionalFeatures || event?.additionalFeatures;
-
-  console.log({ eventDetails, customization, additionalFeatures });
 
   const events = eventDetails?.events;
   const hostedBy = event?.hostedBy;
@@ -102,6 +125,28 @@ export default function Event({ className }: any) {
 
   const videoUrl = event?.video?.videos[event?.video?.videos?.length - 1]?.url;
 
+  const handleCopyLink = () => {
+    navigator.clipboard
+      .writeText(shareUrl(id as string))
+      .then(() => {
+        toast.success('Link copied to clipboard!');
+      })
+      .catch(() => {
+        toast.error('Failed to copy link.');
+      });
+  };
+
+  const onIconSelect = (icon: string) => {
+    setReaction(icon);
+  };
+
+  const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+    eventDetails?.events?.[0]?.title
+  )}&dates=${eventDetails?.events?.[0]?.startDate}/${
+    eventDetails?.events?.[0]?.startDate
+  }&details=${encodeURIComponent(
+    eventDetails?.events?.[0]?.inviteDetails
+  )}&location=${encodeURIComponent(eventDetails?.events?.[0]?.locationName)}`;
   return (
     <div
       className={cn('bg-cover bg-center bg-no-repeat p-10', className)}
@@ -115,16 +160,18 @@ export default function Event({ className }: any) {
       <div className=''>
         {/* Video Section */}
         <div className='relative max-w-[300px] mx-auto rounded-lg shadow-lg overflow-hidden'>
-          <video
-            className='w-full h-[450px] object-cover'
-            poster={thumbnailImage || ''}
-            loop
-            playsInline
-            controls
-          >
-            <source src={videoUrl} type='video/mp4' />
-            Your browser does not support the video tag.
-          </video>
+          {videoUrl && (
+            <video
+              className='w-full h-[450px] object-cover'
+              poster={thumbnailImage || ''}
+              loop
+              playsInline
+              controls
+            >
+              <source src={videoUrl} type='video/mp4' />
+              Your browser does not support the video tag.
+            </video>
+          )}
 
           <div className='absolute top-3 right-3 bg-white text-black text-sm font-medium px-2 py-1 rounded-lg shadow-md'>
             <div className='text-center'>
@@ -138,6 +185,7 @@ export default function Event({ className }: any) {
           <div className='flex gap-6 bg-white/80 backdrop-blur-md px-4 rounded-b-lg shadow-md'>
             {shareEvent && (
               <Button
+                onClick={handleCopyLink}
                 variant='special'
                 className='flex items-center gap-2 text-gray-700 hover:text-black'
               >
@@ -146,13 +194,23 @@ export default function Event({ className }: any) {
               </Button>
             )}
             {reactToEvent && (
-              <Button
-                variant='special'
-                className='flex items-center gap-2 text-gray-700 hover:text-black'
-              >
-                <Heart className='size-4' />
-                Reaction
-              </Button>
+              <>
+                <PickEmoji onChange={onIconSelect}>
+                  <Button
+                    variant='special'
+                    className='flex items-center gap-2 text-gray-700 hover:text-black'
+                  >
+                    {reaction ? (
+                      <span className='text-3xl'>{reaction}</span>
+                    ) : (
+                      <>
+                        <Heart className='size-4' />
+                        Reaction
+                      </>
+                    )}
+                  </Button>
+                </PickEmoji>
+              </>
             )}
           </div>
         </div>
@@ -208,7 +266,7 @@ export default function Event({ className }: any) {
                       endTime) &&
                       when !== 'tbd' && (
                         <div className='space-y-1'>
-                          <div className='flex items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
+                          <div className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
                             <Calendar className='w-5 h-5 text-blue-600' />
                             <span>
                               {startDate &&
@@ -229,7 +287,11 @@ export default function Event({ className }: any) {
                             </span>
                           </div>
                           {isAddToCalendar && (
-                            <a href='#' className='text-blue-500 text-base'>
+                            <a
+                              href={calendarUrl}
+                              target='_blank'
+                              className='text-blue-500 text-base'
+                            >
                               Add to Calendar
                             </a>
                           )}
@@ -239,7 +301,7 @@ export default function Event({ className }: any) {
                     {(address || locationName) &&
                       locationType === 'in-person' && (
                         <div className='space-y-1'>
-                          <div className='flex items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
+                          <div className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'>
                             <MapPin className='w-5 h-5 text-blue-600' />
                             <span>
                               {address}, {locationName}
@@ -311,7 +373,13 @@ export default function Event({ className }: any) {
                 {buttonText || 'RSVP Now'}
               </Button>
             )}
-            <RSVPSheet />
+            <RSVPSheet
+              reaction={reaction}
+              rsvp={rsvp}
+              email={email}
+              name={name}
+              id={id}
+            />
           </div>
 
           {/* Gift Section */}
@@ -383,7 +451,7 @@ export default function Event({ className }: any) {
                           className='flex flex-col items-center gap-1'
                           key={index}
                         >
-                          <div className='flex items-center gap-1'>
+                          <div className='flex sm:flex-row flex-col items-center justify-center gap-1 text-center'>
                             <Hotel className='w-6 h-6 text-blue-600' />
                             <span className='text-sm text-gray-700'>
                               {item.accommodationName}, {item.location}

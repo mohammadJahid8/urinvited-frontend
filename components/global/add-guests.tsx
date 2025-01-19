@@ -8,11 +8,8 @@ import { EmailPreview } from './email-preview';
 import { useAppContext } from '@/lib/context';
 
 const AddGuests = ({ id }: { id: string }) => {
-  const { setOpenEmailPreview, guests } = useAppContext();
+  const { setOpenEmailPreview, totalGuestAdded } = useAppContext();
   const [emails, setEmails] = React.useState<string[]>([]);
-
-  const addedGuests =
-    guests.filter((guest: any) => guest.isConfirmed).length || 0;
 
   return (
     <div className='w-full max-w-full sm:max-w-[900px] mx-auto bg-white rounded-lg overflow-hidden shadow-sm border'>
@@ -20,7 +17,7 @@ const AddGuests = ({ id }: { id: string }) => {
         <h2 className='text-lg sm:text-xl font-bold'>Add guest</h2>
         <div className='flex items-center gap-2'>
           <p className='text-sm sm:text-base text-gray-600 font-medium'>
-            Total guests added: {addedGuests}
+            Total guests added: {totalGuestAdded}
           </p>
           <Button
             variant='outline'

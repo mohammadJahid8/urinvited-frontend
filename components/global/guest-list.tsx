@@ -17,24 +17,43 @@ import { useAppContext } from '@/lib/context';
 import { toast } from 'sonner';
 
 export default function GuestList({ emails }: { emails: string[] }) {
-  const { guests, setGuests } = useAppContext();
+  const { guests, setGuests, event, totalGuestAdded } = useAppContext();
   const [openGroupModal, setOpenGroupModal] = useState(false);
   const [guestIndex, setGuestIndex] = useState<number>(0);
 
+  const maximumCapacity = Number(event?.eventDetails?.maximumCapacity);
+
   const handleOpenGroupModal = (index: number) => {
+    if (totalGuestAdded >= maximumCapacity) {
+      return toast.error(
+        `You have reached the maximum capacity of ${maximumCapacity} guests`
+      );
+    }
+
     setOpenGroupModal(true);
     setGuestIndex(index);
   };
-  console.log({ emails });
 
   useEffect(() => {
     setGuests((prevGuests: any) => {
+      // Get the highest existing guestId
+      const maxGuestId = prevGuests.reduce(
+        (maxId: number, guest: any) => Math.max(maxId, guest.guestId),
+        0
+      );
+
+      // Separate guests with phone numbers (no email)
+      const phoneGuests = prevGuests.filter(
+        (guest: any) => !guest.email.includes('@')
+      );
+
+      // Create new guests from emails that are not already in the guest list
       const newGuests = emails
         .filter(
           (email) => !prevGuests.some((guest: any) => guest.email === email)
         )
         .map((email, index) => ({
-          guestId: prevGuests.length + index,
+          guestId: maxGuestId + index + 1, // Ensure unique guestId
           name: '',
           phone: '',
           email,
@@ -42,16 +61,23 @@ export default function GuestList({ emails }: { emails: string[] }) {
           fromEmail: true,
         }));
 
-      const updatedGuests = prevGuests.filter((guest: any) =>
+      // Filter guests whose emails match the current list of emails
+      const emailMatchedGuests = prevGuests.filter((guest: any) =>
         emails.includes(guest.email)
       );
 
-      return [...updatedGuests, ...newGuests];
+      // Combine all guest categories into the final list
+      return [...emailMatchedGuests, ...newGuests, ...phoneGuests].sort(
+        (a: any, b: any) => a.guestId - b.guestId
+      );
     });
   }, [emails]);
-
   const handleConfirm = (guest: any) => {
-    console.log('handleConfirm', guest);
+    if (totalGuestAdded >= maximumCapacity) {
+      return toast.error(
+        `You have reached the maximum capacity of ${maximumCapacity} guests`
+      );
+    }
     if (!guest.email && !guest.phone) {
       return toast.error('Please enter a valid email or phone number');
     }
@@ -81,8 +107,6 @@ export default function GuestList({ emails }: { emails: string[] }) {
     setGuests(guests.filter((g: any) => g.guestId !== id));
   };
 
-  console.log({ guests });
-
   const handleAddGroupGuests = (data: any) => {
     setGuests((prev: any) => {
       const newGuests = [...prev];
@@ -92,6 +116,11 @@ export default function GuestList({ emails }: { emails: string[] }) {
   };
 
   const handleAddRow = () => {
+    if (totalGuestAdded >= maximumCapacity) {
+      return toast.error(
+        `You have reached the maximum capacity of ${maximumCapacity} guests`
+      );
+    }
     setGuests((prev: any) => [
       ...prev,
       {
@@ -106,9 +135,9 @@ export default function GuestList({ emails }: { emails: string[] }) {
 
   return (
     <div className='w-full'>
-      <p className='text-sm text-primary pb-2 text-end cursor-pointer hoverl:underline'>
+      {/* <p className='text-sm text-primary pb-2 text-end cursor-pointer hoverl:underline'>
         Upload CSV
-      </p>
+      </p> */}
       <Table className=''>
         <TableHeader className='bg-gray-100 rounded-lg'>
           <TableRow className='rounded-lg'>
@@ -179,7 +208,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => handleOpenGroupModal(guest.guestId)}
+                    onClick={() => handleOpenGroupModal(index)}
                   >
                     <Users className='w-5 h-5 text-primary' />
                   </Button>

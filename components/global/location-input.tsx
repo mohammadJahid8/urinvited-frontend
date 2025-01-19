@@ -51,8 +51,6 @@ function LocationInput({
         }
       });
 
-      console.log(`City: ${city}, State: ${state}, Zip: ${zip}`);
-
       const latLng = {
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
@@ -69,8 +67,6 @@ function LocationInput({
       alert('Autocomplete is not ready yet.');
     }
   }
-
-  console.log({ field });
 
   if (!isLoaded) {
     return <div>Loading...</div>;

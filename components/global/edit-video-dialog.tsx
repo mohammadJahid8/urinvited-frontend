@@ -24,8 +24,6 @@ export function EditVideoDialog({ video, refetch }: any) {
   const [thumbnailPreview, setThumbnailPreview] = useState('');
   const [thInfo, setThInfo] = useState(null);
 
-  console.log({ preview });
-
   const handleUpdateVideo = async (event: any) => {
     event.preventDefault();
 
@@ -52,13 +50,6 @@ export function EditVideoDialog({ video, refetch }: any) {
       );
 
       const videourl = response?.data?.secure_url;
-
-      console.log({ videourl });
-
-      // const payload = {
-      //   url: videourl,
-      //   videoId: video._id,
-      // };
 
       const newFormData = new FormData();
       newFormData.append('url', videourl);

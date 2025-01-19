@@ -32,33 +32,15 @@ import { toast } from 'sonner';
 import api from '@/utils/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
 import daysLeft from '@/utils/daysLeft';
+import RsvpGuests from './rsvp-guests';
 
 type RSVPOption = 'yes' | 'no' | 'maybe';
 
-export default function RSVPSheet() {
-  const searchParams = useSearchParams();
-  const name = searchParams.get('n');
-  const email = searchParams.get('e');
-  const { id } = useParams();
+export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
   const [rsvpStatus, setRsvpStatus] = useState<RSVPOption | null>('yes');
   const { openRSVP, setOpenRSVP, event } = useAppContext();
-  const [totalGuests, setTotalGuests] = useState<string>('1');
   const [specialMessage, setSpecialMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-
-  const {
-    isLoading: isRsvpLoading,
-    refetch: refetchRsvp,
-    data: rsvp,
-  } = useQuery({
-    queryKey: [`rsvp`, id, email],
-    queryFn: async () => {
-      const response = await api.get(`/rsvp/${id}?contact=${email}`);
-      return response?.data?.data;
-    },
-  });
-
-  console.log('rsvp', rsvp);
 
   useEffect(() => {
     if (rsvp) {
@@ -69,40 +51,48 @@ export default function RSVPSheet() {
 
   const rsvpGuests = rsvp?.guests;
 
-  const [guests, setGuests] = useState<any[]>([
-    {
-      guestId: '1',
-      name: name || '',
-      isAdult: true,
-      email: email || '',
-    },
-  ]);
+  const [guests, setGuests] = useState<any[]>([]);
 
   const eventData = event?.eventDetails;
   const additionalAttendees = eventData?.additionalAttendees;
   const allowAdditionalAttendees = eventData?.allowAdditionalAttendees;
+  const rsvpLength = rsvpGuests?.length || 0;
 
   useEffect(() => {
-    if (rsvpGuests) {
-      setGuests(rsvpGuests);
-    } else {
-      setGuests([
-        {
-          guestId: '1',
-          name: name || '',
-          isAdult: true,
-          email: email || '',
-        },
-        ...(allowAdditionalAttendees
-          ? Array.from({ length: additionalAttendees }, (_, index) => ({
-              guestId: String(Date.now() + index + 1),
-              name: '',
-              isAdult: true,
-            }))
-          : []),
-      ]);
+    const newGuests = [
+      ...(rsvpLength < additionalAttendees
+        ? [
+            ...(rsvpGuests || []),
+            ...Array.from(
+              { length: additionalAttendees - rsvpLength },
+              (_, index) => ({
+                guestId: String(Date.now() + index + 1),
+                name: '',
+                isAdult: true,
+              })
+            ),
+          ]
+        : rsvpGuests || []),
+    ];
+
+    if (name && email) {
+      newGuests[0] = {
+        guestId: '1',
+        name: name,
+        isAdult: true,
+        email: email,
+      };
     }
-  }, [additionalAttendees, name, email, allowAdditionalAttendees, rsvpGuests]);
+
+    setGuests(newGuests);
+  }, [
+    additionalAttendees,
+    name,
+    email,
+    allowAdditionalAttendees,
+    rsvpGuests,
+    rsvpLength,
+  ]);
 
   const eventName = eventData?.events?.[0]?.title;
   const hostName = event?.hostedBy;
@@ -127,39 +117,14 @@ export default function RSVPSheet() {
     message
   )}&location=${encodeURIComponent(eventLocation)}`;
 
-  const handleGuestNameChange = (guestId: string, name: string) => {
-    setGuests(
-      guests.map((guest: any) =>
-        guest.guestId === guestId ? { ...guest, name } : guest
-      )
-    );
-  };
-
-  const handleRemoveGuest = (guestId: string) => {
-    if (guests.length > 1) {
-      // Prevent removing the first guest
-      setGuests(guests.filter((guest: any) => guest.guestId !== guestId));
-      setTotalGuests(String(parseInt(totalGuests) - 1));
-    }
-  };
-
-  const handleGuestTypeChange = (guestId: string, isAdult: boolean) => {
-    setGuests(
-      guests.map((guest: any) =>
-        guest.guestId === guestId ? { ...guest, isAdult } : guest
-      )
-    );
-  };
-
   const handleConfirmRsvp = async () => {
     if (!allowRsvpAfterDueDate) {
       return toast.error('RSVP is not allowed after the due date', {
         position: 'top-center',
       });
     }
-    const isAnyGuestNameEmpty = guests.some((guest: any) => guest.name === '');
-    if (isAnyGuestNameEmpty) {
-      return toast.error('Please fill in all guest names', {
+    if (!guests[0]?.name) {
+      return toast.error('Please fill in the first guest name', {
         position: 'top-center',
       });
     }
@@ -171,9 +136,8 @@ export default function RSVPSheet() {
       contact: email,
       name,
       event: id,
+      reaction,
     };
-
-    console.log({ payload });
 
     try {
       setLoading(true);
@@ -274,79 +238,7 @@ export default function RSVPSheet() {
                   Add to Calendar
                 </Button>
 
-                <div className='space-y-4'>
-                  <div className='space-y-2'>
-                    <Label>Total Guest</Label>
-                    <Input
-                      type='number'
-                      placeholder='Max guest limit is 3 including you'
-                      value={guests?.length}
-                      disabled
-                      // onChange={(e) => handleTotalGuestsChange(e.target.value)}
-                    />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label>Guest Details</Label>
-                    <div className='space-y-2'>
-                      {guests.map((guest: any, index: number) => (
-                        <div
-                          key={guest.guestId}
-                          className='flex items-center gap-2'
-                        >
-                          <div className='flex items-center gap-2'>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() =>
-                                handleGuestTypeChange(guest.guestId, true)
-                              }
-                              // disabled={guest.id === '1'}
-                              className={cn(
-                                guest.isAdult && 'bg-primary/10 text-primary'
-                              )}
-                            >
-                              <User className='w-5 h-5' />
-                            </Button>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() =>
-                                handleGuestTypeChange(guest.guestId, false)
-                              }
-                              // disabled={guest.id === '1'}
-                              className={cn(
-                                !guest.isAdult && 'bg-primary/10 text-primary'
-                              )}
-                            >
-                              <Baby className='w-5 h-5' />
-                            </Button>
-                          </div>
-                          <Input
-                            value={guest.name}
-                            disabled={guest.guestId === '1'}
-                            onChange={(e) =>
-                              handleGuestNameChange(
-                                guest.guestId,
-                                e.target.value
-                              )
-                            }
-                            placeholder='Guest name'
-                          />
-
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            disabled={guest.guestId === '1'}
-                            onClick={() => handleRemoveGuest(guest.guestId)}
-                            className='text-destructive hover:text-destructive hover:bg-destructive/10'
-                          >
-                            <Trash2 className='h-4 w-4' />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <RsvpGuests guests={guests} setGuests={setGuests} />
               </>
             )}
             {/* {rsvpOption === 'maybe' && (

@@ -7,12 +7,6 @@ const VideoPreview = () => {
   const { event, isEventLoading } = useAppContext();
   const previousVideo = event?.video?.videos[event?.video?.videos?.length - 2];
   const currentVideo = event?.video?.videos[event?.video?.videos?.length - 1];
-  console.log(
-    'currentVideo',
-    event?.video?.videos,
-    previousVideo,
-    currentVideo
-  );
 
   if (isEventLoading) return <div>Loading...</div>;
   return (

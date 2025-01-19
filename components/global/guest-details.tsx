@@ -4,12 +4,14 @@ import { Eye, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
+import { EditRSVPModal } from './edit-rsvp-modal';
 
 export default function GuestDetailsDialog({ guest }: { guest: any }) {
   const status = {
@@ -18,28 +20,40 @@ export default function GuestDetailsDialog({ guest }: { guest: any }) {
     maybe: 'Maybe',
   };
 
-  const [open, setOpen] = useState(false);
-
+  const [openGuestDetails, setOpenGuestDetails] = useState(false);
+  const [openEditRSVP, setOpenEditRSVP] = useState(false);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog key={guest.contact}>
       <DialogTrigger asChild>
         <Button size='icon' variant='ghost'>
           <Eye className='h-4 w-4' />
         </Button>
       </DialogTrigger>
-      <DialogContent className='max-w-md'>
+      <DialogContent className='max-w-md max-h-[90vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle>Guest Details</DialogTitle>
         </DialogHeader>
-        <div className='grid gap-4 py-4'>
+        <div className='grid gap-4 py-4' key={guest.contact}>
           <div className='flex items-start justify-between gap-4'>
             <div>
               <div className='text-sm font-medium mb-1'>Guest Name:</div>
               <div>{guest.name}</div>
             </div>
-            {/* <Button variant='outline' size='sm'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => {
+                setOpenGuestDetails(false);
+                setOpenEditRSVP(true);
+              }}
+            >
               Edit
-            </Button> */}
+            </Button>
+            <EditRSVPModal
+              guest={guest}
+              openEditRSVP={openEditRSVP}
+              setOpenEditRSVP={setOpenEditRSVP}
+            />
           </div>
           <div>
             <div className='text-sm font-medium mb-1'>Contact:</div>
@@ -67,13 +81,15 @@ export default function GuestDetailsDialog({ guest }: { guest: any }) {
           </div>
           <div>
             <div className='text-sm font-medium mb-1'>Video Reaction</div>
-            <div className='text-sm text-muted-foreground'>
-              {guest.videoReaction || '-'}
+            <div className='text-3xl text-muted-foreground'>
+              {guest.reaction || '-'}
             </div>
           </div>
         </div>
         <div className='flex justify-end'>
-          <Button onClick={() => setOpen(false)}>Ok</Button>
+          <DialogClose asChild>
+            <Button>Ok</Button>
+          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>

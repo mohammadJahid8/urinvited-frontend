@@ -9,10 +9,6 @@ const VideoLayout = ({ children }: any) => {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
 
-  // console.log('event', event);
-
-  // const videoData = event?.video;
-
   return (
     <div className=''>
       <Navbar />

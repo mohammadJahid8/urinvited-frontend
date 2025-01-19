@@ -11,13 +11,13 @@ const EventLayout = ({ children }: any) => {
   return (
     <div className=''>
       {!isSharePage ? (
-        <div className='grid grid-cols-[580px_auto]'>
+        <div className='lg:grid grid-cols-[580px_auto]'>
           <div className='relative flex flex-col gap-4 h-screen overflow-y-auto pt-28'>
             <EventButtons />
 
             <div className='px-4'>{children}</div>
           </div>
-          <div className='h-screen overflow-y-auto bg-gray-100'>
+          <div className='hidden lg:block h-screen overflow-y-auto bg-gray-100'>
             <Event className='pt-48' />
           </div>
         </div>

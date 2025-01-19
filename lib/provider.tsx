@@ -1,8 +1,8 @@
 'use client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
-import ContextProvider, { useAppContext } from './context';
-import { useState } from 'react';
+import ContextProvider from './context';
+import { Suspense, useState } from 'react';
 
 export default function Provider({ children }: any) {
   const [queryClient] = useState(
@@ -19,12 +19,14 @@ export default function Provider({ children }: any) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ContextProvider>
-        {children}
+    <Suspense>
+      <QueryClientProvider client={queryClient}>
+        <ContextProvider>
+          {children}
 
-        <Toaster />
-      </ContextProvider>
-    </QueryClientProvider>
+          <Toaster />
+        </ContextProvider>
+      </QueryClientProvider>
+    </Suspense>
   );
 }

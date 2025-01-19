@@ -2,6 +2,7 @@
 import Navbar from '@/components/global/navbar';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/lib/context';
+import { cn } from '@/lib/utils';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -23,7 +24,11 @@ const PublicLayout = ({ children }: any) => {
           <span>Go Back</span>
         </Button>
       )}
-      <div className='h-[calc(100vh-64px)] overflow-y-auto'>{children}</div>
+      <div
+        className={cn('overflow-y-auto', preview && 'h-[calc(100vh-104px)]')}
+      >
+        {children}
+      </div>
     </div>
   );
 };

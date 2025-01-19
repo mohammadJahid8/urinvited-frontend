@@ -27,7 +27,7 @@ export function FeedbackSheet() {
         <SheetHeader className='border-b p-4'>
           <div className='flex items-center justify-between'>
             <div className='flex gap-2'>
-              <Button
+              {/* <Button
                 onClick={() => setCurrentTab('message')}
                 size='sm'
                 variant='outline'
@@ -37,7 +37,7 @@ export function FeedbackSheet() {
                 )}
               >
                 Message
-              </Button>
+              </Button> */}
               <Button
                 onClick={() => setCurrentTab('history')}
                 size='sm'
@@ -65,8 +65,36 @@ export function FeedbackSheet() {
 }
 
 const HistoryTab = ({ feedbacks, downloadFile }: any) => {
+  const [openCreateTicket, setOpenCreateTicket] = useState(false);
   return (
     <div className='flex flex-col gap-2 p-4 mb-16'>
+      <div className='flex flex-col gap-2 bg-gray-50 p-4'>
+        <p className='text-sm text-muted-foreground'>
+          Submit up to 3 tickets for revisions and feedback ({feedbacks.length}
+          /3)
+        </p>
+        <Button
+          onClick={() => {
+            if (feedbacks.length >= 3) {
+              return toast.error(
+                'You have reached the maximum number of tickets',
+                {
+                  position: 'top-center',
+                }
+              );
+            }
+            setOpenCreateTicket(true);
+          }}
+          size='sm'
+          className='bg-primary text-white w-max'
+        >
+          Create Ticket
+        </Button>
+        <CreateTicket
+          open={openCreateTicket}
+          onOpenChange={setOpenCreateTicket}
+        />
+      </div>
       <div className='flex flex-col gap-2'>
         {feedbacks.map((feedback: any, index: any) => (
           <FeedbackTicket

@@ -69,7 +69,6 @@ export default function CreateTicket({ open, onOpenChange }: any) {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log({ promise });
       if (promise?.status === 200) {
         toast.success(`Ticket created`, {
           position: 'top-center',
@@ -167,6 +166,7 @@ export default function CreateTicket({ open, onOpenChange }: any) {
             <Label>Attachment</Label>
             <Input
               type='file'
+              accept='image/*'
               onChange={(e) =>
                 setInputs({ ...inputs, attachment: e.target.files?.[0] })
               }

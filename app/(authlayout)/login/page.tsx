@@ -41,7 +41,6 @@ export default function Login() {
     try {
       const promise = await api.post(`/auth/login`, data);
       if (promise.status === 200) {
-        console.log(promise.data.data);
         const accessToken = promise.data.data.accessToken;
         const role = promise.data.data.role;
         window.localStorage.setItem('rmToken', accessToken);

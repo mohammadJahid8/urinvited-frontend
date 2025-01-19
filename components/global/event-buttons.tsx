@@ -31,12 +31,12 @@ export default function EventButtons() {
   ];
 
   return (
-    <div className='flex w-full gap-2 mt-4 p-4 sticky top-0 bg-white z-10'>
+    <div className='flex w-full sm:gap-2 gap-1 mt-4 p-4 sticky top-0 bg-white z-10'>
       {buttons.map((button) => (
         <Button
           key={button.name}
           variant='outline'
-          className={`flex-1 ${
+          className={`flex-1 sm:text-sm text-xs px-2 sm:px-4 ${
             pathname.includes(button.path)
               ? 'bg-[#E9ECFF] text-[#4A61FF]'
               : 'bg-white text-gray-700 hover:bg-gray-100'

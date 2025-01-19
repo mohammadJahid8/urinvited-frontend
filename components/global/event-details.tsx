@@ -32,8 +32,6 @@ const EventDetails = () => {
   });
   const eventDetails = event?.eventDetails?.events;
 
-  // console.log({ formData });
-
   const schemaFields: Record<string, z.ZodTypeAny> = {
     // event details
     hostedBy: z.string().min(1, { message: 'Hosted by is required' }),
@@ -119,11 +117,11 @@ const EventDetails = () => {
             } else {
               delete data.inviteDetails;
             }
+          } else {
+            if (typeof data.inviteDetails !== 'string') {
+              delete data.inviteDetails;
+            }
           }
-          // else {
-          //   console.log('inviteDetails', data.inviteDetails);
-          //   delete data.inviteDetails;
-          // }
 
           if (data.locationType === 'in-person') {
             if (!data.locationName) {
@@ -228,8 +226,6 @@ const EventDetails = () => {
       }
     }
   });
-
-  // console.log({ eventDetails });
 
   const defaultValues = {
     hostedBy: event?.hostedBy || '',
@@ -352,11 +348,9 @@ const EventDetails = () => {
       eventDetails,
     };
 
-    if (id) {
+    if (id && id !== 'null') {
       payload.eventId = id;
     }
-
-    console.log('payload', payload);
 
     try {
       const promise = await api.patch(`/event/create`, payload);
@@ -366,7 +360,7 @@ const EventDetails = () => {
         });
         refetchEvents();
         refetchEvent();
-        router.push(`/customization?id=${id}`);
+        router.push(`/customization?id=${id || promise?.data?.data?._id}`);
         setIsSubmitting(false);
       }
     } catch (error: any) {
@@ -388,7 +382,7 @@ const EventDetails = () => {
     return () => subscription.unsubscribe();
   }, [form.watch]);
 
-  if (isEventLoading) return <div>Loading...</div>;
+  if (isEventLoading && id) return <div>Loading...</div>;
 
   return (
     <Form {...form}>
