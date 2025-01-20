@@ -2,6 +2,7 @@
 
 import api from '@/utils/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import {
   redirect,
   useParams,
@@ -83,6 +84,18 @@ const ContextProvider = ({ children }: any) => {
       return response?.data?.data;
     },
   });
+  // const { isLoading: isGoogleFontsLoading, data: googleFonts } = useQuery({
+  //   queryKey: [`googleFonts`],
+  //   queryFn: async () => {
+  //     const response = await axios.get(
+  //       `https://www.googleapis.com/webfonts/v1/webfonts?key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY} `
+  //     );
+  //     return response?.data?.items;
+  //   },
+  //   staleTime: 1000 * 60 * 60 * 24,
+  // });
+
+  // console.log('googleFonts', googleFonts);
 
   const {
     isLoading: isEventLoading,
@@ -210,6 +223,7 @@ const ContextProvider = ({ children }: any) => {
     setEmailData,
     share,
     refetchShare,
+    // googleFonts,
   };
 
   return (

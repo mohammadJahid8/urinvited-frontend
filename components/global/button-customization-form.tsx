@@ -19,6 +19,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
+import FontSelector from './fonts-selector';
 
 const ButtonCustomizationForm = ({ form }: { form: any }) => {
   return (
@@ -37,32 +38,15 @@ const ButtonCustomizationForm = ({ form }: { form: any }) => {
           </FormItem>
         )}
       />
+
       <FormField
         control={form.control}
         name='buttonFont'
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2 space-y-0'>
-            <FormLabel className='font-bold'>Button Font</FormLabel>
-
-            <FormControl>
-              <Select onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Select Button Font' />
-                </SelectTrigger>
-                <SelectContent>
-                  {['Lato', 'Poppins'].map((font) => (
-                    <SelectItem key={font} value={font}>
-                      {font}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
-
-            <FormMessage className='mt-0' />
-          </FormItem>
+          <FontSelector field={field} form={form} label='Button Font' />
         )}
       />
+
       <FormField
         control={form.control}
         name='buttonColour'

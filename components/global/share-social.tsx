@@ -36,7 +36,7 @@ const ShareSocial = ({ id }: { id: string }) => {
         <div className='flex flex-wrap gap-2 sm:gap-3 w-full'>
           {[
             {
-              src: '/linkedin.svg',
+              src: '/linkedIn.svg',
               alt: 'Share on LinkedIn',
               name: 'LinkedIn',
               url: `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl(
@@ -70,7 +70,7 @@ const ShareSocial = ({ id }: { id: string }) => {
               url: `mailto:?subject=testing&body=${shareUrl(id)}`,
             },
             {
-              src: '/gmail.svg',
+              src: '/Instagram.svg',
               alt: 'Share on Instagram',
               name: 'Instagram',
               url: `https://www.instagram.com/share?url=${shareUrl(id)}`,

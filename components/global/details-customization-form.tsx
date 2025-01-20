@@ -16,8 +16,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { useAppContext } from '@/lib/context';
+import { googleFonts } from '@/public/fonts';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Button } from '../ui/button';
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from '../ui/command';
+import { cn } from '@/lib/utils';
+import FontSelector from './fonts-selector';
 
 const DetailsCustomizationForm = ({ form }: { form: any }) => {
+  // const { googleFonts } = useAppContext();
+
+  function loadFont(fontFamily: string) {
+    const fontUrl = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(
+      ' ',
+      '+'
+    )}&display=swap`;
+
+    // Remove existing font link (if any)
+    const existingLink = document.getElementById('dynamic-font');
+    if (existingLink) {
+      existingLink.remove();
+    }
+
+    // Add new font link
+    const link = document.createElement('link');
+    link.id = 'dynamic-font';
+    link.rel = 'stylesheet';
+    link.href = fontUrl;
+    document.head.appendChild(link);
+  }
+
   return (
     <div className='flex flex-col gap-6'>
       <FormField
@@ -38,81 +75,31 @@ const DetailsCustomizationForm = ({ form }: { form: any }) => {
           </FormItem>
         )}
       />
+
       <FormField
         control={form.control}
         name='headingFont'
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2 space-y-0'>
-            <FormLabel className='font-bold'>Heading Font</FormLabel>
-            <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Select Heading Font' />
-                </SelectTrigger>
-                <SelectContent>
-                  {['Lato', 'Poppins'].map((font) => (
-                    <SelectItem key={font} value={font}>
-                      {font}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
-
-            <FormMessage className='mt-0' />
-          </FormItem>
+          <FontSelector field={field} form={form} label='Heading Font' />
         )}
       />
+
       <FormField
         control={form.control}
         name='dateTimeLocationFont'
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2 space-y-0'>
-            <FormLabel className='font-bold'>Date/Time/Location Font</FormLabel>
-
-            <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Select Date/Time/Location Font' />
-                </SelectTrigger>
-                <SelectContent>
-                  {['Lato', 'Poppins'].map((font) => (
-                    <SelectItem key={font} value={font}>
-                      {font}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
-
-            <FormMessage className='mt-0' />
-          </FormItem>
+          <FontSelector
+            field={field}
+            form={form}
+            label='Date/Time/Location Font'
+          />
         )}
       />
       <FormField
         control={form.control}
         name='descriptionFont'
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2 space-y-0'>
-            <FormLabel className='font-bold'>Description Font</FormLabel>
-
-            <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Select Description Font' />
-                </SelectTrigger>
-                <SelectContent>
-                  {['Lato', 'Poppins'].map((font) => (
-                    <SelectItem key={font} value={font}>
-                      {font}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
-
-            <FormMessage className='mt-0' />
-          </FormItem>
+          <FontSelector field={field} form={form} label='Description Font' />
         )}
       />
     </div>

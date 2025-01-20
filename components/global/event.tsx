@@ -62,10 +62,6 @@ export default function Event({ className }: any) {
     }
   }, [rsvp]);
 
-  if (isEventLoading) {
-    return <div>Loading...</div>;
-  }
-
   const eventDetails = formData?.eventDetails || event?.eventDetails;
   const customization = formData?.customization || event?.customization;
   const additionalFeatures =
@@ -104,6 +100,46 @@ export default function Event({ className }: any) {
   const accommodation = additionalFeatures?.accommodation;
   const travelSource = additionalFeatures?.travelSource;
   const travelSourceLink = additionalFeatures?.travelSourceLink;
+  useEffect(() => {
+    // Helper function to dynamically load a font
+    const loadFont = (fontFamily: string, id: string) => {
+      const fontUrl = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(
+        ' ',
+        '+'
+      )}&display=swap`;
+
+      // Remove existing font link with the same id
+      const existingLink = document.getElementById(id);
+      if (existingLink) {
+        existingLink.remove();
+      }
+
+      // Add new font link
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = fontUrl;
+      document.head.appendChild(link);
+    };
+
+    // Load each font with a unique ID
+    if (headingFont) {
+      loadFont(headingFont, 'dynamic-heading-font');
+    }
+    if (descriptionFont) {
+      loadFont(descriptionFont, 'dynamic-description-font');
+    }
+    if (dateTimeLocationFont) {
+      loadFont(dateTimeLocationFont, 'dynamic-datetime-font');
+    }
+    if (buttonFont) {
+      loadFont(buttonFont, 'dynamic-button-font');
+    }
+  }, [headingFont, descriptionFont, dateTimeLocationFont, buttonFont]);
+
+  if (isEventLoading) {
+    return <div>Loading...</div>;
+  }
 
   const createImageUrl = (image: any) =>
     typeof image === 'string'
@@ -140,15 +176,13 @@ export default function Event({ className }: any) {
     setReaction(icon);
   };
 
-  const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-    eventDetails?.events?.[0]?.title
-  )}&dates=${eventDetails?.events?.[0]?.startDate}/${
-    eventDetails?.events?.[0]?.startDate
-  }&details=${encodeURIComponent(
-    eventDetails?.events?.[0]?.inviteDetails
-  )}&location=${encodeURIComponent(eventDetails?.events?.[0]?.locationName)}`;
-
-  console.log({ textColour });
+  const combineDateTime = (date: string, time: string) => {
+    if (!date || !time) return '';
+    const [hours, minutes] = time?.split(':') || [];
+    const dateObject = new Date(date);
+    dateObject.setUTCHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0); // Set hours and minutes
+    return dateObject.toISOString().replace(/-|:|\.\d{3}/g, '');
+  };
 
   return (
     <div
@@ -246,13 +280,21 @@ export default function Event({ className }: any) {
                 <div className='text-center space-y-4'>
                   <h1
                     className='text-4xl font-semibold text-gray-800'
-                    style={{ color: textColour }}
+                    style={{
+                      color: textColour,
+                      fontFamily: headingFont,
+                      transition: 'font-family 0.3s ease',
+                    }}
                   >
                     {title}
                   </h1>
                   {typeof inviteDetails === 'string' && (
                     <p
                       className='text-lg text-gray-600'
+                      style={{
+                        color: textColour,
+                        fontFamily: descriptionFont,
+                      }}
                       dangerouslySetInnerHTML={{ __html: inviteDetails }}
                     />
                   )}
@@ -276,9 +318,13 @@ export default function Event({ className }: any) {
                         <div className='space-y-1'>
                           <div
                             className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'
-                            style={{ color: textColour }}
+                            style={{
+                              color: textColour,
+                              fontFamily: dateTimeLocationFont,
+                            }}
                           >
                             <Calendar className='w-5 h-5 text-blue-600' />
+                            {/* {console.log({ startDate, startTime })} */}
                             <span>
                               {startDate &&
                                 format(new Date(startDate), 'dd/MM/yyyy')}{' '}
@@ -299,9 +345,24 @@ export default function Event({ className }: any) {
                           </div>
                           {isAddToCalendar && (
                             <a
-                              href={calendarUrl}
+                              href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+                                title
+                              )}&dates=${combineDateTime(
+                                startDate,
+                                startTime
+                              )}/${combineDateTime(
+                                endDate,
+                                endTime
+                              )}&details=${encodeURIComponent(
+                                inviteDetails || ''
+                              )}&location=${encodeURIComponent(
+                                locationName
+                              )}&timezone=${timeZone}`}
                               target='_blank'
                               className='text-blue-500 text-base'
+                              style={{
+                                fontFamily: dateTimeLocationFont,
+                              }}
                             >
                               Add to Calendar
                             </a>
@@ -314,7 +375,10 @@ export default function Event({ className }: any) {
                         <div className='space-y-1'>
                           <div
                             className='flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold'
-                            style={{ color: textColour }}
+                            style={{
+                              color: textColour,
+                              fontFamily: dateTimeLocationFont,
+                            }}
                           >
                             <MapPin className='w-5 h-5 text-blue-600' />
                             <span>
@@ -325,6 +389,9 @@ export default function Event({ className }: any) {
                             <a
                               href={`https://www.google.com/maps?q=${latLng?.lat},${latLng?.lng}`}
                               className='text-blue-500 text-base'
+                              style={{
+                                fontFamily: dateTimeLocationFont,
+                              }}
                             >
                               View Map
                             </a>
@@ -337,7 +404,10 @@ export default function Event({ className }: any) {
                         <div className='space-y-1'>
                           <div
                             className='flex items-center justify-center gap-2 text-lg text-gray-700 font-semibold'
-                            style={{ color: textColour }}
+                            style={{
+                              color: textColour,
+                              fontFamily: dateTimeLocationFont,
+                            }}
                           >
                             <Plane className='w-5 h-5 text-blue-600' />
                             <span>{virtualPlatformName}</span>
@@ -347,6 +417,9 @@ export default function Event({ className }: any) {
                               target='_blank'
                               href={virtualUrl}
                               className='text-blue-500 text-base'
+                              style={{
+                                fontFamily: dateTimeLocationFont,
+                              }}
                             >
                               Join Link
                             </a>
@@ -364,7 +437,10 @@ export default function Event({ className }: any) {
           {hostedBy && (
             <p
               className='text-xl text-gray-500 text-center'
-              style={{ color: textColour }}
+              style={{
+                color: textColour,
+                fontFamily: descriptionFont,
+              }}
             >
               Hosted By: {hostedBy}
             </p>
@@ -376,7 +452,10 @@ export default function Event({ className }: any) {
                 <Border />
                 <p
                   className='text-sm text-gray-500 pt-4'
-                  style={{ color: textColour }}
+                  style={{
+                    color: textColour,
+                    fontFamily: descriptionFont,
+                  }}
                 >
                   RSVP by {format(new Date(rsvpDueDate), 'dd MMMM yyyy')}
                 </p>
@@ -390,6 +469,7 @@ export default function Event({ className }: any) {
                 )}
                 style={{
                   backgroundColor: buttonColour,
+                  fontFamily: buttonFont,
                 }}
                 onClick={() => setOpenRSVP(true)}
               >
@@ -413,17 +493,30 @@ export default function Event({ className }: any) {
                 key={index}
               >
                 <img src='/gift.svg' alt='Gift' className='mx-auto h-10' />
-                <h2 className='text-xl font-bold' style={{ color: textColour }}>
+                <h2
+                  className='text-xl font-bold'
+                  style={{
+                    color: textColour,
+                    fontFamily: descriptionFont,
+                  }}
+                >
                   {item.title}
                 </h2>
                 <div
                   className='text-sm text-gray-500'
+                  style={{
+                    fontFamily: descriptionFont,
+                    color: textColour,
+                  }}
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 />
                 {item.url && (
                   <Button
                     href={item.url}
                     target='_blank'
+                    style={{
+                      fontFamily: buttonFont,
+                    }}
                     variant='outline'
                     className={cn(
                       'max-w-[172px] w-full py-2 mt-2 border rounded-lg text-blue-600 border-blue-600 hover:bg-blue-100',
@@ -461,9 +554,18 @@ export default function Event({ className }: any) {
                   target='_blank'
                   variant='special'
                   className='flex items-center gap-1 text-gray-700 hover:text-black hover:underline'
+                  style={{
+                    fontFamily: buttonFont,
+                    color: textColour,
+                  }}
                 >
                   <Car className='w-6 h-6 text-blue-600' />
-                  <span className='text-sm text-gray-700'>{travelSource}</span>
+                  <span
+                    className='text-sm text-gray-700'
+                    style={{ color: textColour }}
+                  >
+                    {travelSource}
+                  </span>
                 </Button>
               )}
 
@@ -475,6 +577,9 @@ export default function Event({ className }: any) {
                         <div
                           className='flex flex-col items-center gap-1'
                           key={index}
+                          style={{
+                            fontFamily: descriptionFont,
+                          }}
                         >
                           <div className='flex sm:flex-row flex-col items-center justify-center gap-1 text-center'>
                             <Hotel className='w-6 h-6 text-blue-600' />
@@ -488,6 +593,7 @@ export default function Event({ className }: any) {
 
                           <div
                             className='text-sm text-gray-700'
+                            style={{ color: textColour }}
                             dangerouslySetInnerHTML={{ __html: item.note }}
                           />
                         </div>
