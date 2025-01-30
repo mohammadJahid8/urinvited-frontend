@@ -23,22 +23,22 @@ export default function Navbar() {
         <span className='text-lg font-semibold text-black'>Urinvited</span>
       </Link>
       <div className='flex items-center gap-2'>
-        <Button
+        {/* <Button
           variant='ghost'
           size='icon'
           className='text-black hover:bg-white/20'
         >
           <Bell className='h-5 w-5' />
           <span className='sr-only'>Notifications</span>
-        </Button>
-        <Button
+        </Button> */}
+        {/* <Button
           variant='ghost'
           size='icon'
           className='text-black hover:bg-white/20'
         >
           <HelpCircle className='h-5 w-5' />
           <span className='sr-only'>Time</span>
-        </Button>
+        </Button> */}
         <UserDropdown user={user} logout={logout} />
       </div>
     </header>

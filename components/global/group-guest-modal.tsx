@@ -113,8 +113,8 @@ export default function GroupGuestModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[560px] max-h-[90vh] overflow-y-auto'>
         <DialogHeader className='text-left'>
-          <DialogTitle>Add Guests</DialogTitle>
-          <DialogDescription>Add guests to your event.</DialogDescription>
+          <DialogTitle>Add Extra Guests</DialogTitle>
+          <DialogDescription>Add extra guests to your event.</DialogDescription>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
           <div className='grid grid-cols-4 items-center gap-4'>

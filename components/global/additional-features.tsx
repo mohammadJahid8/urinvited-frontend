@@ -272,7 +272,7 @@ const AdditionalFeatures = () => {
           {/* <EventAccordion items={customField} /> */}
           <EventAccordion items={accommodation} />
           <EventAccordion items={travel} />
-          <BottomButtons />
+          <BottomButtons label='Save & Share' />
         </div>
       </form>
     </Form>

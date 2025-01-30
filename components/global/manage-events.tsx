@@ -1,5 +1,5 @@
 'use client';
-import { Edit, Search, Share2 } from 'lucide-react';
+import { Edit, Search, Share2, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,11 +8,14 @@ import moment from 'moment';
 import daysLeft from '@/utils/daysLeft';
 import { useMemo, useState } from 'react';
 import statusCounts from '@/utils/statusCount';
+import api from '@/utils/axiosInstance';
+import { toast } from 'sonner';
 
 export default function ManageEvents({ title }: { title: string }) {
-  const { events, isEventsLoading, user, statusCountsData } = useAppContext();
+  const { events, isEventsLoading, user, statusCountsData, refetchEvents } =
+    useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('upcoming');
 
   const filteredEvents = events?.filter((event: any) => {
     const eventTitle = event?.eventDetails?.events?.[0]?.title?.toLowerCase();
@@ -35,17 +38,27 @@ export default function ManageEvents({ title }: { title: string }) {
     return eventDate.isBefore(moment());
   });
 
+  const tbdEvents = events?.filter((event: any) => {
+    return event?.eventDetails?.events?.[0]?.when === 'tbd';
+  });
+
+  // const allValidEvents =
+
   const eventsToDisplay =
     activeTab === 'upcoming'
       ? upcomingEvents
       : activeTab === 'past'
       ? pastEvents
+      : activeTab === 'tbd'
+      ? tbdEvents
       : filteredEvents;
 
   return (
     <div className=''>
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6'>
-        <h1 className='text-xl font-semibold'>{title}</h1>
+        <h1 className='text-xl font-semibold'>
+          {title} ({events?.length || 0})
+        </h1>
         <Button
           href='/event-details'
           className='bg-primary text-white w-full md:w-auto'
@@ -57,7 +70,7 @@ export default function ManageEvents({ title }: { title: string }) {
       {/* Tabs and Search Section */}
       <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8'>
         <div className='flex flex-wrap gap-2 w-full md:w-auto'>
-          <Button
+          {/* <Button
             variant='outline'
             className={`${
               activeTab === 'all' ? 'bg-primary/10 text-primary' : ''
@@ -65,7 +78,7 @@ export default function ManageEvents({ title }: { title: string }) {
             onClick={() => setActiveTab('all')}
           >
             All Events ({events?.length || 0})
-          </Button>
+          </Button> */}
           <Button
             variant='outline'
             className={`${
@@ -83,6 +96,15 @@ export default function ManageEvents({ title }: { title: string }) {
             onClick={() => setActiveTab('past')}
           >
             Past Events ({pastEvents?.length || 0})
+          </Button>
+          <Button
+            variant='outline'
+            className={`${
+              activeTab === 'tbd' ? 'bg-primary/10 text-primary' : ''
+            } flex-grow md:flex-grow-0`}
+            onClick={() => setActiveTab('tbd')}
+          >
+            TBD Events ({tbdEvents?.length || 0})
           </Button>
         </div>
         <div className='relative w-full md:w-[300px]'>
@@ -116,6 +138,7 @@ export default function ManageEvents({ title }: { title: string }) {
               daysLeft={daysLeft(event?.eventDetails?.events?.[0]?.startDate)}
               video={event?.video}
               isAdmin={user?.role === 'admin'}
+              refetchEvents={refetchEvents}
             />
           ))
         ) : (
@@ -139,6 +162,7 @@ interface EventCardProps {
   video: any;
   isAdmin: boolean;
   rsvps: any;
+  refetchEvents: any;
 }
 
 function EventCard({
@@ -154,6 +178,7 @@ function EventCard({
   video,
   isAdmin,
   rsvps,
+  refetchEvents,
 }: EventCardProps) {
   const isVideoPending = video?.status === 'Pending';
 
@@ -163,6 +188,32 @@ function EventCard({
       : `/event-details?id=${id}`;
 
   const statusCountsData = useMemo(() => statusCounts(rsvps), [rsvps]);
+
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this event?')) {
+      try {
+        const promise = api.delete(`/event/${id}`);
+        toast.promise(promise, {
+          loading: 'Deleting event...',
+          success: () => {
+            refetchEvents();
+            return 'Event deleted successfully';
+          },
+          error: 'Event deletion failed',
+          position: 'top-center',
+        });
+      } catch (error: any) {
+        console.error(error);
+
+        return toast.error(
+          error?.response?.data?.message || `Guest deletion failed`,
+          {
+            position: 'top-center',
+          }
+        );
+      }
+    }
+  };
 
   return (
     <div className=''>
@@ -262,6 +313,14 @@ function EventCard({
             className='flex-grow md:flex-grow-0'
           >
             <Edit className='h-4 w-4' />
+          </Button>
+          <Button
+            variant='outline'
+            size='icon'
+            className='flex-grow md:flex-grow-0'
+            onClick={handleDelete}
+          >
+            <Trash2 className='h-4 w-4 text-red-500' />
           </Button>
         </div>
       </div>

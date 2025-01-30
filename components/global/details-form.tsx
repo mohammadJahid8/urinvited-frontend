@@ -28,10 +28,27 @@ import LocationInput from './location-input';
 
 const timeZones = [
   { value: 'IST', label: 'Indian Standard Time' },
-  { value: 'GMT', label: 'GMT' },
-  { value: 'UTC', label: 'UTC' },
-  { value: 'EST', label: 'EST' },
-  { value: 'PST', label: 'PST' },
+  { value: 'GMT', label: 'Greenwich Mean Time' },
+  { value: 'UTC', label: 'Coordinated Universal Time' },
+  { value: 'EST', label: 'Eastern Standard Time' },
+  { value: 'PST', label: 'Pacific Standard Time' },
+  { value: 'CST', label: 'Central Standard Time' },
+  { value: 'MST', label: 'Mountain Standard Time' },
+  { value: 'AKST', label: 'Alaska Standard Time' },
+  { value: 'HST', label: 'Hawaii-Aleutian Standard Time' },
+  { value: 'AST', label: 'Atlantic Standard Time' },
+  { value: 'NST', label: 'Newfoundland Standard Time' },
+  { value: 'CET', label: 'Central European Time' },
+  { value: 'EET', label: 'Eastern European Time' },
+  { value: 'BST', label: 'British Summer Time' },
+  { value: 'AEST', label: 'Australian Eastern Standard Time' },
+  { value: 'ACST', label: 'Australian Central Standard Time' },
+  { value: 'AWST', label: 'Australian Western Standard Time' },
+  { value: 'JST', label: 'Japan Standard Time' },
+  { value: 'KST', label: 'Korea Standard Time' },
+  { value: 'CST', label: 'China Standard Time' },
+  { value: 'SGT', label: 'Singapore Time' },
+  { value: 'NZST', label: 'New Zealand Standard Time' },
 ];
 
 const DetailsForm = ({
@@ -165,6 +182,7 @@ const EachEvent = ({
           <FormItem>
             <div className='flex items-center gap-2 justify-between'>
               <FormLabel className='font-bold'>Invite Details</FormLabel>
+
               <Switch
                 id={`events.${index}.inviteDetails`}
                 checked={field.value}
@@ -181,6 +199,7 @@ const EachEvent = ({
                     menubar: false,
                     branding: false,
                     statusbar: false,
+                    placeholder: 'Enter Invite Details',
                     plugins: [
                       'advlist autolink lists link image charmap print preview anchor',
                       'searchreplace visualblocks code fullscreen',

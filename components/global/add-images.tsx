@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useRef } from 'react';
 import { Checkbox } from '../ui/checkbox';
 import {
   FormControl,
@@ -8,8 +9,9 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
-import DateInput from './date-input';
 import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Trash2 } from 'lucide-react';
 
 const AddImages = ({ form }: { form: any }) => {
   return (
@@ -43,24 +45,47 @@ const AddImages = ({ form }: { form: any }) => {
                 <FormField
                   control={form.control}
                   name={`eventLogo`}
-                  render={({ field: { value, onChange, ...fieldProps } }) => (
-                    <FormItem className='w-full'>
-                      <FormControl>
-                        <Input
-                          {...fieldProps}
-                          placeholder='Picture'
-                          type='file'
-                          accept='image/*, application/pdf'
-                          onChange={(event) =>
-                            onChange(
-                              event.target.files && event.target.files[0]
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field: { value, onChange, ...fieldProps } }) => {
+                    const inputRef = useRef<HTMLInputElement>(null);
+                    return (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <Input
+                            {...fieldProps}
+                            ref={inputRef}
+                            placeholder='Picture'
+                            type='file'
+                            accept='image/*, application/pdf'
+                            onChange={(event) =>
+                              onChange(
+                                event.target.files && event.target.files[0]
+                              )
+                            }
+                          />
+                        </FormControl>
+                        {value && (
+                          <div className='flex items-center gap-2'>
+                            <span>
+                              {value.name} ({(value.size / 1024).toFixed(2)} KB)
+                            </span>
+                            <Button
+                              variant='outline'
+                              size='icon'
+                              onClick={() => {
+                                onChange(null);
+                                if (inputRef.current) {
+                                  inputRef.current.value = '';
+                                }
+                              }}
+                            >
+                              <Trash2 className='w-4 h-4 text-red-500' />
+                            </Button>
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
             )}
@@ -76,7 +101,7 @@ const AddImages = ({ form }: { form: any }) => {
               <Checkbox
                 checked={field.value}
                 onCheckedChange={field.onChange}
-                id={`isEventLogoEnabled`}
+                id={`isThemeBackgroundImageEnabled`}
               />
               <div className='flex flex-col gap-1'>
                 <FormLabel
@@ -96,24 +121,47 @@ const AddImages = ({ form }: { form: any }) => {
                 <FormField
                   control={form.control}
                   name={`themeBackgroundImage`}
-                  render={({ field: { value, onChange, ...fieldProps } }) => (
-                    <FormItem className='w-full'>
-                      <FormControl>
-                        <Input
-                          {...fieldProps}
-                          placeholder='Picture'
-                          type='file'
-                          accept='image/*, application/pdf'
-                          onChange={(event) =>
-                            onChange(
-                              event.target.files && event.target.files[0]
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field: { value, onChange, ...fieldProps } }) => {
+                    const inputRef = useRef<HTMLInputElement>(null);
+                    return (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <Input
+                            {...fieldProps}
+                            ref={inputRef}
+                            placeholder='Picture'
+                            type='file'
+                            accept='image/*, application/pdf'
+                            onChange={(event) =>
+                              onChange(
+                                event.target.files && event.target.files[0]
+                              )
+                            }
+                          />
+                        </FormControl>
+                        {value && (
+                          <div className='flex items-center gap-2'>
+                            <span>
+                              {value.name} ({(value.size / 1024).toFixed(2)} KB)
+                            </span>
+                            <Button
+                              variant='outline'
+                              size='icon'
+                              onClick={() => {
+                                onChange(null);
+                                if (inputRef.current) {
+                                  inputRef.current.value = '';
+                                }
+                              }}
+                            >
+                              <Trash2 className='w-4 h-4 text-red-500' />
+                            </Button>
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
             )}
@@ -149,24 +197,47 @@ const AddImages = ({ form }: { form: any }) => {
                 <FormField
                   control={form.control}
                   name={`footerBackgroundImage`}
-                  render={({ field: { value, onChange, ...fieldProps } }) => (
-                    <FormItem className='w-full'>
-                      <FormControl>
-                        <Input
-                          {...fieldProps}
-                          placeholder='Picture'
-                          type='file'
-                          accept='image/*, application/pdf'
-                          onChange={(event) =>
-                            onChange(
-                              event.target.files && event.target.files[0]
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field: { value, onChange, ...fieldProps } }) => {
+                    const inputRef = useRef<HTMLInputElement>(null);
+                    return (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <Input
+                            {...fieldProps}
+                            ref={inputRef}
+                            placeholder='Picture'
+                            type='file'
+                            accept='image/*, application/pdf'
+                            onChange={(event) =>
+                              onChange(
+                                event.target.files && event.target.files[0]
+                              )
+                            }
+                          />
+                        </FormControl>
+                        {value && (
+                          <div className='flex items-center gap-2'>
+                            <span>
+                              {value.name} ({(value.size / 1024).toFixed(2)} KB)
+                            </span>
+                            <Button
+                              variant='outline'
+                              size='icon'
+                              onClick={() => {
+                                onChange(null);
+                                if (inputRef.current) {
+                                  inputRef.current.value = '';
+                                }
+                              }}
+                            >
+                              <Trash2 className='w-4 h-4 text-red-500' />
+                            </Button>
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
             )}
@@ -202,24 +273,47 @@ const AddImages = ({ form }: { form: any }) => {
                 <FormField
                   control={form.control}
                   name={`thumbnailImage`}
-                  render={({ field: { value, onChange, ...fieldProps } }) => (
-                    <FormItem className='w-full'>
-                      <FormControl>
-                        <Input
-                          {...fieldProps}
-                          placeholder='Picture'
-                          type='file'
-                          accept='image/*, application/pdf'
-                          onChange={(event) =>
-                            onChange(
-                              event.target.files && event.target.files[0]
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field: { value, onChange, ...fieldProps } }) => {
+                    const inputRef = useRef<HTMLInputElement>(null);
+                    return (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <Input
+                            {...fieldProps}
+                            ref={inputRef}
+                            placeholder='Picture'
+                            type='file'
+                            accept='image/*, application/pdf'
+                            onChange={(event) =>
+                              onChange(
+                                event.target.files && event.target.files[0]
+                              )
+                            }
+                          />
+                        </FormControl>
+                        {value && (
+                          <div className='flex items-center gap-2'>
+                            <span>
+                              {value.name} ({(value.size / 1024).toFixed(2)} KB)
+                            </span>
+                            <Button
+                              variant='outline'
+                              size='icon'
+                              onClick={() => {
+                                onChange(null);
+                                if (inputRef.current) {
+                                  inputRef.current.value = '';
+                                }
+                              }}
+                            >
+                              <Trash2 className='w-4 h-4 text-red-500' />
+                            </Button>
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
             )}

@@ -8,7 +8,8 @@ import { EmailPreview } from './email-preview';
 import { useAppContext } from '@/lib/context';
 
 const AddGuests = ({ id }: { id: string }) => {
-  const { setOpenEmailPreview, totalGuestAdded } = useAppContext();
+  const { setOpenEmailPreview, totalGuestAdded, maximumCapacity } =
+    useAppContext();
   const [emails, setEmails] = React.useState<string[]>([]);
 
   return (
@@ -18,6 +19,9 @@ const AddGuests = ({ id }: { id: string }) => {
         <div className='flex items-center gap-2'>
           <p className='text-sm sm:text-base text-gray-600 font-medium'>
             Total guests added: {totalGuestAdded}
+          </p>
+          <p className='text-sm sm:text-base text-gray-600 font-medium'>
+            Maximum capacity: {maximumCapacity}
           </p>
           <Button
             variant='outline'

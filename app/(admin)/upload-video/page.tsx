@@ -166,7 +166,7 @@ export default function VideoUpload() {
           />
         </div>
 
-        <div className='border border-gray-200 rounded-lg overflow-x-auto'>
+        {/* <div className='border border-gray-200 rounded-lg overflow-x-auto'>
           <Table>
             <TableHeader className='bg-gray-100'>
               <TableRow>
@@ -195,7 +195,7 @@ export default function VideoUpload() {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </div> */}
 
         <Dropzone
           key={fileKey}
@@ -245,7 +245,7 @@ export default function VideoUpload() {
             />
             <button
               className='absolute -top-2 -right-1 bg-white rounded-full border border-black p-1'
-              // onClick={(e) => handleFileDelete(e, 'image')}
+              onClick={(e) => handleFileDelete(e, 'image')}
             >
               <XIcon className='h-4 w-4 text-black ' />
             </button>

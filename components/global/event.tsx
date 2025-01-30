@@ -67,8 +67,10 @@ export default function Event({ className }: any) {
   const additionalFeatures =
     formData?.additionalFeatures || event?.additionalFeatures;
 
+  console.log({ eventDetails, event });
+
   const events = eventDetails?.events;
-  const hostedBy = event?.hostedBy;
+  const hostedBy = eventDetails?.hostedBy;
   const requestRsvps = eventDetails?.requestRsvps;
   const rsvpDueDate = eventDetails?.rsvpDueDate;
   const isRsvpDueDateSet = eventDetails?.isRsvpDueDateSet;
@@ -323,11 +325,14 @@ export default function Event({ className }: any) {
                               fontFamily: dateTimeLocationFont,
                             }}
                           >
-                            <Calendar className='w-5 h-5 text-blue-600' />
+                            <Calendar
+                              className='w-5 h-5'
+                              style={{ color: textColour || 'blue' }}
+                            />
                             {/* {console.log({ startDate, startTime })} */}
                             <span>
                               {startDate &&
-                                format(new Date(startDate), 'dd/MM/yyyy')}{' '}
+                                format(new Date(startDate), 'MMM d, yyyy')}{' '}
                               {startTime &&
                                 startTime &&
                                 `| ${convertTime(startTime)}`}{' '}
@@ -335,7 +340,7 @@ export default function Event({ className }: any) {
                                 endDate &&
                                 `to ${format(
                                   new Date(endDate),
-                                  'MM/dd/yyyy'
+                                  'MMM d, yyyy'
                                 )}`}{' '}
                               {endTime &&
                                 endTime &&
@@ -380,9 +385,13 @@ export default function Event({ className }: any) {
                               fontFamily: dateTimeLocationFont,
                             }}
                           >
-                            <MapPin className='w-5 h-5 text-blue-600' />
+                            <MapPin
+                              className='w-5 h-5'
+                              style={{ color: textColour || 'blue' }}
+                            />
                             <span>
-                              {address}, {locationName}
+                              {locationName && `${locationName}, `}
+                              {address}
                             </span>
                           </div>
                           {showGoogleMap && (
@@ -457,19 +466,20 @@ export default function Event({ className }: any) {
                     fontFamily: descriptionFont,
                   }}
                 >
-                  RSVP by {format(new Date(rsvpDueDate), 'dd MMMM yyyy')}
+                  RSVP by {format(new Date(rsvpDueDate), 'MMM d, yyyy')}
                 </p>
               </>
             )}
             {requestRsvps && (
               <Button
                 className={cn(
-                  'max-w-[172px] w-full py-2 mt-2 text-white',
+                  'max-w-[172px] w-full py-2 mt-2',
                   buttonFormat === 'rounded' && 'rounded-full'
                 )}
                 style={{
                   backgroundColor: buttonColour,
                   fontFamily: buttonFont,
+                  color: textColour || 'white',
                 }}
                 onClick={() => setOpenRSVP(true)}
               >

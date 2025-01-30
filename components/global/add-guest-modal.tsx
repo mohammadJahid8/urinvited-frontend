@@ -72,8 +72,11 @@ export function AddGuestModal() {
     setRSVPData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const isRequiredFieldsFilled =
+    rsvpData.name && rsvpData.contact && rsvpData.rsvpStatus;
+
   const handleSubmit = async () => {
-    if (rsvpData.name && rsvpData.contact) {
+    if (isRequiredFieldsFilled) {
       rsvpData.guests = guests;
       rsvpData.event = event?._id;
 
@@ -171,10 +174,17 @@ export function AddGuestModal() {
           )}
         </div>
         <DialogFooter>
-          <Button disabled={loading} onClick={() => setOpen(false)}>
+          <Button
+            disabled={loading}
+            onClick={() => setOpen(false)}
+            variant='outline'
+          >
             Cancel
           </Button>
-          <Button disabled={loading} onClick={handleSubmit}>
+          <Button
+            disabled={loading || !isRequiredFieldsFilled}
+            onClick={handleSubmit}
+          >
             {loading ? 'Submitting...' : 'Submit'}
           </Button>
         </DialogFooter>

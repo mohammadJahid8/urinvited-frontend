@@ -17,11 +17,10 @@ import { useAppContext } from '@/lib/context';
 import { toast } from 'sonner';
 
 export default function GuestList({ emails }: { emails: string[] }) {
-  const { guests, setGuests, event, totalGuestAdded } = useAppContext();
+  const { guests, setGuests, event, totalGuestAdded, maximumCapacity } =
+    useAppContext();
   const [openGroupModal, setOpenGroupModal] = useState(false);
   const [guestIndex, setGuestIndex] = useState<number>(0);
-
-  const maximumCapacity = Number(event?.eventDetails?.maximumCapacity);
 
   const handleOpenGroupModal = (index: number) => {
     if (totalGuestAdded >= maximumCapacity) {
@@ -209,6 +208,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
                     variant='outline'
                     size='sm'
                     onClick={() => handleOpenGroupModal(index)}
+                    disabled={!guest.isConfirmed}
                   >
                     <Users className='w-5 h-5 text-primary' />
                   </Button>

@@ -200,13 +200,15 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
                 </div> */}
               </div>
             </div>
-            <div className='space-y-2 bg-slate-50 p-3 rounded-md'>
-              <h4 className='font-medium'>{hostName}&apos;s Message</h4>
-              <div
-                className='text-sm text-muted-foreground'
-                dangerouslySetInnerHTML={{ __html: message }}
-              />
-            </div>
+            {message && (
+              <div className='space-y-2 bg-slate-50 p-3 rounded-md'>
+                <h4 className='font-medium'>{hostName}&apos;s Message</h4>
+                <div
+                  className='text-sm text-muted-foreground'
+                  dangerouslySetInnerHTML={{ __html: message }}
+                />
+              </div>
+            )}
             <div className='space-y-4'>
               <h4 className='font-medium'>Are you going?</h4>
               <div className='flex gap-4'>

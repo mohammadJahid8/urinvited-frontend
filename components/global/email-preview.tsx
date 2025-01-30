@@ -22,6 +22,12 @@ export function EmailPreview() {
   const [loading, setLoading] = React.useState(false);
 
   const handleSendTestEmail = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailData.to || !emailRegex.test(emailData.to)) {
+      return toast.error(`Please enter a valid email address`, {
+        position: 'top-center',
+      });
+    }
     if (!emailData.subject) {
       return toast.error(`Please fill subject`, {
         position: 'top-center',
@@ -65,7 +71,7 @@ export function EmailPreview() {
         <SheetHeader className='border-b p-4'>
           <div className='flex gap-2 items-center justify-between'>
             <h1 className='text-base font-bold'>Email Preview</h1>
-            <Button
+            {/* <Button
               size='sm'
               variant='outline'
               className={cn(
@@ -75,11 +81,21 @@ export function EmailPreview() {
               disabled={loading}
             >
               {loading ? 'Sending...' : 'Send Test Email'}
-            </Button>
+            </Button> */}
           </div>
         </SheetHeader>
 
         <div className='p-4 flex flex-col gap-4'>
+          <div className='flex flex-col gap-2'>
+            <Label>To</Label>
+            <Input
+              placeholder='Enter Email'
+              value={emailData.to}
+              onChange={(e) =>
+                setEmailData({ ...emailData, to: e.target.value })
+              }
+            />
+          </div>
           <div className='flex flex-col gap-2'>
             <Label>Subject</Label>
             <Input
@@ -113,11 +129,8 @@ export function EmailPreview() {
             >
               Cancel
             </Button>
-            <Button
-              disabled={loading}
-              onClick={() => setOpenEmailPreview(false)}
-            >
-              Save Email
+            <Button disabled={loading} onClick={handleSendTestEmail}>
+              {loading ? 'Sending...' : 'Send Test Email'}
             </Button>
           </div>
         </div>

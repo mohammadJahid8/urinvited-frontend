@@ -34,10 +34,7 @@ const ContextProvider = ({ children }: any) => {
   const querySuffix = queryString ? `?${queryString}` : '';
 
   const [guests, setGuests] = useState<any[]>([]);
-  const [emailData, setEmailData] = useState({
-    subject: '',
-    body: '',
-  });
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -84,6 +81,12 @@ const ContextProvider = ({ children }: any) => {
       return response?.data?.data;
     },
   });
+
+  const [emailData, setEmailData] = useState({
+    subject: '',
+    body: '',
+    to: user?.email,
+  });
   // const { isLoading: isGoogleFontsLoading, data: googleFonts } = useQuery({
   //   queryKey: [`googleFonts`],
   //   queryFn: async () => {
@@ -120,6 +123,8 @@ const ContextProvider = ({ children }: any) => {
       }
     },
   });
+
+  const maximumCapacity = Number(event?.eventDetails?.maximumCapacity);
 
   if (isLoading)
     return (
@@ -224,6 +229,7 @@ const ContextProvider = ({ children }: any) => {
     share,
     refetchShare,
     // googleFonts,
+    maximumCapacity,
   };
 
   return (
