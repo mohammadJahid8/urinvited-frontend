@@ -81,6 +81,17 @@ export default function GuestList({ emails }: { emails: string[] }) {
       return toast.error('Please enter a valid email or phone number');
     }
 
+    if (guest.phone && !guest.phone.includes('+')) {
+      return toast.error(
+        'Please enter a valid phone number without a country code'
+      );
+    }
+
+    // validate the email
+    if (guest.email && !guest.email.includes('@')) {
+      return toast.error('Please enter a valid email address');
+    }
+
     if (!guest.name) {
       return toast.error('Please enter a valid name');
     }
@@ -183,12 +194,20 @@ export default function GuestList({ emails }: { emails: string[] }) {
                           phone: i === index ? '' : guest.phone,
                         }))
                       );
-                    } else {
+                    } else if (value.includes('+') || /^\d{3}/.test(value)) {
                       setGuests(
                         guests.map((guest: any, i: number) => ({
                           ...guest,
                           email: i === index ? '' : guest.email,
                           phone: i === index ? value : guest.phone,
+                        }))
+                      );
+                    } else {
+                      setGuests(
+                        guests.map((guest: any, i: number) => ({
+                          ...guest,
+                          phone: '',
+                          email: i === index ? value : guest.email,
                         }))
                       );
                     }
