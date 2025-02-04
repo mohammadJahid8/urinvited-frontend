@@ -24,6 +24,7 @@ import { useAppContext } from '@/lib/context';
 import { toast } from 'sonner';
 import { shareUrl } from '@/lib/shareUrl';
 import PickEmoji from './emoji-picker';
+import Video from './video';
 
 const convertTime = (timeString: string) => {
   // Parse the time string into a Date object
@@ -200,8 +201,9 @@ export default function Event({ className }: any) {
         {/* Video Section */}
         {videoUrl && (
           <div className='relative max-w-[300px] mx-auto rounded-lg shadow-lg overflow-hidden'>
+            {/* <Video videoUrl={videoUrl} thumbnailImage={thumbnailImage} /> */}
             <video
-              className='w-full h-[450px] object-cover'
+              className='w-auto h-full'
               poster={thumbnailImage || ''}
               loop
               playsInline
@@ -332,7 +334,10 @@ export default function Event({ className }: any) {
                             {/* {console.log({ startDate, startTime })} */}
                             <span>
                               {startDate &&
-                                format(new Date(startDate), 'MMM d, yyyy')}{' '}
+                                format(
+                                  new Date(startDate),
+                                  'MMMM d, yyyy'
+                                )}{' '}
                               {startTime &&
                                 startTime &&
                                 `| ${convertTime(startTime)}`}{' '}
@@ -340,7 +345,7 @@ export default function Event({ className }: any) {
                                 endDate &&
                                 `to ${format(
                                   new Date(endDate),
-                                  'MMM d, yyyy'
+                                  'MMMM d, yyyy'
                                 )}`}{' '}
                               {endTime &&
                                 endTime &&
@@ -466,7 +471,7 @@ export default function Event({ className }: any) {
                     fontFamily: descriptionFont,
                   }}
                 >
-                  RSVP by {format(new Date(rsvpDueDate), 'MMM d, yyyy')}
+                  RSVP by {format(new Date(rsvpDueDate), 'MMMM d, yyyy')}
                 </p>
               </>
             )}
@@ -479,7 +484,7 @@ export default function Event({ className }: any) {
                 style={{
                   backgroundColor: buttonColour,
                   fontFamily: buttonFont,
-                  color: textColour || 'white',
+                  // color: textColour || 'white',
                 }}
                 onClick={() => setOpenRSVP(true)}
               >

@@ -13,15 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Logo from './logo';
 
 export default function Navbar() {
   const { user, logout } = useAppContext();
 
   return (
     <header className='flex h-16 items-center justify-between bg-white px-4 border-b'>
-      <Link href='/' className='flex items-center gap-2'>
-        <span className='text-lg font-semibold text-black'>Urinvited</span>
-      </Link>
+      <Logo />
       <div className='flex items-center gap-2'>
         {/* <Button
           variant='ghost'

@@ -41,7 +41,7 @@ export default function VideoPreviewNav() {
         toast.success(`Video approved successfully.`, {
           position: 'top-center',
         });
-        router.push(`/events/event-details?id=${event?._id}`);
+        router.push(`/event-details?id=${event?._id}`);
       }
     } catch (error: any) {
       setIsLoading(false);

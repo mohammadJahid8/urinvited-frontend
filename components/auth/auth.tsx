@@ -4,6 +4,7 @@ import { Button } from '../ui/button';
 import Link from 'next/link';
 import { useAppContext } from '@/lib/context';
 import { useSearchParams } from 'next/navigation';
+import Logo from '../global/logo';
 
 const Auth = ({
   title,
@@ -27,49 +28,7 @@ const Auth = ({
         <div className='flex min-h-screen'>
           <div className='flex flex-1 flex-col px-6 py-6'>
             <div className='flex items-center gap-4 pb-16 lg:pb-0'>
-              <Link className='shrink-0' href='/'>
-                Urinvited
-              </Link>
-              <div className='bg-white shadow-sm flex h-8 w-fit shrink-0 items-center justify-start gap-2 rounded-full pr-4'>
-                <svg
-                  width={32}
-                  height={32}
-                  viewBox='0 0 32 32'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                  className=' shrink-0 rounded-full shadow-md'
-                >
-                  <circle
-                    cx={16}
-                    cy={16}
-                    r='15.3333'
-                    fill='url(#gradient-56473308-bed0-48e7-a727-9c98e8ea23c6)'
-                    stroke='white'
-                    strokeWidth='1.33333'
-                  />
-                  <circle cx={16} cy={16} r='10.6667' fill='white' />
-                  <path
-                    fillRule='evenodd'
-                    clipRule='evenodd'
-                    d='M20.4434 9.61408C20.372 9.25702 20.0585 9 19.6944 9C19.3303 9 19.0167 9.25702 18.9453 9.61408L18.7631 10.5251C18.7027 10.8275 18.4663 11.0638 18.1639 11.1243L17.2529 11.3065C16.8959 11.3779 16.6388 11.6914 16.6388 12.0556C16.6388 12.4197 16.8959 12.7332 17.2529 12.8046L18.1639 12.9868C18.4663 13.0473 18.7027 13.2837 18.7631 13.5861L18.9453 14.497C19.0167 14.8541 19.3303 15.1111 19.6944 15.1111C20.0585 15.1111 20.372 14.8541 20.4434 14.497L20.6256 13.5861C20.6861 13.2837 20.9225 13.0473 21.2249 12.9868L22.136 12.8046C22.493 12.7332 22.7499 12.4197 22.7499 12.0556C22.7499 11.6914 22.493 11.3779 22.136 11.3065L21.2249 11.1243C20.9225 11.0638 20.6861 10.8275 20.6256 10.5251L20.4434 9.61408ZM13.5441 12.5779C13.4401 12.266 13.1483 12.0556 12.8195 12.0556C12.4907 12.0556 12.1987 12.266 12.0947 12.5779L11.5725 14.1449C11.4964 14.373 11.3175 14.552 11.0894 14.628L9.52232 15.1503C9.21039 15.2543 9 15.5462 9 15.875C9 16.2038 9.21039 16.4957 9.52232 16.5997L11.0894 17.122C11.3175 17.198 11.4964 17.377 11.5725 17.6051L12.0947 19.1721C12.1987 19.484 12.4907 19.6944 12.8195 19.6944C13.1483 19.6944 13.4401 19.484 13.5441 19.1721L14.0665 17.6051C14.1425 17.377 14.3214 17.198 14.5495 17.122L16.1166 16.5997C16.4285 16.4957 16.6388 16.2038 16.6388 15.875C16.6388 15.5462 16.4285 15.2543 16.1166 15.1503L14.5495 14.628C14.3214 14.552 14.1425 14.373 14.0665 14.1449L13.5441 12.5779ZM18.1666 18.1667C18.4954 18.1667 18.7873 18.3771 18.8913 18.689L19.0317 19.1101C19.1077 19.3382 19.2867 19.5172 19.5148 19.5933L19.936 19.7336C20.2479 19.8376 20.4583 20.1295 20.4583 20.4583C20.4583 20.7871 20.2479 21.079 19.936 21.183L19.5148 21.3234C19.2867 21.3994 19.1077 21.5784 19.0317 21.8065L18.8913 22.2277C18.7873 22.5396 18.4954 22.75 18.1666 22.75C17.8378 22.75 17.5459 22.5396 17.4419 22.2277L17.3015 21.8065C17.2255 21.5784 17.0465 21.3994 16.8184 21.3234L16.3973 21.183C16.0853 21.079 15.875 20.7871 15.875 20.4583C15.875 20.1295 16.0853 19.8376 16.3973 19.7336L16.8184 19.5933C17.0465 19.5172 17.2255 19.3382 17.3015 19.1101L17.4419 18.689C17.5459 18.3771 17.8378 18.1667 18.1666 18.1667Z'
-                    fill='url(#gradient-56473308-bed0-48e7-a727-9c98e8ea23c6)'
-                  />
-                  <defs>
-                    <linearGradient
-                      id='gradient-56473308-bed0-48e7-a727-9c98e8ea23c6'
-                      x1='6.52956'
-                      y1='4.576'
-                      x2='20.7892'
-                      y2='27.5453'
-                      gradientUnits='userSpaceOnUse'
-                    >
-                      <stop stopColor='#AD7EE1' />
-                      <stop offset='0.376174' stopColor='#636FCB' />
-                      <stop offset={1} stopColor='#087279' />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
+              <Logo />
             </div>
             <div className='mb-24 flex flex-1 flex-col lg:justify-center'>
               <div className='mx-auto w-full max-w-[400px]'>
@@ -237,10 +196,10 @@ const Auth = ({
               width={3000}
               height={2000}
               className='absolute inset-0 h-full w-full object-cover'
-              src='/auth-img.jpg'
-              style={{ filter: 'brightness(70%)' }}
+              src='/urinvited_login.svg'
+              // style={{ filter: 'brightness(70%)' }}
             />
-            <div className='absolute left-20 top-1/3 mt-8'>
+            {/* <div className='absolute left-20 top-1/3 mt-8'>
               <h3 className='mb-3 text-2xl font-bold leading-10 tracking-tight text-white'>
                 100% Free. Seriously.
               </h3>
@@ -255,7 +214,7 @@ const Auth = ({
                 grateful for EarnBetter!&quot;{' '}
                 <p className='breakwords'>-Dawn</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

@@ -12,6 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Urinvited',
   description: 'Urinvited',
+
   twitter: {
     card: 'summary_large_image',
   },

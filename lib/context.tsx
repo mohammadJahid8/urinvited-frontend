@@ -146,7 +146,7 @@ const ContextProvider = ({ children }: any) => {
   const logout = () => {
     window.localStorage.removeItem('rmToken');
     refetchUser();
-    redirect('/login');
+    window.location.href = '/login';
   };
 
   const handleResendOTP = async (data: any) => {

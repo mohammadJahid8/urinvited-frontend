@@ -22,9 +22,7 @@ const registerFields = [
     label: 'Phone number',
     type: 'number',
     placeholder: 'Enter Phone number...',
-    validation: z
-      .string()
-      .min(1, { message: 'Phone number has to be filled.' }),
+    validation: z.string().optional(),
   },
   {
     name: 'email',
