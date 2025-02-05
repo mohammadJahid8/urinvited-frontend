@@ -359,6 +359,18 @@ const EachEvent = ({
                   In person
                 </Label>
               </div>
+              <FormField
+                control={form.control}
+                name={`events.${index}.address`}
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormControl>
+                      <Input placeholder='Address' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {field.value === 'in-person' && (
                 <div className='flex flex-col gap-2'>
                   <FormField
@@ -400,18 +412,6 @@ const EachEvent = ({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name={`events.${index}.address`}
-                    render={({ field }) => (
-                      <FormItem className='w-full'>
-                        <FormControl>
-                          <Input placeholder='Address' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name={`events.${index}.showGoogleMap`}

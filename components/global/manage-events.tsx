@@ -24,7 +24,8 @@ export default function ManageEvents({ title }: { title: string }) {
     ).format('MM/DD/YYYY');
     return (
       eventTitle?.includes(searchTerm.toLowerCase()) ||
-      eventDate.includes(searchTerm)
+      eventDate.includes(searchTerm) ||
+      event?.userEmail?.toLowerCase()?.includes(searchTerm.toLowerCase())
     );
   });
 
@@ -39,10 +40,13 @@ export default function ManageEvents({ title }: { title: string }) {
   });
 
   const tbdEvents = events?.filter((event: any) => {
-    return event?.eventDetails?.events?.[0]?.when === 'tbd';
+    return (
+      event?.eventDetails?.events?.[0]?.when === 'tbd' ||
+      event?.eventDetails?.events?.length === 0
+    );
   });
 
-  // const allValidEvents =
+  console.log({ events });
 
   const eventsToDisplay =
     activeTab === 'upcoming'
@@ -109,7 +113,7 @@ export default function ManageEvents({ title }: { title: string }) {
         </div>
         <div className='relative w-full md:w-[300px]'>
           <Input
-            placeholder='Search events by name or date...'
+            placeholder='Search event by title or email...'
             className='pl-8 pr-4 py-2 w-full border rounded-md'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -139,6 +143,7 @@ export default function ManageEvents({ title }: { title: string }) {
               video={event?.video}
               isAdmin={user?.role === 'admin'}
               refetchEvents={refetchEvents}
+              userEmail={event?.userEmail}
             />
           ))
         ) : (
@@ -163,6 +168,7 @@ interface EventCardProps {
   isAdmin: boolean;
   rsvps: any;
   refetchEvents: any;
+  userEmail: string;
 }
 
 function EventCard({
@@ -179,6 +185,7 @@ function EventCard({
   isAdmin,
   rsvps,
   refetchEvents,
+  userEmail,
 }: EventCardProps) {
   const isVideoPending = video?.status === 'Pending';
 
@@ -223,9 +230,13 @@ function EventCard({
             <div className='flex flex-col md:flex-row justify-between items-start gap-2 md:gap-4 mb-4'>
               <div>
                 <h3 className='text-lg font-medium mb-2'>{title}</h3>
+                <p className='text-sm font-medium mb-2 text-gray-500'>
+                  {userEmail}
+                </p>
                 <div className='text-sm text-gray-500 mb-1'>
                   {startDate} | {startTime}
                 </div>
+
                 <div className='text-sm text-gray-500'>{location}</div>
               </div>
               <div className='flex items-center'>
@@ -242,7 +253,10 @@ function EventCard({
             />
           </>
         ) : (
-          <div className='text-sm text-gray-600 mb-6 text-center'>
+          <div className='text-sm text-gray-600 mb-6 text-start'>
+            <p className='text-sm font-medium mb-2 text-gray-500'>
+              {userEmail}
+            </p>
             This event has no event details. Please update the event details
           </div>
         )}

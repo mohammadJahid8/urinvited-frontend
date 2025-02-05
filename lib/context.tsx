@@ -68,6 +68,8 @@ const ContextProvider = ({ children }: any) => {
         }
       }
     },
+
+    refetchOnWindowFocus: false,
   });
 
   const {
@@ -80,6 +82,7 @@ const ContextProvider = ({ children }: any) => {
       const response = await api.get(`/event`);
       return response?.data?.data;
     },
+    refetchOnWindowFocus: false,
   });
 
   const [emailData, setEmailData] = useState({
@@ -124,6 +127,10 @@ const ContextProvider = ({ children }: any) => {
     },
   });
 
+  const hasMaximumCapacity =
+    event?.eventDetails?.isMaximumCapacitySet &&
+    event?.eventDetails?.maximumCapacity;
+
   const maximumCapacity = Number(event?.eventDetails?.maximumCapacity);
 
   if (isLoading)
@@ -133,7 +140,14 @@ const ContextProvider = ({ children }: any) => {
       </div>
     );
 
-  const publicRoutes = ['/login', '/signup', '/event'];
+  const publicRoutes = [
+    '/login',
+    '/signup',
+    '/event',
+    '/forgot-password',
+    '/reset-password',
+    '/verify-otp',
+  ];
 
   if (
     !user?.email &&
@@ -230,6 +244,7 @@ const ContextProvider = ({ children }: any) => {
     refetchShare,
     // googleFonts,
     maximumCapacity,
+    hasMaximumCapacity,
   };
 
   return (

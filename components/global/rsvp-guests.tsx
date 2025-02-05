@@ -4,8 +4,10 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { User, Baby, Trash2 } from 'lucide-react';
+import { useAppContext } from '@/lib/context';
 
 const RsvpGuests = ({ guests, setGuests }: any) => {
+  const { hasMaximumCapacity } = useAppContext();
   const handleGuestNameChange = (guestId: string, name: string) => {
     setGuests(
       guests.map((guest: any) =>
@@ -37,7 +39,7 @@ const RsvpGuests = ({ guests, setGuests }: any) => {
           type='number'
           placeholder='Max guest limit is 3 including you'
           value={guests?.length}
-          disabled
+          disabled={hasMaximumCapacity}
           // onChange={(e) => handleTotalGuestsChange(e.target.value)}
         />
       </div>

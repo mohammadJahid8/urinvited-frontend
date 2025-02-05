@@ -62,7 +62,7 @@ function LocationInput({
 
       form.setValue(`events.${index}.latLng`, latLng);
 
-      field.onChange(`${name}, ${city}, ${state}, ${zip}`);
+      field.onChange(`${name}, ${city}, ${state} ${zip}`);
     } else {
       alert('Autocomplete is not ready yet.');
     }

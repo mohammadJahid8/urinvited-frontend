@@ -170,10 +170,10 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
               <SheetTitle>RSVP Now</SheetTitle>
             </div>
             <div className='text-sm text-muted-foreground'>
-              <p>
+              {/* <p>
                 Hi {name}, we are excited to invite you to our special event. We
                 hope you can join us for a memorable experience.
-              </p>
+              </p> */}
               <p className='text-xs mt-1'>{email}</p>
             </div>
           </SheetHeader>
@@ -202,7 +202,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
             </div>
             {message && (
               <div className='space-y-2 bg-slate-50 p-3 rounded-md'>
-                <h4 className='font-medium'>{hostName}&apos;s Message</h4>
+                <h4 className='font-medium'>Host&apos;s Message</h4>
                 <div
                   className='text-sm text-muted-foreground'
                   dangerouslySetInnerHTML={{ __html: message }}

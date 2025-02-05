@@ -38,7 +38,7 @@ function Dropzone({
 
   //BUG: issue with this if statements
   const handleFiles = (file: any) => {
-    if (!file.type.startsWith(`${type}/`)) {
+    if (!file?.type?.startsWith(`${type}/`)) {
       setError(`Invalid file type. Expected: ${file} file`);
       return;
     }
@@ -87,7 +87,7 @@ function Dropzone({
             variant='ghost'
             size='sm'
             className='ml-auto flex h-8 space-x-2 px-0 pl-1 text-xs'
-            onClick={handleButtonClick}
+            // onClick={handleButtonClick}
           >
             Click Here
           </Button>

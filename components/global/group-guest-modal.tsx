@@ -20,7 +20,7 @@ export default function GroupGuestModal({
   onAddGuests,
   extraGuests,
 }: any) {
-  const { event } = useAppContext();
+  const { event, hasMaximumCapacity } = useAppContext();
 
   const eventData = event?.eventDetails;
   const additionalAttendees = eventData?.additionalAttendees;
@@ -125,7 +125,7 @@ export default function GroupGuestModal({
               onChange={(e) => handleTotalGuestsChange(e.target.value)}
               min='1'
               max='10'
-              disabled={true}
+              disabled={hasMaximumCapacity}
               className='col-span-3'
               placeholder='Enter number of guests'
             />

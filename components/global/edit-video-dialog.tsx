@@ -86,6 +86,13 @@ export function EditVideoDialog({ video, refetch }: any) {
       );
     }
   };
+  const handleClose = () => {
+    setOpen(false);
+    setVideoFile(null);
+    setPreview('');
+    setFileInfo(null);
+    setThumbnail(null);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -131,10 +138,7 @@ export function EditVideoDialog({ video, refetch }: any) {
 
               {preview && (
                 <div className='relative w-full mt-4' key={preview}>
-                  <video
-                    controls
-                    className='w-full h-[200px] object-cover rounded-lg'
-                  >
+                  <video controls className='w-full h-[200px] rounded-lg'>
                     <source src={preview} type='video/mp4' />
                     Your browser does not support the video tag.
                   </video>
@@ -170,10 +174,11 @@ export function EditVideoDialog({ video, refetch }: any) {
             <Button
               variant='destructive'
               className='w-max'
-              onClick={() => setOpen(false)}
+              onClick={handleClose}
             >
               Cancel
             </Button>
+
             <Button
               onClick={handleUpdateVideo}
               className='w-max'

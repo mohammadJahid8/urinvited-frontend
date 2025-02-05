@@ -173,7 +173,11 @@ export function EditRSVPModal({ guest, openEditRSVP, setOpenEditRSVP }: any) {
           )}
         </div>
         <DialogFooter>
-          <Button disabled={loading} onClick={() => setOpenEditRSVP(false)}>
+          <Button
+            variant={'outline'}
+            disabled={loading}
+            onClick={() => setOpenEditRSVP(false)}
+          >
             Cancel
           </Button>
           <Button disabled={loading} onClick={handleSubmit}>

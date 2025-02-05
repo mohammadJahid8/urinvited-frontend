@@ -131,13 +131,13 @@ const EventDetails = () => {
                 message: 'Location name is required',
               });
             }
-            if (!data.address) {
-              ctx.addIssue({
-                code: 'custom',
-                path: ['address'],
-                message: 'Address is required',
-              });
-            }
+            // if (!data.address) {
+            //   ctx.addIssue({
+            //     code: 'custom',
+            //     path: ['address'],
+            //     message: 'Address is required',
+            //   });
+            // }
 
             delete data.virtualPlatformName;
             delete data.virtualUrl;
@@ -258,10 +258,10 @@ const EventDetails = () => {
     // autoReminder: false,
     // guest management
     allowAdditionalAttendees:
-      event?.eventDetails?.allowAdditionalAttendees || true,
-    additionalAttendees: event?.eventDetails?.additionalAttendees || '1',
-    isMaximumCapacitySet: event?.eventDetails?.isMaximumCapacitySet || true,
-    maximumCapacity: event?.eventDetails?.maximumCapacity || '1',
+      event?.eventDetails?.allowAdditionalAttendees || false,
+    additionalAttendees: event?.eventDetails?.additionalAttendees || '',
+    isMaximumCapacitySet: event?.eventDetails?.isMaximumCapacitySet || false,
+    maximumCapacity: event?.eventDetails?.maximumCapacity || '',
     // trackAttendees: true,
     // sendReminderToAttendees: true,
     // attendingReminderDate: undefined,

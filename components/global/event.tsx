@@ -24,7 +24,6 @@ import { useAppContext } from '@/lib/context';
 import { toast } from 'sonner';
 import { shareUrl } from '@/lib/shareUrl';
 import PickEmoji from './emoji-picker';
-import Video from './video';
 
 const convertTime = (timeString: string) => {
   // Parse the time string into a Date object
@@ -203,7 +202,7 @@ export default function Event({ className }: any) {
           <div className='relative max-w-[300px] mx-auto rounded-lg shadow-lg overflow-hidden'>
             {/* <Video videoUrl={videoUrl} thumbnailImage={thumbnailImage} /> */}
             <video
-              className='w-auto h-full'
+              className='w-auto h-auto'
               poster={thumbnailImage || ''}
               loop
               playsInline
@@ -406,6 +405,7 @@ export default function Event({ className }: any) {
                               style={{
                                 fontFamily: dateTimeLocationFont,
                               }}
+                              target='_blank'
                             >
                               View Map
                             </a>

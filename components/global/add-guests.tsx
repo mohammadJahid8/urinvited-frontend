@@ -8,9 +8,14 @@ import { EmailPreview } from './email-preview';
 import { useAppContext } from '@/lib/context';
 
 const AddGuests = ({ id }: { id: string }) => {
-  const { setOpenEmailPreview, totalGuestAdded, maximumCapacity } =
-    useAppContext();
+  const {
+    setOpenEmailPreview,
+    totalGuestAdded,
+    maximumCapacity,
+    hasMaximumCapacity,
+  } = useAppContext();
   const [emails, setEmails] = React.useState<string[]>([]);
+  console.log({ hasMaximumCapacity });
 
   return (
     <div className='w-full max-w-full sm:max-w-[900px] mx-auto bg-white rounded-lg overflow-hidden shadow-sm border'>
@@ -20,9 +25,12 @@ const AddGuests = ({ id }: { id: string }) => {
           <p className='text-sm sm:text-base text-gray-600 font-medium'>
             Total guests added: {totalGuestAdded}
           </p>
-          <p className='text-sm sm:text-base text-gray-600 font-medium'>
-            Maximum capacity: {maximumCapacity}
-          </p>
+          {hasMaximumCapacity && (
+            <p className='text-sm sm:text-base text-gray-600 font-medium'>
+              Maximum capacity: {maximumCapacity}
+            </p>
+          )}
+
           <Button
             variant='outline'
             className='border-primary text-primary'

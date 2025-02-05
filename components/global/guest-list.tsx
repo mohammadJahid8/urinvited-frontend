@@ -17,13 +17,19 @@ import { useAppContext } from '@/lib/context';
 import { toast } from 'sonner';
 
 export default function GuestList({ emails }: { emails: string[] }) {
-  const { guests, setGuests, event, totalGuestAdded, maximumCapacity } =
-    useAppContext();
+  const {
+    guests,
+    setGuests,
+    allowAdditionalAttendees,
+    totalGuestAdded,
+    maximumCapacity,
+    hasMaximumCapacity,
+  } = useAppContext();
   const [openGroupModal, setOpenGroupModal] = useState(false);
   const [guestIndex, setGuestIndex] = useState<number>(0);
 
   const handleOpenGroupModal = (index: number) => {
-    if (totalGuestAdded >= maximumCapacity) {
+    if (totalGuestAdded >= maximumCapacity && hasMaximumCapacity) {
       return toast.error(
         `You have reached the maximum capacity of ${maximumCapacity} guests`
       );
@@ -72,7 +78,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
     });
   }, [emails]);
   const handleConfirm = (guest: any) => {
-    if (totalGuestAdded >= maximumCapacity) {
+    if (totalGuestAdded >= maximumCapacity && hasMaximumCapacity) {
       return toast.error(
         `You have reached the maximum capacity of ${maximumCapacity} guests`
       );
@@ -126,7 +132,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
   };
 
   const handleAddRow = () => {
-    if (totalGuestAdded >= maximumCapacity) {
+    if (totalGuestAdded >= maximumCapacity && hasMaximumCapacity) {
       return toast.error(
         `You have reached the maximum capacity of ${maximumCapacity} guests`
       );
@@ -223,14 +229,16 @@ export default function GuestList({ emails }: { emails: string[] }) {
                   >
                     <Trash2 className='w-5 h-5 text-red-500' />
                   </Button>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => handleOpenGroupModal(index)}
-                    disabled={!guest.isConfirmed}
-                  >
-                    <Users className='w-5 h-5 text-primary' />
-                  </Button>
+                  {allowAdditionalAttendees && (
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => handleOpenGroupModal(index)}
+                      disabled={!guest.isConfirmed}
+                    >
+                      <Users className='w-5 h-5 text-primary' />
+                    </Button>
+                  )}
                   {!guest.isConfirmed && (
                     <Button
                       variant='outline'

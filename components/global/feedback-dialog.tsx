@@ -28,7 +28,7 @@ export function FeedbackDialog({ feedbacks, userEmail }: any) {
           </DialogTitle>
         </DialogHeader>
         <div className='space-y-4 pt-4'>
-          {feedbacks.map((feedback: any, index: any) => (
+          {feedbacks?.map((feedback: any, index: any) => (
             <div key={index} className='flex gap-3 border-b pb-4'>
               <div className='flex-1 space-y-1'>
                 <p className='text-sm font-medium leading-none'>
@@ -48,13 +48,15 @@ export function FeedbackDialog({ feedbacks, userEmail }: any) {
                   Received on:{' '}
                   {moment(feedback.createdAt).format('DD-MM-YYYY hh:mm a')}
                 </p>
-                <Link
-                  href={feedback.attachment}
-                  target='_blank'
-                  className='text-xs text-blue-500 hover:underline'
-                >
-                  View Attachment
-                </Link>
+                {feedback?.attachment && (
+                  <Link
+                    href={feedback?.attachment}
+                    target='_blank'
+                    className='text-xs text-blue-500 hover:underline'
+                  >
+                    View Attachment
+                  </Link>
+                )}
               </div>
             </div>
           ))}
