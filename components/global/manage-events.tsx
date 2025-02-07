@@ -302,6 +302,15 @@ function EventCard({
                 Track RSVP
               </Button>
 
+              {video && (
+                <Button
+                  href={`/video-preview?id=${id}`}
+                  variant='outline'
+                  className='text-gray-700 flex-grow md:flex-grow-0'
+                >
+                  Video Preview
+                </Button>
+              )}
               <Button
                 href={`/event/${id}?preview=true`}
                 variant='outline'

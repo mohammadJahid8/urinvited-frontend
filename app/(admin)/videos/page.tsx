@@ -150,7 +150,7 @@ const VideosPage = () => {
         const createdAt = row.getValue('createdAt');
         return (
           <div className=' font-medium'>
-            {moment(createdAt).format('DD-MM-YYYY hh:mm A')}
+            {moment(createdAt).format('MMMM Do, YYYY hh:mm A')}
           </div>
         );
       },
@@ -167,7 +167,7 @@ const VideosPage = () => {
             variant='ghost'
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Email
+            User Email
             <ArrowUpDown className='ml-2 h-4 w-4' />
           </Button>
         );
@@ -183,7 +183,7 @@ const VideosPage = () => {
         const eventDate = row.getValue('eventDate');
         return (
           <div className=' font-medium'>
-            {moment(eventDate).format('DD-MM-YYYY hh:mm A')}
+            {moment(eventDate).format('MMMM Do, YYYY hh:mm A')}
           </div>
         );
       },

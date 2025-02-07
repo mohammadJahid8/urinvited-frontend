@@ -534,7 +534,7 @@ export default function Event({ className }: any) {
                     }}
                     variant='outline'
                     className={cn(
-                      'max-w-[172px] w-full py-2 mt-2 border rounded-lg text-blue-600 border-blue-600 hover:bg-blue-100',
+                      'w-max py-2 px-4 mt-2 border rounded-lg text-blue-600 border-blue-600 hover:bg-blue-100',
                       buttonFormat === 'rounded' && 'rounded-full'
                     )}
                   >

@@ -188,9 +188,9 @@ const AdditionalFeatures = () => {
   const handleSubmit = async (data: any) => {
     const path = user?.role === 'admin' ? '/manage-events' : `/share/${id}`;
 
-    if (!form.formState.isDirty) {
-      return router.push(path);
-    }
+    // if (!form.formState.isDirty) {
+    //   return router.push(path);
+    // }
 
     if (user?.role === 'admin') {
       const isUserConfirmed = window.confirm(

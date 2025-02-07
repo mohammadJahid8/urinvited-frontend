@@ -6,8 +6,9 @@ import { cn } from '@/lib/utils';
 import { User, Baby, Trash2 } from 'lucide-react';
 import { useAppContext } from '@/lib/context';
 
-const RsvpGuests = ({ guests, setGuests }: any) => {
-  const { hasMaximumCapacity } = useAppContext();
+const RsvpGuests = ({ guests, setGuests, contact, setContact }: any) => {
+  const { hasMaximumCapacity, allowAdditionalAttendees, additionalAttendees } =
+    useAppContext();
   const handleGuestNameChange = (guestId: string, name: string) => {
     setGuests(
       guests.map((guest: any) =>
@@ -15,6 +16,8 @@ const RsvpGuests = ({ guests, setGuests }: any) => {
       )
     );
   };
+
+  // console.log({ allowAdditionalAttendees, hasMaximumCapacity });
 
   const handleRemoveGuest = (guestId: string) => {
     if (guests.length > 1) {
@@ -31,16 +34,40 @@ const RsvpGuests = ({ guests, setGuests }: any) => {
     );
   };
 
+  // console.log({ additionalAttendees });
+
   return (
     <div className='space-y-4'>
       <div className='space-y-2'>
-        <Label>Total Guest</Label>
+        <Label>
+          Enter Total Guest{' '}
+          {additionalAttendees && `(Upto ${additionalAttendees} including you)`}
+        </Label>
         <Input
           type='number'
-          placeholder='Max guest limit is 3 including you'
-          value={guests?.length}
-          disabled={hasMaximumCapacity}
-          // onChange={(e) => handleTotalGuestsChange(e.target.value)}
+          // placeholder='Max guest limit is 3 including you'
+          value={guests?.length || null}
+          // disabled={hasMaximumCapacity}
+          onChange={(e) =>
+            setGuests(
+              // @ts-ignore
+              Array.from({ length: e.target.value }, (_, index) => ({
+                guestId: String(index + 1),
+                name: '',
+                isAdult: true,
+              }))
+            )
+          }
+        />
+      </div>
+
+      <div className='space-y-2'>
+        <Label>Contact Phone/Email</Label>
+        <Input
+          type='text'
+          placeholder='Enter contact'
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
         />
       </div>
       <div className='space-y-2'>

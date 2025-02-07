@@ -38,9 +38,18 @@ type RSVPOption = 'yes' | 'no' | 'maybe';
 
 export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
   const [rsvpStatus, setRsvpStatus] = useState<RSVPOption | null>('yes');
-  const { openRSVP, setOpenRSVP, event } = useAppContext();
+  const {
+    openRSVP,
+    setOpenRSVP,
+    event,
+    additionalAttendees,
+    allowAdditionalAttendees,
+  } = useAppContext();
   const [specialMessage, setSpecialMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [contact, setContact] = useState<string>(rsvp?.contact || email);
+
+  console.log({ rsvp });
 
   useEffect(() => {
     if (rsvp) {
@@ -54,8 +63,6 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
   const [guests, setGuests] = useState<any[]>([]);
 
   const eventData = event?.eventDetails;
-  const additionalAttendees = eventData?.additionalAttendees;
-  const allowAdditionalAttendees = eventData?.allowAdditionalAttendees;
   const rsvpLength = rsvpGuests?.length || 0;
 
   useEffect(() => {
@@ -129,11 +136,33 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
       });
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+
+    if (!contact || (!emailRegex.test(contact) && !phoneRegex.test(contact))) {
+      return toast.error(
+        'Please fill in a valid contact (phone number with country code or email)',
+        {
+          position: 'top-center',
+        }
+      );
+    }
+
+    if (!allowAdditionalAttendees && guests.length > 1) {
+      return toast.error(
+        `You can only add ${additionalAttendees} guests including yourself but you have added ${guests.length} guests`,
+        {
+          position: 'top-center',
+        }
+      );
+    }
+
     const payload = {
       rsvpStatus,
       guests,
       message: specialMessage,
-      contact: email,
+      contact,
+
       name,
       event: id,
       reaction,
@@ -229,7 +258,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
                 ))}
               </div>
             </div>
-            {rsvpStatus === 'yes' && (
+            {(rsvpStatus === 'yes' || rsvpStatus === 'maybe') && (
               <>
                 <Button
                   className='w-full bg-black text-white'
@@ -240,7 +269,12 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
                   Add to Calendar
                 </Button>
 
-                <RsvpGuests guests={guests} setGuests={setGuests} />
+                <RsvpGuests
+                  guests={guests}
+                  setGuests={setGuests}
+                  contact={contact}
+                  setContact={setContact}
+                />
               </>
             )}
             {/* {rsvpOption === 'maybe' && (
@@ -283,20 +317,21 @@ const GiftRegistry = ({
 }) => {
   return (
     <div className='space-y-2'>
-      <h4 className='font-medium'>Gift Registry</h4>
-      <p className='text-sm text-muted-foreground'>
+      {/* <h4 className='font-medium'>Gift Registry</h4> */}
+      {/* <p className='text-sm text-muted-foreground'>
         Hi {name}, feel free to pick a gift from the link below if you&apos;d
         like. Your presence is the best gift!
-      </p>
+      </p> */}
       <div className='flex flex-col gap-2 items-start'>
         {giftRegistry.map((registry: any, index: number) => (
           <Button
             key={index}
             variant='link'
-            className='h-auto p-0 text-primary'
+            className='h-auto p-0 text-primary inline-flex items-center gap-2'
             href={registry.url}
             target='_blank'
           >
+            <img src='/gift.svg' alt='Gift' className='mx-auto h-6' />
             View Gift List
           </Button>
         ))}
@@ -326,7 +361,7 @@ const SpecialMessage = ({
         value={specialMessage}
         onChange={(e) => setSpecialMessage(e.target.value)}
       />
-      <div className='text-xs text-right text-muted-foreground'>0/500</div>
+      {/* <div className='text-xs text-right text-muted-foreground'>0/500</div> */}
     </div>
   );
 };

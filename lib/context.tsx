@@ -131,6 +131,10 @@ const ContextProvider = ({ children }: any) => {
     event?.eventDetails?.isMaximumCapacitySet &&
     event?.eventDetails?.maximumCapacity;
 
+  const allowAdditionalAttendees =
+    event?.eventDetails?.allowAdditionalAttendees;
+  const additionalAttendees = event?.eventDetails?.additionalAttendees || 1;
+
   const maximumCapacity = Number(event?.eventDetails?.maximumCapacity);
 
   if (isLoading)
@@ -245,6 +249,8 @@ const ContextProvider = ({ children }: any) => {
     // googleFonts,
     maximumCapacity,
     hasMaximumCapacity,
+    allowAdditionalAttendees,
+    additionalAttendees,
   };
 
   return (

@@ -76,15 +76,15 @@ export function DataTable({ columns, data, statusFilter }: any) {
     <div className='w-full'>
       <div className='flex items-center py-4'>
         <Input
-          placeholder='Filter...'
+          placeholder='Search by user email...'
           value={
             (table
-              .getColumn(columns[1].accessorKey as string)
+              .getColumn(columns[2].accessorKey as string)
               ?.getFilterValue() as string) ?? ''
           }
           onChange={(event) =>
             table
-              .getColumn(columns[1].accessorKey as string)
+              .getColumn(columns[2].accessorKey as string)
               ?.setFilterValue(event.target.value)
           }
           className='max-w-sm'

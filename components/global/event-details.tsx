@@ -215,6 +215,8 @@ const EventDetails = () => {
           message: 'Number of additional attendees is required!',
         });
       }
+    } else {
+      delete data.additionalAttendees;
     }
     if (data.isMaximumCapacitySet) {
       if (!data.maximumCapacity || data.maximumCapacity.trim() === '') {
