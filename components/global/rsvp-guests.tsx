@@ -3,12 +3,22 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
-import { User, Baby, Trash2 } from 'lucide-react';
+import { User, Baby, Trash2, Plus } from 'lucide-react';
 import { useAppContext } from '@/lib/context';
+import { toast } from 'sonner';
 
-const RsvpGuests = ({ guests, setGuests, contact, setContact }: any) => {
+const RsvpGuests = ({
+  guests,
+  setGuests,
+  contact,
+  setContact,
+  setGuestName,
+  rsvpStatus,
+  guestName,
+}: any) => {
   const { hasMaximumCapacity, allowAdditionalAttendees, additionalAttendees } =
     useAppContext();
+
   const handleGuestNameChange = (guestId: string, name: string) => {
     setGuests(
       guests.map((guest: any) =>
@@ -38,85 +48,138 @@ const RsvpGuests = ({ guests, setGuests, contact, setContact }: any) => {
 
   return (
     <div className='space-y-4'>
-      <div className='space-y-2'>
-        <Label>
-          Enter Total Guest{' '}
-          {additionalAttendees && `(Upto ${additionalAttendees} including you)`}
-        </Label>
-        <Input
-          type='number'
-          // placeholder='Max guest limit is 3 including you'
-          value={guests?.length || null}
-          // disabled={hasMaximumCapacity}
-          onChange={(e) =>
-            setGuests(
-              // @ts-ignore
-              Array.from({ length: e.target.value }, (_, index) => ({
-                guestId: String(index + 1),
-                name: '',
-                isAdult: true,
-              }))
-            )
-          }
-        />
-      </div>
-
-      <div className='space-y-2'>
-        <Label>Contact Phone/Email</Label>
-        <Input
-          type='text'
-          placeholder='Enter contact'
-          value={contact}
-          onChange={(e) => setContact(e.target.value)}
-        />
-      </div>
-      <div className='space-y-2'>
-        <Label>Guest Details</Label>
+      {/* {rsvpStatus !== 'no' && (
         <div className='space-y-2'>
-          {guests.map((guest: any, index: number) => (
-            <div key={guest.guestId} className='flex items-center gap-2'>
-              <div className='flex items-center gap-2'>
+          <Label>
+            Enter Total Guest{' '}
+            {additionalAttendees &&
+              `(Upto ${additionalAttendees} including you)`}
+          </Label>
+          <Input
+            type='number'
+            // placeholder='Max guest limit is 3 including you'
+            value={guests?.length || null}
+            // disabled={hasMaximumCapacity}
+            onChange={(e) =>
+              setGuests(
+                // @ts-ignore
+                Array.from({ length: e.target.value }, (_, index) => ({
+                  guestId: String(index + 1),
+                  name: '',
+                  isAdult: true,
+                }))
+              )
+            }
+          />
+        </div>
+      )} */}
+
+      {rsvpStatus && (
+        <div className='space-y-2'>
+          <Label>Contact Phone/Email</Label>
+
+          <Input
+            type='text'
+            placeholder='Enter contact'
+            value={contact}
+            onChange={(e) => setContact(e.target.value)}
+          />
+        </div>
+      )}
+      {rsvpStatus === 'no' && (
+        <div className='space-y-2'>
+          <Label>Your Name</Label>
+
+          <Input
+            type='text'
+            placeholder='Enter your name'
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+          />
+        </div>
+      )}
+
+      {rsvpStatus !== 'no' && (
+        <div className='space-y-2'>
+          <Label>Guest Details</Label>
+          <div className='space-y-2'>
+            {guests.map((guest: any, index: number) => (
+              <div key={guest.guestId} className='flex items-center gap-2'>
+                <div className='flex items-center gap-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => handleGuestTypeChange(guest.guestId, true)}
+                    // disabled={guest.id === '1'}
+                    className={cn(
+                      guest.isAdult && 'bg-primary/10 text-primary'
+                    )}
+                  >
+                    <User className='w-5 h-5' />
+                  </Button>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => handleGuestTypeChange(guest.guestId, false)}
+                    // disabled={guest.id === '1'}
+                    className={cn(
+                      !guest.isAdult && 'bg-primary/10 text-primary'
+                    )}
+                  >
+                    <Baby className='w-5 h-5' />
+                  </Button>
+                </div>
+                <Input
+                  value={guest.name}
+                  // disabled={guest.guestId === '1'}
+                  onChange={(e) =>
+                    handleGuestNameChange(guest.guestId, e.target.value)
+                  }
+                  placeholder='Guest name'
+                />
+
                 <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => handleGuestTypeChange(guest.guestId, true)}
-                  // disabled={guest.id === '1'}
-                  className={cn(guest.isAdult && 'bg-primary/10 text-primary')}
+                  variant='ghost'
+                  size='icon'
+                  disabled={index === 0}
+                  onClick={() => handleRemoveGuest(guest.guestId)}
+                  className='text-destructive hover:text-destructive hover:bg-destructive/10'
                 >
-                  <User className='w-5 h-5' />
-                </Button>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => handleGuestTypeChange(guest.guestId, false)}
-                  // disabled={guest.id === '1'}
-                  className={cn(!guest.isAdult && 'bg-primary/10 text-primary')}
-                >
-                  <Baby className='w-5 h-5' />
+                  <Trash2 className='h-4 w-4' />
                 </Button>
               </div>
-              <Input
-                value={guest.name}
-                // disabled={guest.guestId === '1'}
-                onChange={(e) =>
-                  handleGuestNameChange(guest.guestId, e.target.value)
+            ))}
+          </div>
+          <div className='flex flex-col gap-2'>
+            <Button
+              className='w-full'
+              variant='outline'
+              size='sm'
+              onClick={() => {
+                if (guests.length >= additionalAttendees) {
+                  toast.error('You have reached the maximum number of guests');
+                  return;
                 }
-                placeholder='Guest name'
-              />
-
-              <Button
-                variant='ghost'
-                size='icon'
-                disabled={guest.guestId === '1'}
-                onClick={() => handleRemoveGuest(guest.guestId)}
-                className='text-destructive hover:text-destructive hover:bg-destructive/10'
-              >
-                <Trash2 className='h-4 w-4' />
-              </Button>
-            </div>
-          ))}
+                setGuests([
+                  ...guests,
+                  {
+                    guestId: (guests?.length + 1).toString(),
+                    name: '',
+                    isAdult: true,
+                  },
+                ]);
+              }}
+            >
+              <Plus className='w-4 h-4' />
+              Add Guest
+            </Button>
+            <p className='text-sm text-muted-foreground'>
+              {additionalAttendees &&
+                `Upto ${additionalAttendees} guests including you`}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

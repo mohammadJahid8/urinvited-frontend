@@ -11,8 +11,9 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trash2, Baby, User } from 'lucide-react';
+import { Trash2, Baby, User, Plus } from 'lucide-react';
 import { useAppContext } from '@/lib/context';
+import { toast } from 'sonner';
 
 export default function GroupGuestModal({
   open,
@@ -20,11 +21,10 @@ export default function GroupGuestModal({
   onAddGuests,
   extraGuests,
 }: any) {
-  const { event, hasMaximumCapacity } = useAppContext();
+  const { event, allowAdditionalAttendees, additionalAttendees } =
+    useAppContext();
 
   const eventData = event?.eventDetails;
-  const additionalAttendees = eventData?.additionalAttendees;
-  const allowAdditionalAttendees = eventData?.allowAdditionalAttendees;
 
   const [guests, setGuests] = useState<any[]>([]);
 
@@ -32,19 +32,21 @@ export default function GroupGuestModal({
 
   useEffect(() => {
     setGuests([
-      ...(extraGuestsLength < additionalAttendees
-        ? [
-            ...(extraGuests || []),
-            ...Array.from(
-              { length: additionalAttendees - extraGuestsLength },
-              (_, index) => ({
-                guestId: String(Date.now() + index + 1),
-                name: '',
-                isAdult: true,
-              })
-            ),
-          ]
-        : extraGuests || []),
+      ...(extraGuests || []),
+      // ...(extraGuestsLength < additionalAttendees
+      //   ? [
+      //       ...(extraGuests || []),
+      //       ...Array.from(
+      //         { length: additionalAttendees - extraGuestsLength },
+      //         (_, index) => ({
+
+      //           guestId: String(Date.now() + index + 1),
+      //           name: '',
+      //           isAdult: true,
+      //         })
+      //       ),
+      //     ]
+      //   : extraGuests || []),
     ]);
   }, [
     additionalAttendees,
@@ -53,17 +55,6 @@ export default function GroupGuestModal({
     extraGuestsLength,
     open,
   ]);
-
-  // useEffect(() => {
-  //   if (extraGuests && extraGuests.length > 0) {
-  //     setGuests(extraGuests);
-  //   } else {
-  //     setGuests([
-  //       { id: '1', name: '', isAdult: true },
-  //       { id: '2', name: '', isAdult: false },
-  //     ]);
-  //   }
-  // }, [extraGuests]);
 
   const handleTotalGuestsChange = (value: string) => {
     const newCount = parseInt(value);
@@ -117,7 +108,7 @@ export default function GroupGuestModal({
           <DialogDescription>Add extra guests to your event.</DialogDescription>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
-          <div className='grid grid-cols-4 items-center gap-4'>
+          {/* <div className='grid grid-cols-4 items-center gap-4'>
             <span className='text-sm'>Total Guests</span>
             <Input
               type='number'
@@ -129,7 +120,7 @@ export default function GroupGuestModal({
               className='col-span-3'
               placeholder='Enter number of guests'
             />
-          </div>
+          </div> */}
 
           <div className='space-y-4'>
             <span className='text-sm font-medium'>Guest Details</span>
@@ -169,6 +160,35 @@ export default function GroupGuestModal({
                 </Button>
               </div>
             ))}
+          </div>
+
+          <div className='flex flex-col gap-2'>
+            <Button
+              className='w-full'
+              variant='outline'
+              size='sm'
+              onClick={() => {
+                if (guests.length >= additionalAttendees - 1) {
+                  toast.error('You have reached the maximum number of guests');
+                  return;
+                }
+
+                setGuests([
+                  ...guests,
+                  {
+                    guestId: (guests?.length + 1).toString(),
+                    name: '',
+                    isAdult: true,
+                  },
+                ]);
+              }}
+            >
+              <Plus className='w-4 h-4' />
+              Add Guest
+            </Button>
+            <p className='text-sm text-muted-foreground'>
+              {additionalAttendees && `Upto ${additionalAttendees - 1} guests`}
+            </p>
           </div>
         </div>
         <DialogFooter className='sm:justify-between gap-2'>

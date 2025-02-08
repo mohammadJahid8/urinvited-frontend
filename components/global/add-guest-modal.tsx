@@ -38,7 +38,13 @@ interface RSVPData {
 }
 
 export function AddGuestModal() {
-  const { event, refetchEvents, refetchEvent } = useAppContext();
+  const {
+    event,
+    refetchEvents,
+    refetchEvent,
+    additionalAttendees,
+    allowAdditionalAttendees,
+  } = useAppContext();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rsvpData, setRSVPData] = useState<RSVPData>({
@@ -51,22 +57,22 @@ export function AddGuestModal() {
   });
 
   const eventData = event?.eventDetails;
-  const additionalAttendees = eventData?.additionalAttendees;
-  const allowAdditionalAttendees = eventData?.allowAdditionalAttendees;
 
   const [guests, setGuests] = useState<any[]>([]);
 
   useEffect(() => {
-    setGuests([
-      ...(allowAdditionalAttendees
-        ? Array.from({ length: additionalAttendees }, (_, index) => ({
-            guestId: String(Date.now() + index + 1),
-            name: '',
+    if (rsvpData.rsvpStatus === 'yes' || rsvpData.rsvpStatus === 'maybe') {
+      setGuests([
+        ...[
+          {
+            guestId: '1',
+            name: rsvpData.name,
             isAdult: true,
-          }))
-        : []),
-    ]);
-  }, [additionalAttendees, allowAdditionalAttendees]);
+          },
+        ],
+      ]);
+    }
+  }, [rsvpData]);
 
   const handleChange = (field: keyof RSVPData, value: string) => {
     setRSVPData((prev) => ({ ...prev, [field]: value }));
@@ -79,6 +85,8 @@ export function AddGuestModal() {
     if (isRequiredFieldsFilled) {
       rsvpData.guests = guests;
       rsvpData.event = event?._id;
+
+      console.log({ rsvpData });
 
       try {
         setLoading(true);

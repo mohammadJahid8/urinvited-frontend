@@ -48,6 +48,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
   const [specialMessage, setSpecialMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [contact, setContact] = useState<string>(rsvp?.contact || email);
+  const [guestName, setGuestName] = useState<string>(rsvp?.name || name);
 
   console.log({ rsvp });
 
@@ -67,25 +68,25 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
 
   useEffect(() => {
     const newGuests = [
-      ...(rsvpLength < additionalAttendees
-        ? [
-            ...(rsvpGuests || []),
-            ...Array.from(
-              { length: additionalAttendees - rsvpLength },
-              (_, index) => ({
-                guestId: String(Date.now() + index + 1),
-                name: '',
-                isAdult: true,
-              })
-            ),
-          ]
-        : rsvpGuests || []),
+      // ...(rsvpLength < additionalAttendees
+      //   ? [
+      //       ...(rsvpGuests || []),
+      //       ...Array.from(
+      //         { length: additionalAttendees - rsvpLength },
+      //         (_, index) => ({
+      //           guestId: String(Date.now() + index + 1),
+      //           name: '',
+      //           isAdult: true,
+      //         })
+      //       ),
+      //     ]
+      //   : rsvpGuests || []),
     ];
 
-    if (name && email) {
+    if (guestName && email) {
       newGuests[0] = {
         guestId: '1',
-        name: name,
+        name: guestName,
         isAdult: true,
         email: email,
       };
@@ -94,11 +95,11 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
     setGuests(newGuests);
   }, [
     additionalAttendees,
-    name,
     email,
     allowAdditionalAttendees,
     rsvpGuests,
     rsvpLength,
+    guestName,
   ]);
 
   const eventName = eventData?.events?.[0]?.title;
@@ -130,7 +131,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
         position: 'top-center',
       });
     }
-    if (!guests[0]?.name) {
+    if (!guests[0]?.name && rsvpStatus !== 'no') {
       return toast.error('Please fill in the first guest name', {
         position: 'top-center',
       });
@@ -148,6 +149,12 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
       );
     }
 
+    if (!guestName) {
+      return toast.error('Please fill in your name', {
+        position: 'top-center',
+      });
+    }
+
     if (!allowAdditionalAttendees && guests.length > 1) {
       return toast.error(
         `You can only add ${additionalAttendees} guests including yourself but you have added ${guests.length} guests`,
@@ -159,14 +166,15 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
 
     const payload = {
       rsvpStatus,
-      guests,
+      guests: rsvpStatus === 'no' ? [] : guests,
       message: specialMessage,
       contact,
-
-      name,
+      name: guestName,
       event: id,
       reaction,
     };
+
+    console.log({ payload });
 
     try {
       setLoading(true);
@@ -258,31 +266,36 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
                 ))}
               </div>
             </div>
-            {(rsvpStatus === 'yes' || rsvpStatus === 'maybe') && (
-              <>
-                <Button
-                  className='w-full bg-black text-white'
-                  href={calendarUrl}
-                  target='_blank'
-                >
-                  <Calendar className='mr-2 h-4 w-4' />
-                  Add to Calendar
-                </Button>
 
-                <RsvpGuests
-                  guests={guests}
-                  setGuests={setGuests}
-                  contact={contact}
-                  setContact={setContact}
-                />
-              </>
+            {rsvpStatus !== 'no' && (
+              <Button
+                className='w-full bg-black text-white'
+                href={calendarUrl}
+                target='_blank'
+              >
+                <Calendar className='mr-2 h-4 w-4' />
+                Add to Calendar
+              </Button>
             )}
+
+            <RsvpGuests
+              guests={guests}
+              setGuests={setGuests}
+              contact={contact}
+              setContact={setContact}
+              rsvpStatus={rsvpStatus}
+              setGuestName={setGuestName}
+              guestName={guestName}
+            />
+
             {/* {rsvpOption === 'maybe' && (
               <p className='text-sm text-muted-foreground bg-red-50 px-3 py-2 rounded-full text-center'>
                 We will send a reminder message after 3 days.
               </p>
             )} */}
-            <GiftRegistry giftRegistry={giftRegistry} name={name || ''} />
+            {rsvpStatus !== 'no' && (
+              <GiftRegistry giftRegistry={giftRegistry} name={name || ''} />
+            )}
             <SpecialMessage
               specialMessage={specialMessage}
               setSpecialMessage={setSpecialMessage}
