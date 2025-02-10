@@ -67,8 +67,6 @@ export default function Event({ className }: any) {
   const additionalFeatures =
     formData?.additionalFeatures || event?.additionalFeatures;
 
-  console.log({ eventDetails, event });
-
   const events = eventDetails?.events;
   const hostedBy = eventDetails?.hostedBy;
   const requestRsvps = eventDetails?.requestRsvps;
@@ -330,7 +328,7 @@ export default function Event({ className }: any) {
                               className='w-5 h-5'
                               style={{ color: textColour || 'blue' }}
                             />
-                            {/* {console.log({ startDate, startTime })} */}
+
                             <span>
                               {startDate &&
                                 format(
@@ -501,7 +499,9 @@ export default function Event({ className }: any) {
           </div>
 
           {/* Gift Section */}
+
           {registry &&
+            registry?.[0]?.title &&
             registry.map((item: any, index: number) => (
               <div
                 className='p-4 bg-gray-50 shadow-sm text-center space-y-4'
@@ -561,7 +561,9 @@ export default function Event({ className }: any) {
           </div> */}
 
           {/* Footer Icons */}
-          {(accommodation || travelSource) && (
+
+          {((accommodation && accommodation?.[0]?.accommodationName) ||
+            travelSource) && (
             <div className='flex flex-col justify-center gap-4 py-4 bg-gray-50 shadow-sm items-center'>
               {travelSource && (
                 <Button

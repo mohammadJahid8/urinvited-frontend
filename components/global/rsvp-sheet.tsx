@@ -90,6 +90,13 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
         isAdult: true,
         email: email,
       };
+    } else {
+      newGuests[0] = {
+        guestId: '1',
+        name: '',
+        isAdult: true,
+        email: '',
+      };
     }
 
     setGuests(newGuests);
@@ -149,7 +156,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
       );
     }
 
-    if (!guestName) {
+    if (!guestName && rsvpStatus === 'no') {
       return toast.error('Please fill in your name', {
         position: 'top-center',
       });
@@ -169,7 +176,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
       guests: rsvpStatus === 'no' ? [] : guests,
       message: specialMessage,
       contact,
-      name: guestName,
+      name: guestName || guests[0]?.name,
       event: id,
       reaction,
     };
