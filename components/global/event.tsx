@@ -186,7 +186,7 @@ export default function Event({ className }: any) {
 
   return (
     <div
-      className={cn('bg-cover bg-center bg-no-repeat p-10', className)}
+      className={cn('bg-cover bg-center bg-no-repeat p-4 md:p-10', className)}
       style={{
         backgroundImage: themeBackgroundImage
           ? `url(${themeBackgroundImage})`
@@ -391,10 +391,14 @@ export default function Event({ className }: any) {
                               className='w-5 h-5'
                               style={{ color: textColour || 'blue' }}
                             />
-                            <span>
-                              {locationName && `${locationName}, `}
-                              {address}
+                            <span className='hidden md:inline'>
+                              {locationName && `${locationName}`}
+                              {address && `, ${address}`}
                             </span>
+                            <div className='md:hidden'>
+                              {locationName && `${locationName}`}
+                              {address && <div>{address}</div>}
+                            </div>
                           </div>
                           {showGoogleMap && (
                             <a

@@ -77,6 +77,9 @@ const RsvpGuests = ({
       {rsvpStatus && (
         <div className='space-y-2'>
           <Label>Contact Phone/Email</Label>
+          <p className='text-xs text-muted-foreground'>
+            Example: +14155550123 or example@gmail.com
+          </p>
 
           <Input
             type='text'

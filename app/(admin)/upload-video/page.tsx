@@ -161,7 +161,7 @@ export default function VideoUpload() {
           <Input
             type='email'
             className=''
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.toLowerCase())}
             required
           />
         </div>
