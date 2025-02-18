@@ -35,10 +35,10 @@ const EventDetails = () => {
   const schemaFields: Record<string, z.ZodTypeAny> = {
     // event details
     hostedBy: z.string().min(1, { message: 'Hosted by is required' }),
-    events: z.array(
-      z
-        .object({
-          title: z.string().min(1, { message: 'Title is required' }),
+    events: z
+      .array(
+        z.object({
+          title: z.any().optional(),
           startDate: z
             .any()
             .optional()
@@ -74,96 +74,76 @@ const EventDetails = () => {
           locationType: z.enum(['in-person', 'virtual']),
           latLng: z.any().optional(),
         })
-        .superRefine((data, ctx) => {
-          // Conditional validation for startDate
-          if (data.when === 'startDateTime') {
-            if (!data.startDate) {
+      )
+      .superRefine((events, ctx) => {
+        events.forEach((event, index) => {
+          if (index === 0 && !event.title) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [index, 'title'],
+              message: 'Title is required',
+            });
+          }
+
+          if (index === 0 && event.when === 'startDateTime') {
+            if (!event.startDate) {
               ctx.addIssue({
                 code: 'custom',
-                path: ['startDate'],
+                path: [index, 'startDate'],
                 message: 'Start date is required',
               });
             }
-            if (!data.startTime) {
+            if (!event.startTime) {
               ctx.addIssue({
                 code: 'custom',
-                path: ['startTime'],
+                path: [index, 'startTime'],
                 message: 'Start time is required',
               });
             }
-            if (!data.timeZone) {
+            if (!event.timeZone) {
               ctx.addIssue({
                 code: 'custom',
-                path: ['timeZone'],
+                path: [index, 'timeZone'],
                 message: 'Time zone is required',
               });
             }
-          } else {
-            delete data.startDate;
-            delete data.startTime;
-            delete data.timeZone;
-
-            delete data.endDate;
-            delete data.endTime;
           }
 
-          if (data.inviteDetails === true) {
-            if (typeof data.inviteDetails !== 'string') {
+          if (event.locationType === 'in-person') {
+            if (index === 0 && !event.locationName) {
+              // Require locationName only for the first event
               ctx.addIssue({
                 code: 'custom',
-                path: ['inviteDetails'],
-                message: 'Invite details is required',
-              });
-            } else {
-              delete data.inviteDetails;
-            }
-          } else {
-            if (typeof data.inviteDetails !== 'string') {
-              delete data.inviteDetails;
-            }
-          }
-
-          if (data.locationType === 'in-person') {
-            if (!data.locationName) {
-              ctx.addIssue({
-                code: 'custom',
-                path: ['locationName'],
-                message: 'Location name is required',
+                path: [index, 'locationName'],
+                message: 'Location name is required for the first event',
               });
             }
-            // if (!data.address) {
-            //   ctx.addIssue({
-            //     code: 'custom',
-            //     path: ['address'],
-            //     message: 'Address is required',
-            //   });
-            // }
-
-            delete data.virtualPlatformName;
-            delete data.virtualUrl;
+            delete event.virtualPlatformName;
+            delete event.virtualUrl;
           }
 
-          if (data.locationType === 'virtual') {
-            if (!data.virtualPlatformName) {
+          if (event.locationType === 'virtual') {
+            if (index === 0 && !event.virtualPlatformName) {
               ctx.addIssue({
                 code: 'custom',
-                path: ['virtualPlatformName'],
+                path: [index, 'virtualPlatformName'],
                 message: 'Virtual platform name is required',
               });
             }
-            if (!data.virtualUrl) {
+            if (index === 0 && !event.virtualUrl) {
               ctx.addIssue({
                 code: 'custom',
-                path: ['virtualUrl'],
+                path: [index, 'virtualUrl'],
                 message: 'Virtual URL is required',
               });
             }
 
-            delete data.locationName;
-            delete data.address;
+            delete event.locationName;
+            delete event.address;
           }
-        })
-    ),
+        });
+      }),
+
     // rsvps
     requestRsvps: z.boolean().optional(),
     isRsvpDueDateSet: z.boolean().optional(),
@@ -179,22 +159,12 @@ const EventDetails = () => {
         return parsedDate.toISOString();
       }),
     allowRsvpAfterDueDate: z.boolean().optional(),
-    // isAutoReminderSet: z.boolean().optional(),
-    // autoReminder: z.boolean().optional(),
 
     // guest management
     allowAdditionalAttendees: z.boolean().optional(),
     additionalAttendees: z.string().optional(),
-
     isMaximumCapacitySet: z.boolean().optional(),
     maximumCapacity: z.string().optional(),
-
-    // trackAttendees: z.boolean().optional(),
-
-    // sendReminderToAttendees: z.boolean().optional(),
-    // attendingReminderDate: z.any().optional(),
-
-    // allowUpdateRsvpAfterSubmission: z.boolean().optional(),
   };
 
   const formSchema = z.object(schemaFields).superRefine((data, ctx) => {

@@ -24,13 +24,7 @@ import { useAppContext } from '@/lib/context';
 import { toast } from 'sonner';
 import { shareUrl } from '@/lib/shareUrl';
 import PickEmoji from './emoji-picker';
-
-const convertTime = (timeString: string) => {
-  // Parse the time string into a Date object
-  const time = parse(timeString, 'HH:mm', new Date());
-  // Format the time into a readable format
-  return format(time, 'hh:mm a');
-};
+import convertTime from '@/utils/convertTime';
 
 export default function Event({ className }: any) {
   const { formData } = useStore();
@@ -346,8 +340,8 @@ export default function Event({ className }: any) {
                                 )}`}{' '}
                               {endTime &&
                                 endTime &&
-                                `| ${convertTime(endTime)}`}{' '}
-                              {timeZone && `| ${timeZone}`}
+                                `to ${convertTime(endTime)}`}{' '}
+                              {timeZone && ` ${timeZone}`}
                             </span>
                           </div>
                           {isAddToCalendar && (
@@ -392,12 +386,12 @@ export default function Event({ className }: any) {
                               style={{ color: textColour || 'blue' }}
                             />
                             <span className='hidden md:inline'>
+                              {address && `${address}, `}
                               {locationName && `${locationName}`}
-                              {address && `, ${address}`}
                             </span>
                             <div className='md:hidden'>
-                              {locationName && `${locationName}`}
-                              {address && <div>{address}</div>}
+                              {address && `${address}`}
+                              {locationName && <div>{locationName}</div>}
                             </div>
                           </div>
                           {showGoogleMap && (

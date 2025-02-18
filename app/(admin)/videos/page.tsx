@@ -144,13 +144,13 @@ const VideosPage = () => {
 
   const columns = [
     {
-      accessorKey: 'createdAt',
+      accessorKey: 'updatedAt',
       header: 'Uploaded On',
       cell: ({ row }: any) => {
-        const createdAt = row.getValue('createdAt');
+        const updatedAt = row.getValue('updatedAt');
         return (
           <div className=' font-medium'>
-            {moment(createdAt).format('MMMM Do, YYYY hh:mm A')}
+            {moment(updatedAt).format('MMMM Do, YYYY hh:mm A')}
           </div>
         );
       },

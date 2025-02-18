@@ -153,7 +153,8 @@ const EachEvent = ({
           <FormItem className='flex flex-col gap-2 space-y-0'>
             <div className='flex items-center justify-between'>
               <FormLabel className='font-bold'>
-                Event Title <span className='text-red-500'>*</span>
+                Event Title{' '}
+                {index === 0 && <span className='text-red-500'>*</span>}
               </FormLabel>
               {index > 0 && (
                 <Button
@@ -226,7 +227,7 @@ const EachEvent = ({
         render={({ field }) => (
           <div className=''>
             <FormLabel className='font-bold'>
-              When <span className='text-red-500'>*</span>
+              When {index === 0 && <span className='text-red-500'>*</span>}
             </FormLabel>
 
             <RadioGroup
@@ -346,7 +347,7 @@ const EachEvent = ({
         render={({ field }) => (
           <div className=''>
             <FormLabel className='font-bold'>
-              Location <span className='text-red-500'>*</span>
+              Location {index === 0 && <span className='text-red-500'>*</span>}
             </FormLabel>
             <RadioGroup
               onValueChange={field.onChange}

@@ -65,7 +65,7 @@ export default function AuthForm({
   const handleSubmit = async (data: any) => {
     setLoading(true);
     try {
-      data.email = data.email.toLowerCase();
+      data.email && (data.email = data.email.toLowerCase());
       await onSubmit(data);
     } catch (error) {
       console.error('Submission error:', error);
@@ -113,7 +113,7 @@ export default function AuthForm({
                           placeholder={input.placeholder}
                           disabled={loading}
                           {...field}
-                          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 lowercase'
+                          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500'
                         />
                       )}
                     </FormControl>

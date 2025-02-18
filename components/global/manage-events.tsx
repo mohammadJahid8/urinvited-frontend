@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react';
 import statusCounts from '@/utils/statusCount';
 import api from '@/utils/axiosInstance';
 import { toast } from 'sonner';
+import convertTime from '@/utils/convertTime';
 
 export default function ManageEvents({ title }: { title: string }) {
   const { events, isEventsLoading, user, statusCountsData, refetchEvents } =
@@ -133,8 +134,11 @@ export default function ManageEvents({ title }: { title: string }) {
               title={event?.eventDetails?.events?.[0]?.title}
               startDate={moment(
                 event?.eventDetails?.events?.[0]?.startDate
-              ).format('MM/DD/YYYY')}
-              startTime={event?.eventDetails?.events?.[0]?.startTime}
+              ).format('MMMM d, yyyy')}
+              startTime={
+                event?.eventDetails?.events?.[0]?.startTime &&
+                convertTime(event?.eventDetails?.events?.[0]?.startTime)
+              }
               location={`${event?.eventDetails?.events?.[0]?.locationName}, ${event?.eventDetails?.events?.[0]?.address}`}
               inviteDetails={event?.eventDetails?.events?.[0]?.inviteDetails}
               invited={event?.share?.guests?.length || 0}

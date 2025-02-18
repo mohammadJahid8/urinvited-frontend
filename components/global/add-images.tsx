@@ -34,9 +34,9 @@ const AddImages = ({ form }: { form: any }) => {
                 >
                   Event Logo/Monogram
                 </FormLabel>
-                <FormDescription className='text-[13px]'>
-                  Recommended Image Size: 150*100
-                </FormDescription>
+                {/* <FormDescription className='text-[13px]'>
+                  Recommended Image Size: 1905 x 960 PX
+                </FormDescription> */}
               </div>
             </div>
 
@@ -63,7 +63,7 @@ const AddImages = ({ form }: { form: any }) => {
                             }
                           />
                         </FormControl>
-                        {value && (
+                        {value && value.name && (
                           <div className='flex items-center gap-2'>
                             <span>
                               {value.name} ({(value.size / 1024).toFixed(2)} KB)
@@ -111,7 +111,7 @@ const AddImages = ({ form }: { form: any }) => {
                   Theme Background Image
                 </FormLabel>
                 <FormDescription className='text-[13px]'>
-                  Recommended Image Size: 150*100
+                  Recommended Image Size: 1905 x 960 PX
                 </FormDescription>
               </div>
             </div>
@@ -139,7 +139,7 @@ const AddImages = ({ form }: { form: any }) => {
                             }
                           />
                         </FormControl>
-                        {value && (
+                        {value && value.name && (
                           <div className='flex items-center gap-2'>
                             <span>
                               {value.name} ({(value.size / 1024).toFixed(2)} KB)
@@ -186,9 +186,9 @@ const AddImages = ({ form }: { form: any }) => {
                 >
                   Footer Background Image
                 </FormLabel>
-                <FormDescription className='text-[13px]'>
-                  Recommended Image Size: 150*100
-                </FormDescription>
+                {/* <FormDescription className='text-[13px]'>
+                  Recommended Image Size: 1905 x 960 PX
+                </FormDescription> */}
               </div>
             </div>
 
@@ -215,7 +215,7 @@ const AddImages = ({ form }: { form: any }) => {
                             }
                           />
                         </FormControl>
-                        {value && (
+                        {value && value.name && (
                           <div className='flex items-center gap-2'>
                             <span>
                               {value.name} ({(value.size / 1024).toFixed(2)} KB)
@@ -263,7 +263,7 @@ const AddImages = ({ form }: { form: any }) => {
                   Thumbnail Image
                 </FormLabel>
                 <FormDescription className='text-[13px]'>
-                  Recommended Image Size: 150*100
+                  Recommended Image Size: 1080 x 1920 PX
                 </FormDescription>
               </div>
             </div>
@@ -291,7 +291,7 @@ const AddImages = ({ form }: { form: any }) => {
                             }
                           />
                         </FormControl>
-                        {value && (
+                        {value && value.name && (
                           <div className='flex items-center gap-2'>
                             <span>
                               {value.name} ({(value.size / 1024).toFixed(2)} KB)
