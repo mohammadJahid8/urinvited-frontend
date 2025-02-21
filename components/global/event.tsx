@@ -180,11 +180,15 @@ export default function Event({ className }: any) {
 
   return (
     <div
-      className={cn('bg-cover bg-center bg-no-repeat p-4 md:p-10', className)}
+      className={cn('p-4 md:p-10', className)}
       style={{
         backgroundImage: themeBackgroundImage
           ? `url(${themeBackgroundImage})`
           : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
       }}
       key={themeBackgroundImage}
     >
@@ -396,7 +400,9 @@ export default function Event({ className }: any) {
                           </div>
                           {showGoogleMap && (
                             <a
-                              href={`https://www.google.com/maps?q=${latLng?.lat},${latLng?.lng}`}
+                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                locationName
+                              )}&query_place_id=${latLng?.lat},${latLng?.lng}`}
                               className='text-blue-500 text-base'
                               style={{
                                 fontFamily: dateTimeLocationFont,

@@ -300,7 +300,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
                 We will send a reminder message after 3 days.
               </p>
             )} */}
-            {rsvpStatus !== 'no' && (
+            {rsvpStatus !== 'no' && giftRegistry?.[0]?.url && (
               <GiftRegistry giftRegistry={giftRegistry} name={name || ''} />
             )}
             <SpecialMessage
