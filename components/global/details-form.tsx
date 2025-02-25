@@ -263,7 +263,7 @@ const EachEvent = ({
                       render={({ field }) => (
                         <FormItem className='w-full'>
                           <FormControl>
-                            <Input type='time' {...field} />
+                            <Input type='time' {...field} lang='en-US' />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

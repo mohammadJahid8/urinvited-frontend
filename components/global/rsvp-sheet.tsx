@@ -1,16 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  Baby,
-  Calendar,
-  Clock,
-  MapPin,
-  Trash2,
-  User,
-  Users,
-  X,
-} from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -22,21 +13,28 @@ import {
   SheetFooter,
 } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/lib/context';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import moment from 'moment';
 import { toast } from 'sonner';
 import api from '@/utils/axiosInstance';
-import { useQuery } from '@tanstack/react-query';
 import daysLeft from '@/utils/daysLeft';
 import RsvpGuests from './rsvp-guests';
+import { format } from 'date-fns';
+import convertTime from '@/utils/convertTime';
 
 type RSVPOption = 'yes' | 'no' | 'maybe';
 
-export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
+export default function RSVPSheet({
+  reaction,
+  rsvp,
+  email,
+  name,
+  id,
+  isAddToCalendar,
+  handleCalendarLink,
+}: any) {
   const [rsvpStatus, setRsvpStatus] = useState<RSVPOption | null>('yes');
   const {
     openRSVP,
@@ -67,21 +65,7 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
   const rsvpLength = rsvpGuests?.length || 0;
 
   useEffect(() => {
-    const newGuests = [
-      // ...(rsvpLength < additionalAttendees
-      //   ? [
-      //       ...(rsvpGuests || []),
-      //       ...Array.from(
-      //         { length: additionalAttendees - rsvpLength },
-      //         (_, index) => ({
-      //           guestId: String(Date.now() + index + 1),
-      //           name: '',
-      //           isAdult: true,
-      //         })
-      //       ),
-      //     ]
-      //   : rsvpGuests || []),
-    ];
+    const newGuests = [];
 
     if (guestName && email) {
       newGuests[0] = {
@@ -112,25 +96,17 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
   const eventName = eventData?.events?.[0]?.title;
   const hostName = event?.hostedBy;
   const message = eventData?.events?.[0]?.inviteDetails;
-  const eventDate = moment(eventData?.events?.[0]?.startDate).format(
-    'MM/DD/YYYY'
-  );
+  const startDate = eventData?.events?.[0]?.startDate;
+  const endDate = eventData?.events?.[0]?.endDate;
   const eventLocation = eventData?.events?.[0]?.locationName;
-  const eventTime = moment(eventData?.events?.[0]?.startTime, 'HH:mm').format(
-    'h:mm A'
-  );
+  const startTime = eventData?.events?.[0]?.startTime;
+  const endTime = eventData?.events?.[0]?.endTime;
   const eventDaysLeft = daysLeft(eventData?.events?.[0]?.startDate);
 
   const additionalFeatures = event?.additionalFeatures;
   const giftRegistry = additionalFeatures?.registry;
 
   const allowRsvpAfterDueDate = eventData?.allowRsvpAfterDueDate;
-
-  const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-    eventName
-  )}&dates=${eventDate}/${eventDate}&details=${encodeURIComponent(
-    message
-  )}&location=${encodeURIComponent(eventLocation)}`;
 
   const handleConfirmRsvp = async () => {
     if (!allowRsvpAfterDueDate) {
@@ -230,7 +206,8 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
                 <div className='flex items-center gap-2'>
                   <Calendar className='h-4 w-4 text-primary' />
                   <span>
-                    {eventDate} | {eventTime}
+                    {format(new Date(startDate), 'MMMM d, yyyy')} |{' '}
+                    {convertTime(startTime)}
                   </span>
                   <span className='text-red-500 text-xs'>{eventDaysLeft}</span>
                 </div>
@@ -274,10 +251,18 @@ export default function RSVPSheet({ reaction, rsvp, email, name, id }: any) {
               </div>
             </div>
 
-            {rsvpStatus !== 'no' && (
+            {rsvpStatus !== 'no' && isAddToCalendar && (
               <Button
                 className='w-full bg-black text-white'
-                href={calendarUrl}
+                href={handleCalendarLink(
+                  eventName,
+                  startDate,
+                  startTime,
+                  endDate,
+                  endTime,
+                  message,
+                  eventLocation
+                )}
                 target='_blank'
               >
                 <Calendar className='mr-2 h-4 w-4' />

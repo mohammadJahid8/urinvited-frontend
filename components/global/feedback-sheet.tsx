@@ -24,40 +24,12 @@ export function FeedbackSheet() {
   return (
     <Sheet open={openFeedback} onOpenChange={setOpenFeedback}>
       <SheetContent className='sm:max-w-[480px] w-full p-0'>
-        <SheetHeader className='border-b p-4'>
-          <div className='flex items-center justify-between'>
-            <div className='flex gap-2'>
-              {/* <Button
-                onClick={() => setCurrentTab('message')}
-                size='sm'
-                variant='outline'
-                className={cn(
-                  'border-primary text-primary w-max ',
-                  currentTab === 'message' && 'bg-primary/10'
-                )}
-              >
-                Message
-              </Button> */}
-              <Button
-                onClick={() => setCurrentTab('history')}
-                size='sm'
-                variant='outline'
-                className={cn(
-                  'border-primary text-primary w-max',
-                  currentTab === 'history' && 'bg-primary/10'
-                )}
-              >
-                Feedback History
-              </Button>
-            </div>
-          </div>
-        </SheetHeader>
-
         <div className='h-full overflow-y-auto'>
-          {currentTab === 'message' && <MessageTab feedbacks={feedbacks} />}
+          <HistoryTab feedbacks={feedbacks} downloadFile={downloadFile} />
+          {/* {currentTab === 'message' && <MessageTab feedbacks={feedbacks} />}
           {currentTab === 'history' && (
             <HistoryTab feedbacks={feedbacks} downloadFile={downloadFile} />
-          )}
+          )} */}
         </div>
       </SheetContent>
     </Sheet>
@@ -192,73 +164,73 @@ export default function FeedbackTicket({
   );
 }
 
-const MessageTab = ({ feedbacks }: any) => {
-  const [openCreateTicket, setOpenCreateTicket] = useState(false);
-  return (
-    <>
-      <div className='flex flex-col gap-2 bg-gray-50 p-4'>
-        <p className='text-sm text-muted-foreground'>
-          Submit up to 3 tickets for revisions and feedback ({feedbacks.length}
-          /3)
-        </p>
-        <Button
-          onClick={() => {
-            if (feedbacks.length >= 3) {
-              return toast.error(
-                'You have reached the maximum number of tickets',
-                {
-                  position: 'top-center',
-                }
-              );
-            }
-            setOpenCreateTicket(true);
-          }}
-          size='sm'
-          className='bg-primary text-white w-max'
-        >
-          Create Ticket
-        </Button>
-        <CreateTicket
-          open={openCreateTicket}
-          onOpenChange={setOpenCreateTicket}
-        />
-      </div>
-      <ChatContainer>
-        <ChatMessage
-          isAdmin
-          message='Figma ipsum component variant main layer. Edit layer text align shadow pencil star pencil share. Variant union auto underline vertical undo. Device figma pencil hand pixel effect plugin.'
-          timestamp='15th November 02:10 PM'
-          avatarFallback='A'
-        />
-        <ChatMessage
-          message='Welcome'
-          timestamp='16th November 01:10 PM'
-          avatarFallback='U'
-        />
-      </ChatContainer>
+// const MessageTab = ({ feedbacks }: any) => {
+//   const [openCreateTicket, setOpenCreateTicket] = useState(false);
+//   return (
+//     <>
+//       <div className='flex flex-col gap-2 bg-gray-50 p-4'>
+//         <p className='text-sm text-muted-foreground'>
+//           Submit up to 3 tickets for revisions and feedback ({feedbacks.length}
+//           /3)
+//         </p>
+//         <Button
+//           onClick={() => {
+//             if (feedbacks.length >= 3) {
+//               return toast.error(
+//                 'You have reached the maximum number of tickets',
+//                 {
+//                   position: 'top-center',
+//                 }
+//               );
+//             }
+//             setOpenCreateTicket(true);
+//           }}
+//           size='sm'
+//           className='bg-primary text-white w-max'
+//         >
+//           Create Ticket
+//         </Button>
+//         <CreateTicket
+//           open={openCreateTicket}
+//           onOpenChange={setOpenCreateTicket}
+//         />
+//       </div>
+//       <ChatContainer>
+//         <ChatMessage
+//           isAdmin
+//           message='Figma ipsum component variant main layer. Edit layer text align shadow pencil star pencil share. Variant union auto underline vertical undo. Device figma pencil hand pixel effect plugin.'
+//           timestamp='15th November 02:10 PM'
+//           avatarFallback='A'
+//         />
+//         <ChatMessage
+//           message='Welcome'
+//           timestamp='16th November 01:10 PM'
+//           avatarFallback='U'
+//         />
+//       </ChatContainer>
 
-      <div className='mt-auto border-t p-4 absolute bottom-0 w-full bg-background'>
-        <div className='flex items-center gap-2'>
-          {/* <Button variant='ghost' size='icon' className='h-8 w-8'>
-            <Smile className='h-4 w-4' />
-          </Button>
-          <Button variant='ghost' size='icon' className='h-8 w-8'>
-            <Paperclip className='h-4 w-4' />
-          </Button> */}
-          <div className='relative flex-1'>
-            <input
-              placeholder='Write message'
-              className='w-full rounded-md border bg-background px-3 py-2 text-sm'
-            />
-          </div>
-          <Button size='icon' className='h-8 w-8'>
-            <Send className='h-4 w-4' />
-          </Button>
-        </div>
-      </div>
-    </>
-  );
-};
+//       <div className='mt-auto border-t p-4 absolute bottom-0 w-full bg-background'>
+//         <div className='flex items-center gap-2'>
+//           {/* <Button variant='ghost' size='icon' className='h-8 w-8'>
+//             <Smile className='h-4 w-4' />
+//           </Button>
+//           <Button variant='ghost' size='icon' className='h-8 w-8'>
+//             <Paperclip className='h-4 w-4' />
+//           </Button> */}
+//           <div className='relative flex-1'>
+//             <input
+//               placeholder='Write message'
+//               className='w-full rounded-md border bg-background px-3 py-2 text-sm'
+//             />
+//           </div>
+//           <Button size='icon' className='h-8 w-8'>
+//             <Send className='h-4 w-4' />
+//           </Button>
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
 interface ChatContainerProps {
   children: React.ReactNode;
 }

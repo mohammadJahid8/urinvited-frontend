@@ -172,12 +172,35 @@ export default function Event({ className }: any) {
 
   const combineDateTime = (date: string, time: string) => {
     if (!date || !time) return '';
+    console.log({ date, time });
     const [hours, minutes] = time?.split(':') || [];
     const dateObject = new Date(date);
-    dateObject.setUTCHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0); // Set hours and minutes
-    return dateObject.toISOString().replace(/-|:|\.\d{3}/g, '');
+    dateObject.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+
+    // return dateObject.toISOString().replace(/-|:|\.\d{3}/g, '');
+    return moment(dateObject.toISOString().replace(/-|:|\.\d{3}/g, '')).format(
+      'YYYYMMDDTHHmmss[Z]'
+    );
   };
 
+  const handleCalendarLink = (
+    title: string,
+    startDate: string,
+    startTime: string,
+    endDate: string,
+    endTime: string,
+    inviteDetails: string,
+    locationName: string
+  ) => {
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+      title
+    )}&dates=${combineDateTime(startDate, startTime)}/${combineDateTime(
+      endDate,
+      endTime
+    )}&details=${encodeURIComponent(
+      inviteDetails || ''
+    )}&location=${encodeURIComponent(locationName)}`;
+  };
   return (
     <div
       className={cn('p-4 md:p-10', className)}
@@ -350,19 +373,15 @@ export default function Event({ className }: any) {
                           </div>
                           {isAddToCalendar && (
                             <a
-                              href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-                                title
-                              )}&dates=${combineDateTime(
+                              href={handleCalendarLink(
+                                title,
                                 startDate,
-                                startTime
-                              )}/${combineDateTime(
+                                startTime,
                                 endDate,
-                                endTime
-                              )}&details=${encodeURIComponent(
-                                inviteDetails || ''
-                              )}&location=${encodeURIComponent(
+                                endTime,
+                                inviteDetails,
                                 locationName
-                              )}&timezone=${timeZone}`}
+                              )}
                               target='_blank'
                               className='text-blue-500 text-base'
                               style={{
@@ -499,6 +518,8 @@ export default function Event({ className }: any) {
               email={email}
               name={name}
               id={id}
+              isAddToCalendar={isAddToCalendar}
+              handleCalendarLink={handleCalendarLink}
             />
           </div>
 

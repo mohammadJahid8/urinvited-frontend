@@ -76,10 +76,10 @@ const Customization = () => {
     buttonText: customization?.buttonText || 'RSVP',
     buttonColour: customization?.buttonColour || '#000000',
     buttonFormat: customization?.buttonFormat || 'rectangular',
-    isAddToCalendar: customization?.isAddToCalendar || true,
-    reactToEvent: customization?.reactToEvent || true,
-    shareEvent: customization?.shareEvent || true,
-    commentOnEvent: customization?.commentOnEvent || true,
+    isAddToCalendar: customization?.isAddToCalendar || false,
+    reactToEvent: customization?.reactToEvent || false,
+    shareEvent: customization?.shareEvent || false,
+    commentOnEvent: customization?.commentOnEvent || false,
   };
 
   const form = useForm({
@@ -153,6 +153,7 @@ const Customization = () => {
     }
     formData.append('data', JSON.stringify(data));
 
+    console.log('formData', data);
     try {
       const promise = await api.patch(`/event/customization/${id}`, formData, {
         headers: {
