@@ -69,12 +69,12 @@ const ShareSocial = ({ id }: { id: string }) => {
               name: 'Gmail',
               url: `mailto:?subject=testing&body=${shareUrl(id)}`,
             },
-            {
-              src: '/Instagram.svg',
-              alt: 'Share on Instagram',
-              name: 'Instagram',
-              url: `https://www.instagram.com/share?url=${shareUrl(id)}`,
-            },
+            // {
+            //   src: '/Instagram.svg',
+            //   alt: 'Share on Instagram',
+            //   name: 'Instagram',
+            //   url: `https://www.instagram.com/share?url=${shareUrl(id)}`,
+            // },
             {
               src: '/messenger.svg',
               alt: 'Share on Messenger',

@@ -206,8 +206,12 @@ export default function RSVPSheet({
                 <div className='flex items-center gap-2'>
                   <Calendar className='h-4 w-4 text-primary' />
                   <span>
-                    {format(new Date(startDate), 'MMMM d, yyyy')} |{' '}
-                    {convertTime(startTime)}
+                    {startDate
+                      ? format(new Date(startDate), 'MMMM d, yyyy')
+                      : ''}
+                    {startDate && startTime
+                      ? ` | ${convertTime(startTime)}`
+                      : ''}
                   </span>
                   <span className='text-red-500 text-xs'>{eventDaysLeft}</span>
                 </div>

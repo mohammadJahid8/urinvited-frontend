@@ -93,13 +93,13 @@ const EventDetails = () => {
                 message: 'Start date is required',
               });
             }
-            if (!event.startTime) {
-              ctx.addIssue({
-                code: 'custom',
-                path: [index, 'startTime'],
-                message: 'Start time is required',
-              });
-            }
+            // if (!event.startTime) {
+            //   ctx.addIssue({
+            //     code: 'custom',
+            //     path: [index, 'startTime'],
+            //     message: 'Start time is required',
+            //   });
+            // }
             if (!event.timeZone) {
               ctx.addIssue({
                 code: 'custom',
