@@ -28,7 +28,10 @@ import GuestsTable from './guests-table';
 
 const TrackRsvp = () => {
   const { event, isEventLoading } = useAppContext();
+  // console.log({ event });
+
   const eventData = event?.eventDetails;
+  const videoComments = event?.videoComments;
   const eventTitle = eventData?.events?.[0]?.title;
   const eventDaysLeft = daysLeft(eventData?.events?.[0]?.startDate);
   const startDate = moment(eventData?.events?.[0]?.startDate).format(
@@ -56,7 +59,7 @@ const TrackRsvp = () => {
           <Loader2 className='h-4 w-4 animate-spin' />
         </div>
       ) : (
-        <GuestsTable data={rsvps} />
+        <GuestsTable data={rsvps} videoComments={videoComments} />
       )}
     </div>
   );

@@ -23,7 +23,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -38,6 +37,7 @@ import GuestDetailsDialog from './guest-details';
 import statusCounts from '@/utils/statusCount';
 import DeleteGuest from './delete-guest';
 import { AddGuestModal } from './add-guest-modal';
+import ViewCommentsModal from './view-comments-moda';
 
 type Guest = {
   _id: string;
@@ -165,7 +165,13 @@ const columns: ColumnDef<Guest>[] = [
   },
 ];
 
-export default function GuestsTable({ data }: { data: Guest[] }) {
+export default function GuestsTable({
+  data,
+  videoComments,
+}: {
+  data: Guest[];
+  videoComments: any;
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -289,7 +295,7 @@ export default function GuestsTable({ data }: { data: Guest[] }) {
               )}
             </CardDescription>
           </div>
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-2 flex-wrap'>
             {/* <Button variant='outline' size='icon'>
               <Mail className='h-4 w-4' />
             </Button>
@@ -299,6 +305,7 @@ export default function GuestsTable({ data }: { data: Guest[] }) {
             <Button variant='outline' size='icon' onClick={downloadCSV}>
               <Download className='h-4 w-4' />
             </Button>
+            <ViewCommentsModal videoComments={videoComments} />
             <AddGuestModal />
           </div>
         </div>

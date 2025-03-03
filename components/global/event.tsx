@@ -25,6 +25,7 @@ import { toast } from 'sonner';
 import { shareUrl } from '@/lib/shareUrl';
 import PickEmoji from './emoji-picker';
 import convertTime from '@/utils/convertTime';
+import { CommentModal } from './comment-modal';
 
 export default function Event({ className }: any) {
   const { formData } = useStore();
@@ -88,7 +89,7 @@ export default function Event({ className }: any) {
   const isAddToCalendar = customization?.isAddToCalendar;
   const reactToEvent = customization?.reactToEvent;
   const shareEvent = customization?.shareEvent;
-  // const commentOnEvent = customization?.commentOnEvent;
+  const commentOnEvent = customization?.commentOnEvent;
 
   const registry = additionalFeatures?.registry;
   const accommodation = additionalFeatures?.accommodation;
@@ -242,23 +243,13 @@ export default function Event({ className }: any) {
               </div>
             </div>
 
-            <div className='flex gap-6 bg-white/80 backdrop-blur-md px-4 rounded-b-lg shadow-md'>
-              {shareEvent && (
-                <Button
-                  onClick={handleCopyLink}
-                  variant='special'
-                  className='flex items-center gap-2 text-gray-700 hover:text-black'
-                >
-                  <Share2 className='size-4' />
-                  Share Event
-                </Button>
-              )}
+            <div className='flex justify-between gap-3 bg-white/80 backdrop-blur-md px-4 rounded-b-lg shadow-md'>
               {reactToEvent && (
                 <>
                   <PickEmoji onChange={onIconSelect}>
                     <Button
                       variant='special'
-                      className='flex items-center gap-2 text-gray-700 hover:text-black'
+                      className='flex items-center gap-2 text-gray-700 hover:text-black px-0 text-xs'
                     >
                       {reaction ? (
                         <span className='text-3xl'>{reaction}</span>
@@ -271,6 +262,19 @@ export default function Event({ className }: any) {
                     </Button>
                   </PickEmoji>
                 </>
+              )}
+
+              {commentOnEvent && <CommentModal id={id as string} />}
+
+              {shareEvent && (
+                <Button
+                  onClick={handleCopyLink}
+                  variant='special'
+                  className='flex items-center gap-2 text-gray-700 hover:text-black px-0 text-xs'
+                >
+                  <Share2 className='size-4' />
+                  Share
+                </Button>
               )}
             </div>
           </div>
