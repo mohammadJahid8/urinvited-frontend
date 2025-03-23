@@ -5,26 +5,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form";
 
-import { Switch } from '../ui/switch';
+import { Switch } from "../ui/switch";
 
-import { Checkbox } from '../ui/checkbox';
+import { Checkbox } from "../ui/checkbox";
 
-import DateInput from './date-input';
-import { Input } from '../ui/input';
+import DateInput from "./date-input";
+import { Input } from "../ui/input";
 
 const GuestManagementForm = ({ form }: { form: any }) => {
   return (
-    <div className='flex flex-col gap-6'>
+    <div className="flex flex-col gap-6">
       <FormField
         control={form.control}
         name={`allowAdditionalAttendees`}
         render={({ field }) => (
           <FormItem>
-            <div className='flex items-center gap-2 justify-between'>
-              <FormLabel className='font-bold'>
-                Allow guest to bring additional attendees
+            <div className="flex items-center gap-2 justify-between">
+              <FormLabel className="font-bold">
+                Limit additional attendees
               </FormLabel>
 
               <Switch
@@ -35,17 +35,17 @@ const GuestManagementForm = ({ form }: { form: any }) => {
             </div>
 
             {field.value === true && (
-              <div className='flex flex-col gap-2'>
+              <div className="flex flex-col gap-2">
                 <FormField
                   control={form.control}
                   name={`additionalAttendees`}
                   render={({ field }) => (
-                    <FormItem className='w-full'>
+                    <FormItem className="w-full">
                       <FormControl>
                         <Input
-                          type='number'
+                          type="number"
                           {...field}
-                          placeholder='Number of additional attendees'
+                          placeholder="Number of additional attendees"
                         />
                       </FormControl>
                       <FormMessage />
@@ -62,8 +62,8 @@ const GuestManagementForm = ({ form }: { form: any }) => {
         name={`isMaximumCapacitySet`}
         render={({ field }) => (
           <FormItem>
-            <div className='flex items-center gap-2 justify-between'>
-              <FormLabel className='font-bold'>Set maximum capacity</FormLabel>
+            <div className="flex items-center gap-2 justify-between">
+              <FormLabel className="font-bold">Set maximum capacity</FormLabel>
 
               <Switch
                 id={`isMaximumCapacitySet`}
@@ -73,17 +73,17 @@ const GuestManagementForm = ({ form }: { form: any }) => {
             </div>
 
             {field.value === true && (
-              <div className='flex flex-col gap-2'>
+              <div className="flex flex-col gap-2">
                 <FormField
                   control={form.control}
                   name={`maximumCapacity`}
                   render={({ field }) => (
-                    <FormItem className='w-full'>
+                    <FormItem className="w-full">
                       <FormControl>
                         <Input
-                          type='number'
+                          type="number"
                           {...field}
-                          placeholder='Maximum capacity'
+                          placeholder="Maximum capacity"
                         />
                       </FormControl>
                       <FormMessage />
@@ -121,9 +121,9 @@ const GuestManagementForm = ({ form }: { form: any }) => {
         name={`sendReminderToAttendees`}
         render={({ field }) => (
           <FormItem>
-            <div className='flex items-center gap-2 justify-between'>
-              <FormLabel className='font-bold'>
-                Send reminder to guest who are attending{' '}
+            <div className="flex items-center gap-2 justify-between">
+              <FormLabel className="font-bold">
+                Send reminder to guest who are attending{" "}
               </FormLabel>
 
               <Switch
@@ -134,16 +134,16 @@ const GuestManagementForm = ({ form }: { form: any }) => {
             </div>
 
             {field.value === true && (
-              <div className='flex flex-col gap-2'>
+              <div className="flex flex-col gap-2">
                 <FormField
                   control={form.control}
                   name={`attendingReminderDate`}
                   render={({ field }) => (
-                    <FormItem className='w-full'>
+                    <FormItem className="w-full">
                       <FormControl>
                         <DateInput
                           field={field}
-                          label='Number of days before the event'
+                          label="Number of days before the event"
                         />
                       </FormControl>
                       <FormMessage />

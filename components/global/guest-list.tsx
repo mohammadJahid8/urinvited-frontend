@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,13 +8,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Trash2, Users } from 'lucide-react';
-import GroupGuestModal from './group-guest-modal';
-import { useAppContext } from '@/lib/context';
-import { toast } from 'sonner';
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Trash2, Users } from "lucide-react";
+import GroupGuestModal from "./group-guest-modal";
+import { useAppContext } from "@/lib/context";
+import { toast } from "sonner";
 
 export default function GuestList({ emails }: { emails: string[] }) {
   const {
@@ -49,7 +49,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
 
       // Separate guests with phone numbers (no email)
       const phoneGuests = prevGuests.filter(
-        (guest: any) => !guest.email.includes('@')
+        (guest: any) => !guest.email.includes("@")
       );
 
       // Create new guests from emails that are not already in the guest list
@@ -59,8 +59,8 @@ export default function GuestList({ emails }: { emails: string[] }) {
         )
         .map((email, index) => ({
           guestId: maxGuestId + index + 1, // Ensure unique guestId
-          name: '',
-          phone: '',
+          name: "",
+          phone: "",
           email,
           isConfirmed: false,
           fromEmail: true,
@@ -84,22 +84,22 @@ export default function GuestList({ emails }: { emails: string[] }) {
       );
     }
     if (!guest.email && !guest.phone) {
-      return toast.error('Please enter a valid email or phone number');
+      return toast.error("Please enter a valid email or phone number");
     }
 
-    if (guest.phone && !guest.phone.includes('+')) {
+    if (guest.phone && !guest.phone.includes("+")) {
       return toast.error(
-        'Please enter a valid phone number without a country code'
+        "Please enter a valid phone number with a country code. e.g +2348060000000"
       );
     }
 
     // validate the email
-    if (guest.email && !guest.email.includes('@')) {
-      return toast.error('Please enter a valid email address');
+    if (guest.email && !guest.email.includes("@")) {
+      return toast.error("Please enter a valid email address");
     }
 
     if (!guest.name) {
-      return toast.error('Please enter a valid name');
+      return toast.error("Please enter a valid name");
     }
 
     setGuests(
@@ -141,39 +141,39 @@ export default function GuestList({ emails }: { emails: string[] }) {
       ...prev,
       {
         guestId: prev.length + 1,
-        name: '',
-        phone: '',
-        email: '',
+        name: "",
+        phone: "",
+        email: "",
         isConfirmed: false,
       },
     ]);
   };
 
   return (
-    <div className='w-full'>
+    <div className="w-full">
       {/* <p className='text-sm text-primary pb-2 text-end cursor-pointer hoverl:underline'>
         Upload CSV
       </p> */}
-      <Table className=''>
-        <TableHeader className='bg-gray-100 rounded-lg'>
-          <TableRow className='rounded-lg'>
-            <TableHead className='rounded-tl-lg border-r text-black'>
+      <Table className="">
+        <TableHeader className="bg-gray-100 rounded-lg">
+          <TableRow className="rounded-lg">
+            <TableHead className="rounded-tl-lg border-r text-black">
               Guest Name
             </TableHead>
-            <TableHead className='border-r text-black'>
+            <TableHead className="border-r text-black">
               Phone/ Email Address
             </TableHead>
-            <TableHead className='w-[100px] rounded-tr-lg text-black'>
+            <TableHead className="w-[100px] rounded-tr-lg text-black">
               Action
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className='rounded-b-lg border'>
+        <TableBody className="rounded-b-lg border">
           {guests.map((guest: any, index: number) => (
             <TableRow key={guest.guestId}>
-              <TableCell className='border-r'>
+              <TableCell className="border-r">
                 <Input
-                  placeholder='Enter name'
+                  placeholder="Enter name"
                   value={guest.name}
                   onChange={(e) =>
                     setGuests(
@@ -185,26 +185,26 @@ export default function GuestList({ emails }: { emails: string[] }) {
                   }
                 />
               </TableCell>
-              <TableCell className='border-r'>
+              <TableCell className="border-r">
                 <Input
-                  placeholder='Enter Phone or Email address'
+                  placeholder="Enter Phone or Email address"
                   value={guest.phone || guest.email}
                   disabled={guest.fromEmail}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value.includes('@')) {
+                    if (value.includes("@")) {
                       setGuests(
                         guests.map((guest: any, i: number) => ({
                           ...guest,
                           email: i === index ? value : guest.email,
-                          phone: i === index ? '' : guest.phone,
+                          phone: i === index ? "" : guest.phone,
                         }))
                       );
-                    } else if (value.includes('+') || /^\d{3}/.test(value)) {
+                    } else if (value.includes("+") || /^\d{3}/.test(value)) {
                       setGuests(
                         guests.map((guest: any, i: number) => ({
                           ...guest,
-                          email: i === index ? '' : guest.email,
+                          email: i === index ? "" : guest.email,
                           phone: i === index ? value : guest.phone,
                         }))
                       );
@@ -212,7 +212,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
                       setGuests(
                         guests.map((guest: any, i: number) => ({
                           ...guest,
-                          phone: '',
+                          phone: "",
                           email: i === index ? value : guest.email,
                         }))
                       );
@@ -221,28 +221,28 @@ export default function GuestList({ emails }: { emails: string[] }) {
                 />
               </TableCell>
               <TableCell>
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <Button
-                    variant='outline'
-                    size='sm'
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleDeleteGuest(guest.guestId)}
                   >
-                    <Trash2 className='w-5 h-5 text-red-500' />
+                    <Trash2 className="w-5 h-5 text-red-500" />
                   </Button>
                   {allowAdditionalAttendees && (
                     <Button
-                      variant='outline'
-                      size='sm'
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleOpenGroupModal(index)}
                       disabled={!guest.isConfirmed}
                     >
-                      <Users className='w-5 h-5 text-primary' />
+                      <Users className="w-5 h-5 text-primary" />
                     </Button>
                   )}
                   {!guest.isConfirmed && (
                     <Button
-                      variant='outline'
-                      size='sm'
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleConfirm(guest)}
                     >
                       Confirm
@@ -250,8 +250,8 @@ export default function GuestList({ emails }: { emails: string[] }) {
                   )}
                   {guest.isConfirmed && (
                     <Button
-                      variant='outline'
-                      size='sm'
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleRemoveGuest(guest.guestId)}
                     >
                       Remove
@@ -265,16 +265,16 @@ export default function GuestList({ emails }: { emails: string[] }) {
       </Table>
 
       <Button
-        variant='outline'
-        className='mt-4 border-dashed w-full'
+        variant="outline"
+        className="mt-4 border-dashed w-full"
         onClick={handleAddRow}
       >
         + Add Guests
       </Button>
 
       {guests.some((guest: any) => guest.isConfirmed) && (
-        <div className='mt-8'>
-          <h2 className='text-lg font-semibold mb-4'>Added Guests</h2>
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">Added Guests</h2>
           <Table>
             <TableHeader>
               <TableRow>

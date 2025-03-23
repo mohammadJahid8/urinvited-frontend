@@ -1,28 +1,28 @@
-'use client';
-import React from 'react';
-import Event from './event';
-import EventButtons from './event-buttons';
-import { usePathname } from 'next/navigation';
+"use client";
+import React from "react";
+import Event from "./event";
+import EventButtons from "./event-buttons";
+import { usePathname } from "next/navigation";
 
 const EventLayout = ({ children }: any) => {
   const pathname = usePathname();
 
-  const isSharePage = pathname.includes('share');
+  const isSharePage = pathname.includes("share");
   return (
-    <div className=''>
+    <div className="">
       {!isSharePage ? (
-        <div className='lg:grid grid-cols-[580px_auto]'>
-          <div className='relative flex flex-col gap-4 h-screen overflow-y-auto pt-28'>
+        <div className="lg:grid grid-cols-[580px_auto]">
+          <div className="relative flex flex-col gap-4 h-screen overflow-y-auto pt-28">
             <EventButtons />
 
-            <div className='px-4'>{children}</div>
+            <div className="px-4">{children}</div>
           </div>
-          <div className='hidden lg:block h-screen overflow-y-auto bg-gray-100'>
-            <Event className='pt-48' />
+          <div className="hidden lg:block h-screen overflow-y-auto bg-gray-100">
+            <Event className="mt-28" />
           </div>
         </div>
       ) : (
-        <div className='pt-32 bg-gray-50'>{children}</div>
+        <div className="pt-32 bg-gray-50">{children}</div>
       )}
     </div>
   );

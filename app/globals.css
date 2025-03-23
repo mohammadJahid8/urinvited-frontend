@@ -84,3 +84,21 @@ video::-webkit-media-controls-panel {
     transparent
   ) !important;
 }
+.custom-quill .ql-toolbar {
+  @apply border border-input rounded-t-[6px]; /* Customize border color */
+}
+
+.ql-snow {
+  @apply !border !border-input;
+}
+.custom-quill .ql-container {
+  @apply border border-input rounded-b-[6px] h-auto;
+}
+
+.custom-quill .ql-editor {
+  @apply text-[#5E6864] p-4 min-h-[150px] text-[16px]; /* Set font size */
+}
+
+.custom-quill .ql-editor::before {
+  @apply text-gray-400 text-[16px]; /* Set placeholder font size */
+}

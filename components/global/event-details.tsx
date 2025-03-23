@@ -1,27 +1,27 @@
-'use client';
-import * as z from 'zod';
-import { Form } from '@/components/ui/form';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import DetailsForm from './details-form';
-import { EventAccordion } from './event-accordion';
-import BottomButtons from './bottom-buttons';
-import useStore from '@/app/store/useStore';
-import { useCallback, useEffect, useState } from 'react';
-import RsvpForm from './rsvp-form';
-import GuestManagementForm from './guest-management-form';
-import api from '@/utils/axiosInstance';
-import { toast } from 'sonner';
-import { useQuery } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAppContext } from '@/lib/context';
-import LoadingOverlay from './loading-overlay';
+"use client";
+import * as z from "zod";
+import { Form } from "@/components/ui/form";
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import DetailsForm from "./details-form";
+import { EventAccordion } from "./event-accordion";
+import BottomButtons from "./bottom-buttons";
+import useStore from "@/app/store/useStore";
+import { useCallback, useEffect, useState } from "react";
+import RsvpForm from "./rsvp-form";
+import GuestManagementForm from "./guest-management-form";
+import api from "@/utils/axiosInstance";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAppContext } from "@/lib/context";
+import LoadingOverlay from "./loading-overlay";
 
 const EventDetails = () => {
   const { updateFormData, formData } = useStore();
   const [hasEndDate, setHasEndDate] = useState(false);
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
   const { refetchEvents, event, isEventLoading, refetchEvent } =
     useAppContext();
   const router = useRouter();
@@ -34,7 +34,7 @@ const EventDetails = () => {
 
   const schemaFields: Record<string, z.ZodTypeAny> = {
     // event details
-    hostedBy: z.string().min(1, { message: 'Hosted by is required' }),
+    hostedBy: z.string().min(1, { message: "Hosted by is required" }),
     events: z
       .array(
         z.object({
@@ -46,7 +46,7 @@ const EventDetails = () => {
               if (!date) return undefined;
               const parsedDate = new Date(date);
               if (isNaN(parsedDate.getTime())) {
-                throw new Error('Invalid start date format');
+                throw new Error("Invalid start date format");
               }
               return parsedDate.toISOString();
             }),
@@ -60,7 +60,7 @@ const EventDetails = () => {
               if (!date) return undefined;
               const parsedDate = new Date(date);
               if (isNaN(parsedDate.getTime())) {
-                throw new Error('Invalid start date format');
+                throw new Error("Invalid start date format");
               }
               return parsedDate.toISOString();
             }),
@@ -70,8 +70,8 @@ const EventDetails = () => {
           showGoogleMap: z.boolean().optional(),
           virtualPlatformName: z.string().optional(),
           virtualUrl: z.string().optional(),
-          when: z.enum(['startDateTime', 'tbd']),
-          locationType: z.enum(['in-person', 'virtual']),
+          when: z.enum(["startDateTime", "tbd"]),
+          locationType: z.enum(["in-person", "virtual"]),
           latLng: z.any().optional(),
         })
       )
@@ -79,18 +79,18 @@ const EventDetails = () => {
         events.forEach((event, index) => {
           if (index === 0 && !event.title) {
             ctx.addIssue({
-              code: 'custom',
-              path: [index, 'title'],
-              message: 'Title is required',
+              code: "custom",
+              path: [index, "title"],
+              message: "Title is required",
             });
           }
 
-          if (index === 0 && event.when === 'startDateTime') {
+          if (index === 0 && event.when === "startDateTime") {
             if (!event.startDate) {
               ctx.addIssue({
-                code: 'custom',
-                path: [index, 'startDate'],
-                message: 'Start date is required',
+                code: "custom",
+                path: [index, "startDate"],
+                message: "Start date is required",
               });
             }
             // if (!event.startTime) {
@@ -102,39 +102,39 @@ const EventDetails = () => {
             // }
             if (!event.timeZone) {
               ctx.addIssue({
-                code: 'custom',
-                path: [index, 'timeZone'],
-                message: 'Time zone is required',
+                code: "custom",
+                path: [index, "timeZone"],
+                message: "Time zone is required",
               });
             }
           }
 
-          if (event.locationType === 'in-person') {
+          if (event.locationType === "in-person") {
             if (index === 0 && !event.locationName) {
               // Require locationName only for the first event
               ctx.addIssue({
-                code: 'custom',
-                path: [index, 'locationName'],
-                message: 'Location name is required for the first event',
+                code: "custom",
+                path: [index, "locationName"],
+                message: "Location name is required for the first event",
               });
             }
             delete event.virtualPlatformName;
             delete event.virtualUrl;
           }
 
-          if (event.locationType === 'virtual') {
+          if (event.locationType === "virtual") {
             if (index === 0 && !event.virtualPlatformName) {
               ctx.addIssue({
-                code: 'custom',
-                path: [index, 'virtualPlatformName'],
-                message: 'Virtual platform name is required',
+                code: "custom",
+                path: [index, "virtualPlatformName"],
+                message: "Virtual platform name is required",
               });
             }
             if (index === 0 && !event.virtualUrl) {
               ctx.addIssue({
-                code: 'custom',
-                path: [index, 'virtualUrl'],
-                message: 'Virtual URL is required',
+                code: "custom",
+                path: [index, "virtualUrl"],
+                message: "Virtual URL is required",
               });
             }
 
@@ -147,6 +147,7 @@ const EventDetails = () => {
     // rsvps
     requestRsvps: z.boolean().optional(),
     isRsvpDueDateSet: z.boolean().optional(),
+    isAutoReminderSet: z.boolean().optional(),
     rsvpDueDate: z
       .any()
       .optional()
@@ -154,11 +155,18 @@ const EventDetails = () => {
         if (!date) return undefined;
         const parsedDate = new Date(date);
         if (isNaN(parsedDate.getTime())) {
-          throw new Error('Invalid start date format');
+          throw new Error("Invalid start date format");
         }
         return parsedDate.toISOString();
       }),
     allowRsvpAfterDueDate: z.boolean().optional(),
+    autoReminderDate: z
+      .any()
+      .optional()
+      .transform((date) => {
+        if (!date) return undefined;
+        return new Date(date).toISOString();
+      }),
 
     // guest management
     allowAdditionalAttendees: z.boolean().optional(),
@@ -171,55 +179,64 @@ const EventDetails = () => {
     if (data.isRsvpDueDateSet) {
       if (!data.rsvpDueDate) {
         ctx.addIssue({
-          code: 'custom',
-          path: ['rsvpDueDate'],
-          message: 'RSVP due date is required!',
+          code: "custom",
+          path: ["rsvpDueDate"],
+          message: "RSVP due date is required!",
+        });
+      }
+    }
+    if (data.isAutoReminderSet) {
+      if (!data.autoReminderDate) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["autoReminderDate"],
+          message: "Auto reminder date is required!",
         });
       }
     }
     if (data.allowAdditionalAttendees) {
-      if (!data.additionalAttendees || data.additionalAttendees.trim() === '') {
+      if (!data.additionalAttendees || data.additionalAttendees.trim() === "") {
         ctx.addIssue({
-          code: 'custom',
-          path: ['additionalAttendees'],
-          message: 'Number of additional attendees is required!',
+          code: "custom",
+          path: ["additionalAttendees"],
+          message: "Number of additional attendees is required!",
         });
       }
     } else {
       delete data.additionalAttendees;
     }
     if (data.isMaximumCapacitySet) {
-      if (!data.maximumCapacity || data.maximumCapacity.trim() === '') {
+      if (!data.maximumCapacity || data.maximumCapacity.trim() === "") {
         ctx.addIssue({
-          code: 'custom',
-          path: ['maximumCapacity'],
-          message: 'Maximum capacity is required!',
+          code: "custom",
+          path: ["maximumCapacity"],
+          message: "Maximum capacity is required!",
         });
       }
     }
   });
 
   const defaultValues = {
-    hostedBy: event?.hostedBy || '',
+    hostedBy: event?.hostedBy || "",
     events:
       eventDetails?.length > 0
         ? eventDetails
         : [
             {
-              title: '',
+              title: "",
               inviteDetails: true,
               startDate: undefined,
               startTime: undefined,
-              timeZone: '',
+              timeZone: "",
               endDate: undefined,
               endTime: undefined,
-              locationName: '',
-              address: '',
+              locationName: "",
+              address: "",
               showGoogleMap: false,
-              virtualPlatformName: '',
-              virtualUrl: '',
-              when: 'startDateTime',
-              locationType: 'in-person',
+              virtualPlatformName: "",
+              virtualUrl: "",
+              when: "startDateTime",
+              locationType: "in-person",
               latLng: undefined,
             },
           ],
@@ -227,13 +244,15 @@ const EventDetails = () => {
     isRsvpDueDateSet: event?.eventDetails?.isRsvpDueDateSet || true,
     rsvpDueDate: event?.eventDetails?.rsvpDueDate || undefined,
     allowRsvpAfterDueDate: event?.eventDetails?.allowRsvpAfterDueDate || true,
-    // autoReminder: false,
+
+    isAutoReminderSet: event?.eventDetails?.isAutoReminderSet || true,
+    autoReminderDate: event?.eventDetails?.autoReminderDate || undefined,
     // guest management
     allowAdditionalAttendees:
       event?.eventDetails?.allowAdditionalAttendees || false,
-    additionalAttendees: event?.eventDetails?.additionalAttendees || '',
+    additionalAttendees: event?.eventDetails?.additionalAttendees || "",
     isMaximumCapacitySet: event?.eventDetails?.isMaximumCapacitySet || false,
-    maximumCapacity: event?.eventDetails?.maximumCapacity || '',
+    maximumCapacity: event?.eventDetails?.maximumCapacity || "",
     // trackAttendees: true,
     // sendReminderToAttendees: true,
     // attendingReminderDate: undefined,
@@ -260,12 +279,12 @@ const EventDetails = () => {
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'events',
+    name: "events",
   });
 
   const eventDetailsComponent = [
     {
-      trigger: 'Event Details',
+      trigger: "Event Details",
       content: (
         <DetailsForm
           form={form}
@@ -283,14 +302,14 @@ const EventDetails = () => {
 
   const rsvps = [
     {
-      trigger: 'RSVPs',
+      trigger: "RSVPs",
       content: <RsvpForm form={form} fields={fields} />,
     },
   ];
 
   const guestManagement = [
     {
-      trigger: 'Guest Management',
+      trigger: "Guest Management",
       content: <GuestManagementForm form={form} />,
     },
   ];
@@ -305,7 +324,7 @@ const EventDetails = () => {
     [updateFormData, formData]
   );
 
-  console.log('form.formState.isDirty', form.formState.isDirty);
+  console.log("form.formState.isDirty", form.formState.isDirty);
 
   const handleSubmit = async (data: any) => {
     if (!form.formState.isDirty) {
@@ -320,7 +339,7 @@ const EventDetails = () => {
       eventDetails,
     };
 
-    if (id && id !== 'null') {
+    if (id && id !== "null") {
       payload.eventId = id;
     }
 
@@ -328,7 +347,7 @@ const EventDetails = () => {
       const promise = await api.patch(`/event/create`, payload);
       if (promise?.status === 200) {
         toast.success(`Event details updated`, {
-          position: 'top-center',
+          position: "top-center",
         });
         refetchEvents();
         refetchEvent();
@@ -341,7 +360,7 @@ const EventDetails = () => {
       return toast.error(
         error?.response?.data?.message || `Event details failed`,
         {
-          position: 'top-center',
+          position: "top-center",
         }
       );
     }
@@ -360,7 +379,7 @@ const EventDetails = () => {
     <Form {...form}>
       {isSubmitting && <LoadingOverlay />}
       <form onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className='flex flex-col gap-6'>
+        <div className="flex flex-col gap-6">
           <EventAccordion items={eventDetailsComponent} />
           <EventAccordion items={rsvps} />
           <EventAccordion items={guestManagement} />

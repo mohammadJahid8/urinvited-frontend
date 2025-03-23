@@ -4,12 +4,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Editor } from '@tinymce/tinymce-react';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
-import { Button } from '../ui/button';
-import { Plus, Trash2 } from 'lucide-react';
+import { Button } from "../ui/button";
+import { Plus, Trash2 } from "lucide-react";
+import Editor from "./editor";
 
 const AccommodationForm = ({
   form,
@@ -23,7 +23,7 @@ const AccommodationForm = ({
   remove: any;
 }) => {
   return (
-    <div className='flex flex-col gap-6'>
+    <div className="flex flex-col gap-6">
       {fields.map((accommodation: any, index: number) => (
         <EachAccommodation
           form={form}
@@ -34,16 +34,16 @@ const AccommodationForm = ({
       ))}
 
       <div
-        className='w-full border-dashed border border-gray-300 rounded-lg py-3 text-sm flex items-center justify-center gap-2 cursor-pointer'
+        className="w-full border-dashed border border-gray-300 rounded-lg py-3 text-sm flex items-center justify-center gap-2 cursor-pointer"
         onClick={() =>
           append({
-            accommodationName: '',
-            location: '',
-            note: '',
+            accommodationName: "",
+            location: "",
+            note: "",
           })
         }
       >
-        <Plus className='w-4 h-4' />
+        <Plus className="w-4 h-4" />
         Add Another Registry
       </div>
     </div>
@@ -59,24 +59,24 @@ const EachAccommodation = ({ form, index, remove }: any) => {
         control={form.control}
         name={`accommodation.${index}.accommodationName`}
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2 space-y-0'>
-            <div className='flex items-center justify-between'>
-              <FormLabel className='font-bold'>Accommodation Name</FormLabel>
+          <FormItem className="flex flex-col gap-2 space-y-0">
+            <div className="flex items-center justify-between">
+              <FormLabel className="font-bold">Accommodation Name</FormLabel>
               {index > 0 && (
                 <Button
-                  variant='outline'
-                  size='icon'
-                  className=''
+                  variant="outline"
+                  size="icon"
+                  className=""
                   onClick={() => remove(index)}
                 >
-                  <Trash2 className='w-4 h-4 text-red-500' />
+                  <Trash2 className="w-4 h-4 text-red-500" />
                 </Button>
               )}
             </div>
             <FormControl>
-              <Input type='text' placeholder='E.g., Hotel Name' {...field} />
+              <Input type="text" placeholder="E.g., Hotel Name" {...field} />
             </FormControl>
-            <FormMessage className='mt-0' />
+            <FormMessage className="mt-0" />
           </FormItem>
         )}
       />
@@ -85,12 +85,12 @@ const EachAccommodation = ({ form, index, remove }: any) => {
         control={form.control}
         name={`accommodation.${index}.location`}
         render={({ field }) => (
-          <FormItem className='flex flex-col gap-2 space-y-0'>
-            <FormLabel className='font-bold'>Location</FormLabel>
+          <FormItem className="flex flex-col gap-2 space-y-0">
+            <FormLabel className="font-bold">Location</FormLabel>
             <FormControl>
-              <Input type='text' placeholder='Select Address' {...field} />
+              <Input type="text" placeholder="Select Address" {...field} />
             </FormControl>
-            <FormMessage className='mt-0' />
+            <FormMessage className="mt-0" />
           </FormItem>
         )}
       />
@@ -100,9 +100,15 @@ const EachAccommodation = ({ form, index, remove }: any) => {
         name={`accommodation.${index}.note`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='font-bold'>Note</FormLabel>
+            <FormLabel className="font-bold">Note</FormLabel>
             <FormControl>
               <Editor
+                value={field.value}
+                onChange={(content) => field.onChange(content)}
+                placeholder="Enter Note"
+              />
+
+              {/* <Editor
                 apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY as string}
                 value={field.value}
                 init={{
@@ -122,7 +128,7 @@ const EachAccommodation = ({ form, index, remove }: any) => {
                   bullist numlist outdent indent | removeformat | help',
                 }}
                 onEditorChange={(content) => field.onChange(content)}
-              />
+              /> */}
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = 'https://urinvited-backend.vercel.app/api/v1';
+const BASE_URL = "https://urinvited-backend.vercel.app/api/v1";
 // const BASE_URL = 'http://localhost:5000/api/v1';
 
 const api = axios.create({
@@ -9,11 +9,11 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('rmToken');
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("rmToken");
 
       if (token) {
-        config.headers['Authorization'] = `${token}`;
+        config.headers["Authorization"] = `${token}`;
       }
     }
     return config;

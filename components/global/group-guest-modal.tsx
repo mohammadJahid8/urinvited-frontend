@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,12 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Trash2, Baby, User, Plus } from 'lucide-react';
-import { useAppContext } from '@/lib/context';
-import { toast } from 'sonner';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Trash2, Baby, User, Plus } from "lucide-react";
+import { useAppContext } from "@/lib/context";
+import { toast } from "sonner";
 
 export default function GroupGuestModal({
   open,
@@ -64,7 +64,7 @@ export default function GroupGuestModal({
         { length: newCount - guests?.length },
         (_, index) => ({
           guestId: (guests?.length + index + 1).toString(),
-          name: '',
+          name: "",
           isAdult: true,
         })
       );
@@ -102,12 +102,12 @@ export default function GroupGuestModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[560px] max-h-[90vh] overflow-y-auto'>
-        <DialogHeader className='text-left'>
+      <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="text-left">
           <DialogTitle>Add Extra Guests</DialogTitle>
           <DialogDescription>Add extra guests to your event.</DialogDescription>
         </DialogHeader>
-        <div className='grid gap-4 py-4'>
+        <div className="grid gap-4 py-4">
           {/* <div className='grid grid-cols-4 items-center gap-4'>
             <span className='text-sm'>Total Guests</span>
             <Input
@@ -122,54 +122,57 @@ export default function GroupGuestModal({
             />
           </div> */}
 
-          <div className='space-y-4'>
-            <span className='text-sm font-medium'>Guest Details</span>
+          <div className="space-y-4">
+            <span className="text-sm font-medium">Guest Details</span>
             {guests?.map((guest) => (
-              <div key={guest.guestId} className='flex items-center gap-2'>
+              <div key={guest.guestId} className="flex items-center gap-2">
                 <Button
-                  variant='outline'
-                  size='sm'
+                  variant="outline"
+                  size="sm"
                   onClick={() => handleGuestTypeChange(guest.guestId, true)}
-                  className={guest.isAdult ? 'bg-primary/10 text-primary' : ''}
+                  className={guest.isAdult ? "bg-primary/10 text-primary" : ""}
                 >
-                  <User className='w-5 h-5' />
+                  <User className="w-5 h-5" />
                 </Button>
                 <Button
-                  variant='outline'
-                  size='sm'
+                  variant="outline"
+                  size="sm"
                   onClick={() => handleGuestTypeChange(guest.guestId, false)}
-                  className={!guest.isAdult ? 'bg-primary/10 text-primary' : ''}
+                  className={!guest.isAdult ? "bg-primary/10 text-primary" : ""}
                 >
-                  <Baby className='w-5 h-5' />
+                  <Baby className="w-5 h-5" />
                 </Button>
                 <Input
                   value={guest.name}
                   onChange={(e) =>
                     handleGuestNameChange(guest.guestId, e.target.value)
                   }
-                  placeholder='Enter guest name'
-                  className='flex-1'
+                  placeholder="Enter guest name"
+                  className="flex-1"
                 />
                 <Button
-                  variant='ghost'
-                  size='icon'
+                  variant="ghost"
+                  size="icon"
                   onClick={() => handleDeleteGuest(guest.guestId)}
                   disabled={guests?.length === 1}
                 >
-                  <Trash2 className='h-4 w-4 text-red-500' />
+                  <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
             ))}
           </div>
 
-          <div className='flex flex-col gap-2'>
+          <div className="flex flex-col gap-2">
             <Button
-              className='w-full'
-              variant='outline'
-              size='sm'
+              className="w-full"
+              variant="outline"
+              size="sm"
               onClick={() => {
-                if (guests.length >= additionalAttendees - 1) {
-                  toast.error('You have reached the maximum number of guests');
+                if (
+                  guests.length >= additionalAttendees - 1 &&
+                  allowAdditionalAttendees
+                ) {
+                  toast.error("You have reached the maximum number of guests");
                   return;
                 }
 
@@ -177,24 +180,26 @@ export default function GroupGuestModal({
                   ...guests,
                   {
                     guestId: (guests?.length + 1).toString(),
-                    name: '',
+                    name: "",
                     isAdult: true,
                   },
                 ]);
               }}
             >
-              <Plus className='w-4 h-4' />
+              <Plus className="w-4 h-4" />
               Add Guest
             </Button>
-            <p className='text-sm text-muted-foreground'>
-              {additionalAttendees && `Upto ${additionalAttendees - 1} guests`}
+            <p className="text-sm text-muted-foreground">
+              {additionalAttendees &&
+                allowAdditionalAttendees &&
+                `Upto ${additionalAttendees - 1} guests`}
             </p>
           </div>
         </div>
-        <DialogFooter className='sm:justify-between gap-2'>
+        <DialogFooter className="sm:justify-between gap-2">
           <Button
-            type='button'
-            variant='outline'
+            type="button"
+            variant="outline"
             onClick={() => {
               onOpenChange(false);
               setGuests([]);
@@ -203,7 +208,7 @@ export default function GroupGuestModal({
             Clear
           </Button>
           <Button
-            type='button'
+            type="button"
             onClick={handleAddGuests}
             disabled={guests?.every((guest) => !guest.name.trim())}
           >
