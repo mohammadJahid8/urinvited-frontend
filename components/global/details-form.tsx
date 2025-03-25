@@ -352,11 +352,13 @@ const EachEvent = ({
                               <SelectValue placeholder="Select time zone" />
                             </SelectTrigger>
                             <SelectContent>
-                              {timeZones.map((tz) => (
-                                <SelectItem key={tz.value} value={tz.value}>
-                                  {tz.label}
-                                </SelectItem>
-                              ))}
+                              {timeZones
+                                .sort((a, b) => a.label.localeCompare(b.label))
+                                .map((tz) => (
+                                  <SelectItem key={tz.value} value={tz.value}>
+                                    {tz.label}
+                                  </SelectItem>
+                                ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />

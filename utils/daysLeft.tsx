@@ -1,17 +1,18 @@
-import moment from 'moment';
+import moment from "moment";
 
 const daysLeft = (date: any) => {
+  if (!date) return null;
   const startDate = moment(date);
   const today = moment();
-  const diffDays = startDate.diff(today, 'days');
-  const diffHours = startDate.diff(today, 'hours');
+  const diffDays = startDate.diff(today, "days");
+  const diffHours = startDate.diff(today, "hours");
 
   if (diffDays >= 1) {
-    return `${diffDays} days left`;
+    return `${diffDays} day${diffDays > 1 ? "s" : ""} left`;
   } else if (diffHours >= 0) {
-    return `${diffHours} hours left`;
+    return `${diffHours} hour${diffHours > 1 ? "s" : ""} left`;
   } else {
-    return `${Math.abs(diffDays)} days ago`;
+    return `${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago`;
   }
 };
 

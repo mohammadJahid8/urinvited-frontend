@@ -552,7 +552,7 @@ export default function Event({ className }: any) {
                     className="text-xl font-bold"
                     style={{
                       color: textColour,
-                      fontFamily: descriptionFont,
+                      fontFamily: headingFont,
                     }}
                   >
                     {item.title}

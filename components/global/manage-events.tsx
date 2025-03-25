@@ -145,7 +145,7 @@ export default function ManageEvents({ title }: { title: string }) {
               inviteDetails={event?.eventDetails?.events?.[0]?.inviteDetails}
               invited={event?.share?.guests?.length || 0}
               rsvps={event?.rsvps}
-              daysLeft={daysLeft(event?.eventDetails?.events?.[0]?.startDate)}
+              daysLeft={daysLeft(event?.eventDetails?.events?.[0]?.startDate)!}
               video={event?.video}
               isAdmin={user?.role === "admin"}
               refetchEvents={refetchEvents}
