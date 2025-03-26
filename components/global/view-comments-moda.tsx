@@ -37,7 +37,8 @@ export default function ViewCommentsModal({
         <DialogTrigger asChild>
           <Button variant='outline' className='gap-2'>
             <MessageSquare className='h-4 w-4' />
-            View Comments ({videoComments?.length})
+            View Comments{' '}
+            {videoComments?.length > 0 && `(${videoComments?.length})`}
           </Button>
         </DialogTrigger>
         <DialogContent className='sm:max-w-[500px] md:max-w-[600px]'>

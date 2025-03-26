@@ -56,7 +56,7 @@ export function AddGuestModal() {
     event: event?._id,
   });
 
-  const eventData = event?.eventDetails;
+  // const eventData = event?.eventDetails;
 
   const [guests, setGuests] = useState<any[]>([]);
 
@@ -86,7 +86,13 @@ export function AddGuestModal() {
       rsvpData.guests = guests;
       rsvpData.event = event?._id;
 
-      console.log({ rsvpData });
+      // console.log({ rsvpData });
+      // check if the contact is a valid email
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rsvpData.contact)) {
+        return toast.error('Please enter a valid email address', {
+          position: 'top-center',
+        });
+      }
 
       try {
         setLoading(true);
@@ -98,6 +104,14 @@ export function AddGuestModal() {
           refetchEvents();
           refetchEvent();
           setOpen(false);
+          setRSVPData({
+            name: '',
+            contact: '',
+            rsvpStatus: 'maybe',
+            message: '',
+            guests: [],
+            event: event?._id,
+          });
         }
       } catch (error: any) {
         console.error(error);
@@ -112,7 +126,9 @@ export function AddGuestModal() {
         setLoading(false);
       }
     } else {
-      toast.error('Please fill all required fields');
+      toast.error('Please fill all required fields', {
+        position: 'top-center',
+      });
     }
   };
 
