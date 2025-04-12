@@ -133,17 +133,23 @@ export default function ManageEvents({ title }: { title: string }) {
               id={event._id}
               hasEvent={event?.eventDetails?.events?.length > 0}
               title={event?.eventDetails?.events?.[0]?.title}
-              startDate={format(
-                new Date(event?.eventDetails?.events?.[0]?.startDate),
-                "MMMM d, yyyy"
-              )}
+              startDate={
+                event?.eventDetails?.events?.[0]?.startDate &&
+                format(
+                  new Date(event?.eventDetails?.events?.[0]?.startDate),
+                  "MMMM d, yyyy"
+                )
+              }
               startTime={
                 event?.eventDetails?.events?.[0]?.startTime &&
                 convertTime(event?.eventDetails?.events?.[0]?.startTime)
               }
               location={`${event?.eventDetails?.events?.[0]?.locationName}, ${event?.eventDetails?.events?.[0]?.address}`}
               inviteDetails={event?.eventDetails?.events?.[0]?.inviteDetails}
-              invited={event?.share?.guests?.length || 0}
+              invited={
+                event?.rsvps?.filter((rsvp: any) => rsvp.isFromShare)?.length ||
+                0
+              }
               rsvps={event?.rsvps}
               daysLeft={daysLeft(event?.eventDetails?.events?.[0]?.startDate)!}
               video={event?.video}

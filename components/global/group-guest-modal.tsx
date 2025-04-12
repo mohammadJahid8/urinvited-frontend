@@ -19,82 +19,66 @@ export default function GroupGuestModal({
   open,
   onOpenChange,
   onAddGuests,
-  extraGuests,
+  guests,
 }: any) {
   const { event, allowAdditionalAttendees, additionalAttendees } =
     useAppContext();
 
-  const eventData = event?.eventDetails;
+  // const eventData = event?.eventDetails;
 
-  const [guests, setGuests] = useState<any[]>([]);
+  const [guestsState, setGuestsState] = useState<any[]>([]);
 
-  const extraGuestsLength = extraGuests?.length || 0;
+  const extraGuestsLength = guests?.length || 0;
 
   useEffect(() => {
-    setGuests([
-      ...(extraGuests || []),
-      // ...(extraGuestsLength < additionalAttendees
-      //   ? [
-      //       ...(extraGuests || []),
-      //       ...Array.from(
-      //         { length: additionalAttendees - extraGuestsLength },
-      //         (_, index) => ({
-
-      //           guestId: String(Date.now() + index + 1),
-      //           name: '',
-      //           isAdult: true,
-      //         })
-      //       ),
-      //     ]
-      //   : extraGuests || []),
-    ]);
+    setGuestsState([...(guests || [])]);
   }, [
     additionalAttendees,
     allowAdditionalAttendees,
-    extraGuests,
+    guests,
     extraGuestsLength,
     open,
   ]);
 
   const handleTotalGuestsChange = (value: string) => {
     const newCount = parseInt(value);
-    if (newCount > guests?.length) {
+    if (newCount > guestsState?.length) {
       // Add more guest inputs
       const additionalGuests = Array.from(
-        { length: newCount - guests?.length },
+        { length: newCount - guestsState?.length },
         (_, index) => ({
-          guestId: (guests?.length + index + 1).toString(),
+          guestId: (guestsState?.length + index + 1).toString(),
           name: "",
           isAdult: true,
         })
       );
-      setGuests([...guests, ...additionalGuests]);
+      setGuestsState([...guestsState, ...additionalGuests]);
     } else {
       // Remove excess guest inputs
-      setGuests(guests?.slice(0, newCount));
+      setGuestsState(guestsState?.slice(0, newCount));
     }
   };
 
   const handleGuestNameChange = (id: string, name: string) => {
-    setGuests(
-      guests?.map((guest) =>
+    setGuestsState(
+      guestsState?.map((guest) =>
         guest.guestId === id ? { ...guest, name } : guest
       )
     );
   };
 
   const handleDeleteGuest = (id: string) => {
-    setGuests(guests?.filter((guest) => guest.guestId !== id));
+    setGuestsState(guestsState?.filter((guest) => guest.guestId !== id));
   };
 
   const handleAddGuests = () => {
-    onAddGuests(guests);
+    onAddGuests(guestsState);
     onOpenChange(false);
   };
 
   const handleGuestTypeChange = (id: string, isAdult: boolean) => {
-    setGuests(
-      guests?.map((guest) =>
+    setGuestsState(
+      guestsState?.map((guest) =>
         guest.guestId === id ? { ...guest, isAdult } : guest
       )
     );
@@ -124,7 +108,7 @@ export default function GroupGuestModal({
 
           <div className="space-y-4">
             <span className="text-sm font-medium">Guest Details</span>
-            {guests?.map((guest) => (
+            {guestsState?.map((guest) => (
               <div key={guest.guestId} className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -154,7 +138,7 @@ export default function GroupGuestModal({
                   variant="ghost"
                   size="icon"
                   onClick={() => handleDeleteGuest(guest.guestId)}
-                  disabled={guests?.length === 1}
+                  disabled={guestsState?.length === 1}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
@@ -169,17 +153,17 @@ export default function GroupGuestModal({
               size="sm"
               onClick={() => {
                 if (
-                  guests.length >= additionalAttendees - 1 &&
+                  guestsState.length >= additionalAttendees - 1 &&
                   allowAdditionalAttendees
                 ) {
                   toast.error("You have reached the maximum number of guests");
                   return;
                 }
 
-                setGuests([
-                  ...guests,
+                setGuestsState([
+                  ...guestsState,
                   {
-                    guestId: (guests?.length + 1).toString(),
+                    guestId: (guestsState?.length + 1).toString(),
                     name: "",
                     isAdult: true,
                   },
@@ -202,7 +186,7 @@ export default function GroupGuestModal({
             variant="outline"
             onClick={() => {
               onOpenChange(false);
-              setGuests([]);
+              setGuestsState([]);
             }}
           >
             Clear
@@ -210,7 +194,7 @@ export default function GroupGuestModal({
           <Button
             type="button"
             onClick={handleAddGuests}
-            disabled={guests?.every((guest) => !guest.name.trim())}
+            disabled={guestsState?.every((guest) => !guest.name.trim())}
           >
             Add Guests
           </Button>

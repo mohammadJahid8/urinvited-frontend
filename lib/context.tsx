@@ -1,16 +1,16 @@
 /* eslint-disable react/prop-types */
 
-import api from '@/utils/axiosInstance';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import api from "@/utils/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import {
   redirect,
   useParams,
   usePathname,
   useSearchParams,
-} from 'next/navigation';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+} from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export const UserContext = createContext<any>({});
 
@@ -27,28 +27,28 @@ const ContextProvider = ({ children }: any) => {
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const paramsId = searchParams.get('id');
+  const paramsId = searchParams.get("id");
   const { id: urlId } = useParams();
   const id = paramsId || urlId;
   const queryString = searchParams.toString();
-  const querySuffix = queryString ? `?${queryString}` : '';
+  const querySuffix = queryString ? `?${queryString}` : "";
 
   const [guests, setGuests] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    city: '',
-    title: '',
-    state: '',
-    zip: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    city: "",
+    title: "",
+    state: "",
+    zip: "",
     smsAlerts: false,
-    summary: '',
-    workExperience: '',
-    education: '',
-    skills: '',
+    summary: "",
+    workExperience: "",
+    education: "",
+    skills: "",
   });
 
   const {
@@ -63,8 +63,8 @@ const ContextProvider = ({ children }: any) => {
         return response?.data?.data;
       } catch (error: any) {
         console.log(error);
-        if (error.response.data.message === 'Invalid Token!') {
-          localStorage.removeItem('rmToken');
+        if (error.response.data.message === "Invalid Token!") {
+          localStorage.removeItem("rmToken");
         }
       }
     },
@@ -86,8 +86,8 @@ const ContextProvider = ({ children }: any) => {
   });
 
   const [emailData, setEmailData] = useState({
-    subject: '',
-    body: '',
+    subject: "",
+    body: "",
     to: user?.email,
   });
   // const { isLoading: isGoogleFontsLoading, data: googleFonts } = useQuery({
@@ -139,32 +139,32 @@ const ContextProvider = ({ children }: any) => {
 
   if (isLoading)
     return (
-      <div className='h-screen w-screen flex items-center justify-center'>
+      <div className="h-screen w-screen flex items-center justify-center">
         Loading...
       </div>
     );
 
   const publicRoutes = [
-    '/login',
-    '/signup',
-    '/event',
-    '/forgot-password',
-    '/reset-password',
-    '/verify-otp',
+    "/login",
+    "/signup",
+    "/event",
+    "/forgot-password",
+    "/reset-password",
+    "/verify-otp",
   ];
 
   if (
     !user?.email &&
     !publicRoutes.includes(pathname) &&
-    !pathname.startsWith('/event/')
+    !pathname.startsWith("/event/")
   ) {
     return redirect(`/login${querySuffix}`);
   }
 
   const logout = () => {
-    window.localStorage.removeItem('rmToken');
+    window.localStorage.removeItem("rmToken");
     refetchUser();
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   const handleResendOTP = async (data: any) => {
@@ -173,7 +173,7 @@ const ContextProvider = ({ children }: any) => {
       if (promise.status === 200) {
         refetchUser();
         toast.success(`OTP sent to your email.`, {
-          position: 'top-center',
+          position: "top-center",
         });
       }
     } catch (error: any) {
@@ -186,12 +186,12 @@ const ContextProvider = ({ children }: any) => {
     try {
       const response = await fetch(file);
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = name;
       document.body.appendChild(link);
@@ -201,7 +201,7 @@ const ContextProvider = ({ children }: any) => {
       // Revoke the object URL to release memory
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to download file:', error);
+      console.error("Failed to download file:", error);
     }
   };
 
@@ -251,6 +251,7 @@ const ContextProvider = ({ children }: any) => {
     hasMaximumCapacity,
     allowAdditionalAttendees,
     additionalAttendees,
+    id,
   };
 
   return (

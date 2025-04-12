@@ -1,8 +1,6 @@
 import { format, parse } from "date-fns";
 
 const convertTime = (timeString: string) => {
-  console.log({ timeString });
-
   if (!timeString) return;
 
   // Parse the time string into a Date object

@@ -37,7 +37,7 @@ export default function Event({ className }: any) {
   const searchParams = useSearchParams();
   const urlId = searchParams.get("id");
   const name = searchParams.get("n");
-  const email = searchParams.get("e");
+  const email = searchParams.get("c");
   const { id: paramsId } = useParams();
   const id = urlId || paramsId;
 
@@ -97,6 +97,18 @@ export default function Event({ className }: any) {
   const accommodation = additionalFeatures?.accommodation;
   const travelSource = additionalFeatures?.travelSource;
   const travelSourceLink = additionalFeatures?.travelSourceLink;
+
+  useEffect(() => {
+    if (rsvp?.rsvpStatus === "sent") {
+      const updateStatus = async () => {
+        await api.patch(`/rsvp/${rsvp?._id}`, {
+          rsvpStatus: "opened",
+        });
+      };
+      updateStatus();
+    }
+  }, [rsvp, id]);
+
   useEffect(() => {
     // Helper function to dynamically load a font
     const loadFont = (fontFamily: string, id: string) => {
@@ -175,7 +187,6 @@ export default function Event({ className }: any) {
 
   const combineDateTime = (date: string, time: string) => {
     if (!date || !time) return "";
-    console.log({ date, time });
     const [hours, minutes] = time?.split(":") || [];
     const dateObject = new Date(date);
     dateObject.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
@@ -369,18 +380,17 @@ export default function Event({ className }: any) {
                                     new Date(startDate),
                                     "MMMM d, yyyy"
                                   )}{" "}
-                                {startTime &&
-                                  startTime &&
-                                  `| ${convertTime(startTime)}`}{" "}
+                                {startTime && `| ${convertTime(startTime)}`}
+                                {/* Only show 'to' + endTime if endTime exists */}
+                                {endTime && ` to ${convertTime(endTime)}`}
+                                {/* Only show endDate if it's different from startDate */}
                                 {endDate &&
-                                  endDate &&
-                                  `to ${format(
+                                  new Date(endDate).toDateString() !==
+                                    new Date(startDate).toDateString() &&
+                                  ` to ${format(
                                     new Date(endDate),
                                     "MMMM d, yyyy"
-                                  )}`}{" "}
-                                {endTime &&
-                                  endTime &&
-                                  `to ${convertTime(endTime)}`}{" "}
+                                  )}`}
                                 {timeZone && ` ${timeZone}`}
                               </span>
                             </div>
