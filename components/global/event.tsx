@@ -27,6 +27,7 @@ import convertTime from "@/utils/convertTime";
 import { CommentModal } from "./comment-modal";
 import Head from "next/head";
 import dateFormatter from "@/utils/dateFormatter";
+import { formatInTimeZone } from "date-fns-tz";
 
 export default function Event({ className }: any) {
   const { formData } = useStore();
@@ -254,10 +255,24 @@ export default function Event({ className }: any) {
               <div className="absolute top-3 right-3 bg-white text-black text-sm font-medium px-2 py-1 rounded-lg shadow-md">
                 <div className="text-center">
                   <p>
-                    {moment(eventDetails?.events?.[0]?.startDate).format("DD")}
+                    {eventDetails?.events?.[0]?.startDate &&
+                      formatInTimeZone(
+                        new Date(eventDetails?.events?.[0]?.startDate)
+                          .toISOString()
+                          .split("T")[0] ?? "",
+                        "UTC",
+                        "dd"
+                      )}
                   </p>
                   <span>
-                    {moment(eventDetails?.events?.[0]?.startDate).format("MMM")}
+                    {eventDetails?.events?.[0]?.startDate &&
+                      formatInTimeZone(
+                        new Date(eventDetails?.events?.[0]?.startDate)
+                          .toISOString()
+                          .split("T")[0] ?? "",
+                        "UTC",
+                        "MMM"
+                      )}
                   </span>
                 </div>
               </div>

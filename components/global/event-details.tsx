@@ -48,6 +48,7 @@ const EventDetails = () => {
               if (isNaN(parsedDate.getTime())) {
                 throw new Error("Invalid start date format");
               }
+              console.log("parsedDate", parsedDate.toISOString());
               return parsedDate.toISOString();
             }),
           inviteDetails: z.any().optional(),

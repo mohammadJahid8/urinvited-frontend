@@ -354,8 +354,8 @@ const EachEvent = ({
                             <SelectContent>
                               {timeZones
                                 .sort((a, b) => a.label.localeCompare(b.label))
-                                .map((tz) => (
-                                  <SelectItem key={tz.value} value={tz.value}>
+                                .map((tz, index) => (
+                                  <SelectItem key={index} value={tz.value}>
                                     {tz.label}
                                   </SelectItem>
                                 ))}
