@@ -25,6 +25,7 @@ import { useAppContext } from "@/lib/context";
 import daysLeft from "@/utils/daysLeft";
 import moment from "moment";
 import GuestsTable from "./guests-table";
+import dateFormatter from "@/utils/dateFormatter";
 
 const TrackRsvp = () => {
   const { event, isEventLoading } = useAppContext();
@@ -36,9 +37,9 @@ const TrackRsvp = () => {
   const eventDaysLeft =
     eventData?.events?.[0]?.startDate &&
     daysLeft(eventData?.events?.[0]?.startDate);
-  const startDate = moment(eventData?.events?.[0]?.startDate).format(
-    "DD/MM/YYYY"
-  );
+  const startDate =
+    eventData?.events?.[0]?.startDate &&
+    dateFormatter(eventData?.events?.[0]?.startDate);
   const startTime =
     eventData?.events?.[0]?.startTime &&
     moment(eventData?.events?.[0]?.startTime, "HH:mm").format("h:mm A");

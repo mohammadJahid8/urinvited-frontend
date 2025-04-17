@@ -11,7 +11,7 @@ import statusCounts from "@/utils/statusCount";
 import api from "@/utils/axiosInstance";
 import { toast } from "sonner";
 import convertTime from "@/utils/convertTime";
-import { format } from "date-fns";
+import dateFormatter from "@/utils/dateFormatter";
 
 export default function ManageEvents({ title }: { title: string }) {
   const { events, isEventsLoading, user, statusCountsData, refetchEvents } =
@@ -135,10 +135,7 @@ export default function ManageEvents({ title }: { title: string }) {
               title={event?.eventDetails?.events?.[0]?.title}
               startDate={
                 event?.eventDetails?.events?.[0]?.startDate &&
-                format(
-                  new Date(event?.eventDetails?.events?.[0]?.startDate),
-                  "MMMM d, yyyy"
-                )
+                dateFormatter(event?.eventDetails?.events?.[0]?.startDate)
               }
               startTime={
                 event?.eventDetails?.events?.[0]?.startTime &&

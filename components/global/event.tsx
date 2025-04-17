@@ -18,7 +18,6 @@ import RSVPSheet from "./rsvp-sheet";
 import api from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "next/navigation";
-
 import moment from "moment";
 import { useAppContext } from "@/lib/context";
 import { toast } from "sonner";
@@ -27,7 +26,7 @@ import PickEmoji from "./emoji-picker";
 import convertTime from "@/utils/convertTime";
 import { CommentModal } from "./comment-modal";
 import Head from "next/head";
-import { Metadata } from "next";
+import dateFormatter from "@/utils/dateFormatter";
 
 export default function Event({ className }: any) {
   const { formData } = useStore();
@@ -375,22 +374,15 @@ export default function Event({ className }: any) {
                               />
 
                               <span>
-                                {startDate &&
-                                  format(
-                                    new Date(startDate),
-                                    "MMMM d, yyyy"
-                                  )}{" "}
+                                {startDate && dateFormatter(startDate)}{" "}
                                 {startTime && `| ${convertTime(startTime)}`}
                                 {/* Only show 'to' + endTime if endTime exists */}
                                 {endTime && ` to ${convertTime(endTime)}`}
                                 {/* Only show endDate if it's different from startDate */}
                                 {endDate &&
-                                  new Date(endDate).toDateString() !==
-                                    new Date(startDate).toDateString() &&
-                                  ` to ${format(
-                                    new Date(endDate),
-                                    "MMMM d, yyyy"
-                                  )}`}
+                                  dateFormatter(endDate) !==
+                                    dateFormatter(startDate) &&
+                                  ` to ${dateFormatter(endDate)}`}
                                 {timeZone && ` ${timeZone}`}
                               </span>
                             </div>
@@ -517,7 +509,7 @@ export default function Event({ className }: any) {
                       fontFamily: descriptionFont,
                     }}
                   >
-                    RSVP by {format(new Date(rsvpDueDate), "MMMM d, yyyy")}
+                    RSVP by {dateFormatter(rsvpDueDate)}
                   </p>
                 </>
               )}

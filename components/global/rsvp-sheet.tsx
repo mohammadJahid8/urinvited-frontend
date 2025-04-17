@@ -8,7 +8,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   SheetClose,
   SheetFooter,
 } from "@/components/ui/sheet";
@@ -21,8 +20,8 @@ import { toast } from "sonner";
 import api from "@/utils/axiosInstance";
 import daysLeft from "@/utils/daysLeft";
 import RsvpGuests from "./rsvp-guests";
-import { format } from "date-fns";
 import convertTime from "@/utils/convertTime";
+import dateFormatter from "@/utils/dateFormatter";
 
 type RSVPOption = "yes" | "no" | "maybe";
 
@@ -35,7 +34,7 @@ export default function RSVPSheet({
   isAddToCalendar,
   handleCalendarLink,
 }: any) {
-  console.log({ email, name });
+  // console.log({ email, name });
 
   const [rsvpStatus, setRsvpStatus] = useState<RSVPOption | null>("yes");
   const {
@@ -220,9 +219,7 @@ export default function RSVPSheet({
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-primary" />
                   <span>
-                    {startDate
-                      ? format(new Date(startDate), "MMMM d, yyyy")
-                      : ""}
+                    {startDate ? dateFormatter(startDate) : ""}
                     {startDate && startTime
                       ? ` | ${convertTime(startTime)}`
                       : ""}
