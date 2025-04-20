@@ -195,7 +195,7 @@ export default function RSVPSheet({
   };
 
   return (
-    <Sheet open={openRSVP} onOpenChange={setOpenRSVP}>
+    <Sheet open={openRSVP} onOpenChange={setOpenRSVP} modal={false}>
       <SheetContent className="w-full sm:max-w-[485px] overflow-y-auto p-0">
         <div className="relative p-6">
           <SheetHeader className="space-y-4">

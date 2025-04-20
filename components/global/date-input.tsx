@@ -39,7 +39,7 @@ const DateInput = ({ field, label }: { field: any; label: string }) => (
             const formatted = date ? format(date, "yyyy-MM-dd") : "";
             field.onChange(formatted);
           }}
-          disabled={(date) => date < new Date()}
+          // disabled={(date) => date < new Date()}
           initialFocus
         />
       </PopoverContent>

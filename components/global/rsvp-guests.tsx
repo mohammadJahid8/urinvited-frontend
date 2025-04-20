@@ -1,11 +1,12 @@
-import React from 'react';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { cn } from '@/lib/utils';
-import { User, Baby, Trash2, Plus } from 'lucide-react';
-import { useAppContext } from '@/lib/context';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
+import { User, Baby, Trash2, Plus } from "lucide-react";
+import { useAppContext } from "@/lib/context";
+import { toast } from "sonner";
+import { PhoneInput } from "../ui/phone-input";
 
 const RsvpGuests = ({
   guests,
@@ -18,6 +19,8 @@ const RsvpGuests = ({
 }: any) => {
   const { hasMaximumCapacity, allowAdditionalAttendees, additionalAttendees } =
     useAppContext();
+
+  const [input, setInput] = useState("email");
 
   const handleGuestNameChange = (guestId: string, name: string) => {
     setGuests(
@@ -49,7 +52,7 @@ const RsvpGuests = ({
   // console.log({ additionalAttendees });
 
   return (
-    <div className='space-y-4'>
+    <div className="space-y-4">
       {/* {rsvpStatus !== 'no' && (
         <div className='space-y-2'>
           <Label>
@@ -77,61 +80,88 @@ const RsvpGuests = ({
       )} */}
 
       {rsvpStatus && (
-        <div className='space-y-2'>
-          <Label>Contact Email</Label>
-          {/* <p className="text-xs text-muted-foreground">
-            Example: +14155550123 or example@gmail.com
-          </p> */}
+        <div className="space-y-2">
+          <Label>Contact</Label>
 
-          <Input
-            type='text'
-            placeholder='Enter email'
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-          />
+          <div className="flex items-center gap-2">
+            {input === "phone" ? (
+              <PhoneInput
+                value={contact}
+                onChange={(value) => {
+                  setContact(value);
+                }}
+              />
+            ) : (
+              <Input
+                placeholder="Enter Email address"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+              />
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className={`${
+                input === "email" ? "bg-primary/10 text-primary" : ""
+              }`}
+              onClick={() => setInput("email")}
+            >
+              Email
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`${
+                input === "phone" ? "bg-primary/10 text-primary" : ""
+              }`}
+              onClick={() => setInput("phone")}
+            >
+              Phone
+            </Button>
+          </div>
         </div>
       )}
-      {rsvpStatus === 'no' && (
-        <div className='space-y-2'>
+      {rsvpStatus === "no" && (
+        <div className="space-y-2">
           <Label>Your Name</Label>
 
           <Input
-            type='text'
-            placeholder='Enter your name'
+            type="text"
+            placeholder="Enter your name"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
           />
         </div>
       )}
 
-      {rsvpStatus !== 'no' && (
-        <div className='space-y-2'>
+      {rsvpStatus !== "no" && (
+        <div className="space-y-2">
           <Label>Guest Details</Label>
-          <div className='space-y-2'>
+          <div className="space-y-2">
             {guests.map((guest: any, index: number) => (
-              <div key={guest.guestId} className='flex items-center gap-2'>
-                <div className='flex items-center gap-2'>
+              <div key={guest.guestId} className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Button
-                    variant='outline'
-                    size='sm'
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleGuestTypeChange(guest.guestId, true)}
                     // disabled={guest.id === '1'}
                     className={cn(
-                      guest.isAdult && 'bg-primary/10 text-primary'
+                      guest.isAdult && "bg-primary/10 text-primary"
                     )}
                   >
-                    <User className='w-5 h-5' />
+                    <User className="w-5 h-5" />
                   </Button>
                   <Button
-                    variant='outline'
-                    size='sm'
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleGuestTypeChange(guest.guestId, false)}
                     // disabled={guest.id === '1'}
                     className={cn(
-                      !guest.isAdult && 'bg-primary/10 text-primary'
+                      !guest.isAdult && "bg-primary/10 text-primary"
                     )}
                   >
-                    <Baby className='w-5 h-5' />
+                    <Baby className="w-5 h-5" />
                   </Button>
                 </div>
                 <Input
@@ -140,48 +170,48 @@ const RsvpGuests = ({
                   onChange={(e) =>
                     handleGuestNameChange(guest.guestId, e.target.value)
                   }
-                  placeholder='Guest name'
+                  placeholder="Guest name"
                 />
 
                 <Button
-                  variant='ghost'
-                  size='icon'
+                  variant="ghost"
+                  size="icon"
                   disabled={index === 0}
                   onClick={() => handleRemoveGuest(guest.guestId)}
-                  className='text-destructive hover:text-destructive hover:bg-destructive/10'
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
-                  <Trash2 className='h-4 w-4' />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}
           </div>
-          <div className='flex flex-col gap-2'>
+          <div className="flex flex-col gap-2">
             <Button
-              className='w-full'
-              variant='outline'
-              size='sm'
+              className="w-full"
+              variant="outline"
+              size="sm"
               onClick={() => {
                 if (
                   guests.length >= additionalAttendees &&
                   allowAdditionalAttendees
                 ) {
-                  toast.error('You have reached the maximum number of guests');
+                  toast.error("You have reached the maximum number of guests");
                   return;
                 }
                 setGuests([
                   ...guests,
                   {
                     guestId: (guests?.length + 1).toString(),
-                    name: '',
+                    name: "",
                     isAdult: true,
                   },
                 ]);
               }}
             >
-              <Plus className='w-4 h-4' />
+              <Plus className="w-4 h-4" />
               Add Guest
             </Button>
-            <p className='text-sm text-muted-foreground'>
+            <p className="text-sm text-muted-foreground">
               {additionalAttendees &&
                 allowAdditionalAttendees &&
                 `Upto ${additionalAttendees} guests including you`}

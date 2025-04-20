@@ -15,6 +15,7 @@ import { Trash2, Users } from "lucide-react";
 import GroupGuestModal from "./group-guest-modal";
 import { useAppContext } from "@/lib/context";
 import { toast } from "sonner";
+import { PhoneInput } from "../ui/phone-input";
 
 export default function GuestList({ emails }: { emails: string[] }) {
   const {
@@ -29,7 +30,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
   const [openGroupModal, setOpenGroupModal] = useState(false);
   const [guestIndex, setGuestIndex] = useState<number>(0);
 
-  console.log({ id });
+  // console.log({ id });
 
   const handleOpenGroupModal = (index: number) => {
     if (totalGuestAdded >= maximumCapacity && hasMaximumCapacity) {
@@ -67,6 +68,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
           isConfirmed: false,
           fromEmail: true,
           event: id,
+          inputType: "email",
         }));
 
       // Filter guests whose emails match the current list of emails
@@ -87,7 +89,17 @@ export default function GuestList({ emails }: { emails: string[] }) {
       );
     }
     if (!guest.contact) {
-      return toast.error("Please enter a valid email");
+      return toast.error("Please enter a valid email or phone number");
+    }
+
+    if (guest.inputType === "email" && !guest.contact.includes("@")) {
+      return toast.error("Please enter a valid email address");
+    }
+
+    if (guest.inputType === "phone" && !guest.contact.includes("+")) {
+      return toast.error(
+        "Please enter a valid phone number with a country code. e.g +2348060000000"
+      );
     }
 
     // if (guest.phone && !guest.phone.includes("+")) {
@@ -97,9 +109,6 @@ export default function GuestList({ emails }: { emails: string[] }) {
     // }
 
     // validate the email
-    if (guest.contact && !guest.contact.includes("@")) {
-      return toast.error("Please enter a valid email address");
-    }
 
     if (!guest.name) {
       return toast.error("Please enter a valid name");
@@ -148,6 +157,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
         contact: "",
         isConfirmed: false,
         event: id,
+        inputType: "email",
       },
     ]);
   };
@@ -163,7 +173,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
             <TableHead className="rounded-tl-lg border-r text-black">
               Guest Name
             </TableHead>
-            <TableHead className="border-r text-black">Email Address</TableHead>
+            <TableHead className="border-r text-black">Contact</TableHead>
             <TableHead className="w-[100px] rounded-tr-lg text-black">
               Action
             </TableHead>
@@ -186,48 +196,74 @@ export default function GuestList({ emails }: { emails: string[] }) {
                   }
                 />
               </TableCell>
-              <TableCell className="border-r">
-                <Input
-                  placeholder="Enter Phone or Email address"
-                  value={guest.contact}
-                  disabled={guest.fromEmail}
-                  onChange={(e) => {
-                    const value = e.target.value;
+              <TableCell className="border-r flex items-center gap-2">
+                {guest.inputType === "phone" ? (
+                  <PhoneInput
+                    value={guest.contact}
+                    onChange={(value) => {
+                      setGuests(
+                        guests.map((guest: any, i: number) => ({
+                          ...guest,
+                          contact: i === index ? value : guest.contact,
+                        }))
+                      );
+                    }}
+                  />
+                ) : (
+                  <Input
+                    placeholder="Enter Phone or Email address"
+                    value={guest.contact}
+                    disabled={guest.fromEmail}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setGuests(
+                        guests.map((guest: any, i: number) => ({
+                          ...guest,
+
+                          contact: i === index ? value : guest.contact,
+                        }))
+                      );
+                    }}
+                  />
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`${
+                    guest.inputType === "email"
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
+                  onClick={() =>
                     setGuests(
                       guests.map((guest: any, i: number) => ({
                         ...guest,
-                        // phone: "",
-                        contact: i === index ? value : guest.contact,
+                        inputType: i === index ? "email" : guest.inputType,
                       }))
-                    );
-
-                    // if (value.includes('@')) {
-                    //   setGuests(
-                    //     guests.map((guest: any, i: number) => ({
-                    //       ...guest,
-                    //       email: i === index ? value : guest.email,
-                    //       phone: i === index ? '' : guest.phone,
-                    //     }))
-                    //   );
-                    // } else if (value.includes('+') || /^\d{3}/.test(value)) {
-                    //   setGuests(
-                    //     guests.map((guest: any, i: number) => ({
-                    //       ...guest,
-                    //       email: i === index ? '' : guest.email,
-                    //       phone: i === index ? value : guest.phone,
-                    //     }))
-                    //   );
-                    // } else {
-                    //   setGuests(
-                    //     guests.map((guest: any, i: number) => ({
-                    //       ...guest,
-                    //       phone: '',
-                    //       email: i === index ? value : guest.email,
-                    //     }))
-                    //   );
-                    // }
-                  }}
-                />
+                    )
+                  }
+                >
+                  Email
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`${
+                    guest.inputType === "phone"
+                      ? "bg-primary/10 text-primary"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setGuests(
+                      guests.map((guest: any, i: number) => ({
+                        ...guest,
+                        inputType: i === index ? "phone" : guest.inputType,
+                      }))
+                    )
+                  }
+                >
+                  Phone
+                </Button>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
@@ -288,7 +324,7 @@ export default function GuestList({ emails }: { emails: string[] }) {
             <TableHeader>
               <TableRow>
                 <TableHead>Guest Name</TableHead>
-                <TableHead>Phone/ Email Address</TableHead>
+                <TableHead>Contact</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

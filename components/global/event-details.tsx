@@ -86,6 +86,26 @@ const EventDetails = () => {
             });
           }
 
+          if (event.inviteDetails) {
+            // console.log("inside inviteDetails", event.inviteDetails);
+            if (
+              (typeof event.inviteDetails === "string" &&
+                !event.inviteDetails.trim()) ||
+              event.inviteDetails === "<p><br></p>" ||
+              event.inviteDetails === true ||
+              event.inviteDetails === false
+            ) {
+              // console.log("inside inviteDetails.trim");
+              ctx.addIssue({
+                code: "custom",
+                path: [index, "inviteDetails"],
+                message: "Invite details are required",
+              });
+            }
+          } else {
+            // console.log("inside else", event.inviteDetails);
+            delete event.inviteDetails;
+          }
           if (index === 0 && event.when === "startDateTime") {
             if (!event.startDate) {
               ctx.addIssue({
