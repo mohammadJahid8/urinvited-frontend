@@ -24,7 +24,7 @@ import { useAppContext } from "@/lib/context";
 import Editor from "./editor";
 
 export default function CreateTicket({ open, onOpenChange }: any) {
-  const { event, refetchEvent } = useAppContext();
+  const { event, refetchEvent, user } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
   const [inputs, setInputs] = useState<any>({
     videoId: "",
@@ -59,6 +59,7 @@ export default function CreateTicket({ open, onOpenChange }: any) {
     formData.append("videoId", event?.video?._id);
     formData.append("feedbackType", inputs.feedbackType);
     formData.append("feedback", inputs.feedback);
+    formData.append("email", user?.email);
     if (inputs.attachment) {
       formData.append("attachment", inputs.attachment);
     }
