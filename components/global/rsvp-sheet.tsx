@@ -102,7 +102,10 @@ export default function RSVPSheet({
   const eventLocation = eventData?.events?.[0]?.locationName;
   const startTime = eventData?.events?.[0]?.startTime;
   const endTime = eventData?.events?.[0]?.endTime;
-  const eventDaysLeft = daysLeft(eventData?.events?.[0]?.startDate);
+  const eventDaysLeft = daysLeft(
+    dateFormatter(eventData?.events?.[0]?.startDate),
+    eventData?.events?.[0]?.startTime
+  );
 
   const additionalFeatures = event?.additionalFeatures;
   const giftRegistry = additionalFeatures?.registry;

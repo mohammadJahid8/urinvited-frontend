@@ -148,7 +148,12 @@ export default function ManageEvents({ title }: { title: string }) {
                 0
               }
               rsvps={event?.rsvps}
-              daysLeft={daysLeft(event?.eventDetails?.events?.[0]?.startDate)!}
+              daysLeft={
+                daysLeft(
+                  dateFormatter(event?.eventDetails?.events?.[0]?.startDate),
+                  event?.eventDetails?.events?.[0]?.startTime
+                )!
+              }
               video={event?.video}
               isAdmin={user?.role === "admin"}
               refetchEvents={refetchEvents}
@@ -196,6 +201,7 @@ function EventCard({
   refetchEvents,
   userEmail,
 }: EventCardProps) {
+  console.log({ startTime });
   // const isVideoPending = video?.status === 'Pending';
 
   // const path =

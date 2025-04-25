@@ -36,7 +36,10 @@ const TrackRsvp = () => {
   const eventTitle = eventData?.events?.[0]?.title;
   const eventDaysLeft =
     eventData?.events?.[0]?.startDate &&
-    daysLeft(eventData?.events?.[0]?.startDate);
+    daysLeft(
+      dateFormatter(eventData?.events?.[0]?.startDate),
+      eventData?.events?.[0]?.startTime
+    );
   const startDate =
     eventData?.events?.[0]?.startDate &&
     dateFormatter(eventData?.events?.[0]?.startDate);
