@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useAppContext } from '@/lib/context';
-import { redirect } from 'next/navigation';
+import { useAppContext } from "@/lib/context";
+import { redirect } from "next/navigation";
 
 const Home: React.FC = () => {
   const { user } = useAppContext();
@@ -9,13 +9,13 @@ const Home: React.FC = () => {
   // check if the url has any query params
   const urlParams = new URLSearchParams(window.location.search);
   const queryString = urlParams.toString();
-  const querySuffix = queryString ? `?${queryString}` : '';
+  const querySuffix = queryString ? `?${queryString}` : "";
 
-  if (user?.role === 'admin') {
+  if (user?.role === "admin") {
     return redirect(`/manage-events${querySuffix}`);
   }
 
-  if (user?.role === 'user') {
+  if (user?.role === "user") {
     return redirect(`/events${querySuffix}`);
   }
 

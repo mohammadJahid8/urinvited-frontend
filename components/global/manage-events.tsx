@@ -327,6 +327,7 @@ function EventCard({
                 </Button>
               )}
               <Button
+                isReload={true}
                 href={`/event/${id}?preview=true`}
                 variant="outline"
                 className="text-gray-700 flex-grow md:flex-grow-0"
