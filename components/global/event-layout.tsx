@@ -22,7 +22,7 @@ const EventLayout = ({ children }: any) => {
           </div>
         </div>
       ) : (
-        <div className="pt-32 bg-gray-50">{children}</div>
+        <div className=" bg-gray-50">{children}</div>
       )}
     </div>
   );

@@ -151,6 +151,7 @@ const ContextProvider = ({ children }: any) => {
     "/forgot-password",
     "/reset-password",
     "/verify-otp",
+    "/",
   ];
 
   if (

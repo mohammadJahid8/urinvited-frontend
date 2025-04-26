@@ -1,12 +1,12 @@
-import EventLayout from '@/components/global/event-layout';
-import Navbar from '@/components/global/navbar';
-import EventPreviewNav from '@/components/global/event-preview-nav';
+import EventLayout from "@/components/global/event-layout";
+import Navbar from "@/components/global/navbar";
+import EventPreviewNav from "@/components/global/event-preview-nav";
 
 const HomeLayout = ({ children }: any) => {
   return (
-    <div className=''>
-      <div className='fixed top-0 w-full z-50'>
-        <Navbar />
+    <div className="">
+      <div className="mt-16">
+        {/* <Navbar /> */}
         <EventPreviewNav />
       </div>
 
