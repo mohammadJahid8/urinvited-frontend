@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { getCountry } from "@/app/actions";
 
 type PhoneInputProps = Omit<
   React.ComponentProps<"input">,
@@ -32,6 +34,15 @@ type PhoneInputProps = Omit<
 const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> =
   React.forwardRef<React.ElementRef<typeof RPNInput.default>, PhoneInputProps>(
     ({ className, onChange, ...props }, ref) => {
+      const [country, setCountry] = useState("US");
+
+      React.useEffect(() => {
+        async function fetchCountry() {
+          const data = await getCountry();
+          setCountry(data);
+        }
+        fetchCountry();
+      }, []);
       return (
         <RPNInput.default
           ref={ref}
@@ -40,6 +51,7 @@ const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> =
           countrySelectComponent={CountrySelect}
           inputComponent={InputComponent}
           smartCaret={false}
+          defaultCountry={country as RPNInput.Country}
           /**
            * Handles the onChange event.
            *
