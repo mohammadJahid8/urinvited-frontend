@@ -1,10 +1,11 @@
 "use client";
 import { CalendarCheck, Menu, Video } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import Navbar from "@/components/global/navbar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAppContext } from "@/lib/context";
 
 export default function RootLayout({
   children,
@@ -12,6 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  const { user } = useAppContext();
+
+  if (!user?.role || user?.role !== "admin") {
+    return redirect("/");
+  }
 
   const links = [
     { href: "/manage-events", icon: CalendarCheck, label: "Manage Events" },

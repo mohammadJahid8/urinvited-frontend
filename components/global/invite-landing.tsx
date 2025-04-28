@@ -1,9 +1,12 @@
+import { Video } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import { Button } from "../ui/button";
+import RecordVideo from "./record-video";
 
 const InviteLanding = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 p-8 space-y-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 p-8 space-y-10 md:mt-28 mt-20">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-gray-800">
           Every Great Event Deserves a Story.
@@ -44,17 +47,17 @@ const InviteLanding = () => {
       </div>
 
       <div className="flex flex-wrap gap-4">
-        <button className="flex items-center gap-2 px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 font-semibold">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v2a1 1 0 01-2 0v-8a1 1 0 012 0v2z" />
-            <path d="M3 5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
-          </svg>
+        <Button
+          href="/record"
+          className="flex items-center gap-2 px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 font-semibold h-12"
+        >
+          <Video className="w-6 h-6" />
           Record Your Invite
-        </button>
+        </Button>
 
-        <button className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 font-semibold">
+        <Button className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 font-semibold h-12">
           Browse Designer Templates
-        </button>
+        </Button>
       </div>
     </div>
   );

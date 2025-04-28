@@ -7,11 +7,10 @@ import {
   Menu,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import Navbar from "@/components/global/navbar";
+import { redirect, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAppContext } from "@/lib/context";
 
 export default function RootLayout({
   children,
@@ -19,6 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  const { user } = useAppContext();
+  if (!user?.role || user?.role !== "user") {
+    return redirect("/");
+  }
 
   const links = [
     { href: "/events", icon: CalendarCheck, label: "My Events" },

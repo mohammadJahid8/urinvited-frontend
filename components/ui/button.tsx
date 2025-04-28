@@ -42,6 +42,7 @@ export interface ButtonProps
   asChild?: boolean;
   href?: string;
   target?: string;
+  isReload?: boolean;
 }
 
 const Button = React.forwardRef<
@@ -72,7 +73,6 @@ const Button = React.forwardRef<
     } else {
       Comp = "button";
     }
-
     return (
       <Comp
         href={href!}

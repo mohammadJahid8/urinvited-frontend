@@ -60,27 +60,6 @@ export default function VideoPreviewNav() {
       </p>
 
       <div className="flex flex-wrap items-center gap-4">
-        {/* <div className='flex items-center rounded-lg mr-10 gap-2'>
-          <Button
-            variant={activeView === 'Desktop' ? 'secondary' : 'ghost'}
-            size='sm'
-            className='flex items-center gap-2'
-            onClick={() => setActiveView('Desktop')}
-          >
-            <Monitor className='h-4 w-4' />
-            Desktop
-          </Button>
-          <Button
-            variant={activeView === 'Mobile' ? 'secondary' : 'ghost'}
-            size='sm'
-            className='flex items-center gap-2'
-            onClick={() => setActiveView('Mobile')}
-          >
-            <Smartphone className='h-4 w-4' />
-            Mobile
-          </Button>
-        </div> */}
-
         <Button
           onClick={() => downloadFile(videoData?.url, "download")}
           variant="outline"
@@ -88,26 +67,6 @@ export default function VideoPreviewNav() {
         >
           Download
         </Button>
-
-        {/* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant='outline'
-              className='flex items-center gap-2 border-primary text-primary'
-            >
-              Download
-              <ChevronDown className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={handleDownload}>
-              Download as MP4
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDownload}>
-              Download as GIF
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */}
 
         <Button
           onClick={() => setOpenFeedback(true)}
@@ -125,23 +84,6 @@ export default function VideoPreviewNav() {
         >
           Event Details
         </Button>
-
-        {/* {event?.video?.status === 'Pending' ? (
-          <Button
-            disabled={isLoading}
-            className='bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4'
-            onClick={handleApprove}
-          >
-            {isLoading ? 'Approving...' : 'Yes, I Approve'}
-          </Button>
-        ) : (
-          <Button
-            href={`/event-details?id=${event?._id}`}
-            className='bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4'
-          >
-            Event Details
-          </Button>
-        )} */}
       </div>
     </header>
   );

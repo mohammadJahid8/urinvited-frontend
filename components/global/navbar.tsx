@@ -13,20 +13,81 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Logo from "./logo";
 import Link from "next/link";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { ArrowLeft, ChevronLeft } from "lucide-react";
+import { Button } from "../ui/button";
 
 export default function Navbar() {
-  const { user, logout } = useAppContext();
+  const { user, logout, event } = useAppContext();
+  const router = useRouter();
+  const { id: urlId } = useParams();
+  const searchParams = useSearchParams();
 
-  if (!user?.role) {
+  const pathname = usePathname();
+
+  const isTrackPage = pathname.includes("track");
+  const isEventPage = pathname.includes("event/");
+
+  const paramsId = searchParams.get("id");
+  const preview = searchParams.get("preview");
+  const id = urlId || paramsId;
+  const queryString = searchParams.toString();
+  const querySuffix = queryString ? `?${queryString}` : "";
+  const isAdmin = user?.role === "admin";
+  if (isEventPage && !preview) {
     return null;
   }
 
   return (
-    <header className="flex h-16 items-center justify-between bg-white px-4 border-b fixed top-0 left-0 w-full z-50">
-      <Logo />
-      <div className="flex items-center gap-2">
-        <UserDropdown user={user} logout={logout} />
+    <header className="flex flex-col h-max justify-center bg-white  border-b fixed top-0 left-0 w-full z-50">
+      <div className="flex items-center justify-between h-16 gap-2 border-b px-4 py-2">
+        <Logo />
+        <div className="flex items-center gap-2">
+          {user?.role ? (
+            <UserDropdown user={user} logout={logout} />
+          ) : (
+            <Button href="/login" variant="special">
+              Login
+            </Button>
+          )}
+        </div>
       </div>
+
+      {id && !isTrackPage && (
+        <>
+          {!preview ? (
+            <div className="flex h-14 items-center justify-between bg-white px-4 py-2">
+              <Link
+                href={
+                  isAdmin
+                    ? "/manage-events"
+                    : `/video-preview${querySuffix || "?id=" + id}`
+                }
+                className="flex items-center gap-1 text-base font-semibold text-[#2E333B] hover:text-[#4A61FF]"
+              >
+                <ChevronLeft className="h-6 w-6" />
+                {isAdmin ? "Back to Dashboard" : "Back to Video"}
+              </Link>
+              <Button
+                href={`/event/${id}?preview=true`}
+                className="bg-[#4A61FF] hover:bg-[#4338CA] px-6"
+              >
+                Preview
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="special"
+              className="flex items-center gap-2"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft />
+              <span>Go Back</span>
+            </Button>
+          )}
+        </>
+      )}
     </header>
   );
 }
@@ -46,7 +107,9 @@ const UserDropdown = ({ user, logout }: { user: any; logout: () => void }) => {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">
-          <Link href="/manage-events">Manage Events</Link>
+          <Link href={user?.role === "admin" ? "/manage-events" : "/events"}>
+            Manage Events
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer" onClick={logout}>
           Logout
