@@ -43,6 +43,7 @@ export default function RSVPSheet({
     event,
     additionalAttendees,
     allowAdditionalAttendees,
+    input,
   } = useAppContext();
   const [specialMessage, setSpecialMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -137,11 +138,23 @@ export default function RSVPSheet({
       });
     }
 
+    if (!contact) {
+      return toast.error("Please fill in a valid contact", {
+        position: "top-center",
+      });
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // const phoneRegex = /^\+[1-9]\d{1,14}$/;
 
-    if (!contact || !emailRegex.test(contact)) {
+    if (input === "email" && !emailRegex.test(contact)) {
       return toast.error("Please fill in a valid contact (email)", {
+        position: "top-center",
+      });
+    }
+
+    if (input === "phone" && !contact.includes("+")) {
+      return toast.error("Please fill in a valid contact (phone)", {
         position: "top-center",
       });
     }

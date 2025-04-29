@@ -21,7 +21,7 @@ export function useAppContext() {
 const ContextProvider = ({ children }: any) => {
   const [loading, setLoading] = useState(false);
   const [openFeedback, setOpenFeedback] = useState(false);
-
+  const [input, setInput] = useState("email");
   const [openEmailPreview, setOpenEmailPreview] = useState(false);
   const [openRSVP, setOpenRSVP] = useState(false);
 
@@ -252,6 +252,8 @@ const ContextProvider = ({ children }: any) => {
     allowAdditionalAttendees,
     additionalAttendees,
     id,
+    input,
+    setInput,
   };
 
   return (

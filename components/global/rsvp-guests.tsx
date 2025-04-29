@@ -17,10 +17,13 @@ const RsvpGuests = ({
   rsvpStatus,
   guestName,
 }: any) => {
-  const { hasMaximumCapacity, allowAdditionalAttendees, additionalAttendees } =
-    useAppContext();
-
-  const [input, setInput] = useState("email");
+  const {
+    hasMaximumCapacity,
+    allowAdditionalAttendees,
+    additionalAttendees,
+    input,
+    setInput,
+  } = useAppContext();
 
   const handleGuestNameChange = (guestId: string, name: string) => {
     setGuests(
@@ -30,8 +33,7 @@ const RsvpGuests = ({
     );
   };
 
-  console.log({ allowAdditionalAttendees, additionalAttendees });
-
+  // console.log({ allowAdditionalAttendees, additionalAttendees });
   // console.log({ allowAdditionalAttendees, hasMaximumCapacity });
 
   const handleRemoveGuest = (guestId: string) => {
@@ -104,7 +106,10 @@ const RsvpGuests = ({
               className={`${
                 input === "email" ? "bg-primary/10 text-primary" : ""
               }`}
-              onClick={() => setInput("email")}
+              onClick={() => {
+                setInput("email");
+                setContact("");
+              }}
             >
               Email
             </Button>
@@ -114,7 +119,10 @@ const RsvpGuests = ({
               className={`${
                 input === "phone" ? "bg-primary/10 text-primary" : ""
               }`}
-              onClick={() => setInput("phone")}
+              onClick={() => {
+                setInput("phone");
+                setContact("");
+              }}
             >
               Phone
             </Button>
