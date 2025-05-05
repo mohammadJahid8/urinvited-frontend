@@ -1,131 +1,200 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Button } from "../ui/button";
-import { Video } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile } from "@ffmpeg/util";
 
-const RecordVideo: React.FC = () => {
-  const [recording, setRecording] = useState<boolean>(false);
-  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
-  const [caption, setCaption] = useState<string>("");
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+const ffmpeg = new FFmpeg();
+
+const VideoTrimmerApp: React.FC = () => {
+  const [recording, setRecording] = useState(false);
+  const [videoURL, setVideoURL] = useState<string | null>(null);
+  const [trimmedURL, setTrimmedURL] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number>(0);
+  const [endTime, setEndTime] = useState<number>(5);
+  const [duration, setDuration] = useState<number>(5);
+  const [isTrimming, setIsTrimming] = useState(false);
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+
+  useEffect(() => {
+    if (videoURL && videoRef.current) {
+      videoRef.current.onloadedmetadata = () => {
+        const dur = videoRef.current?.duration || 5;
+        setDuration(dur);
+        setStartTime(0);
+        setEndTime(dur);
+      };
+    }
+  }, [videoURL]);
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-    setMediaStream(stream);
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    streamRef.current = stream;
 
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
+      videoRef.current.muted = true;
+      videoRef.current.controls = false;
+      videoRef.current.play();
     }
 
-    const mediaRecorder = new MediaRecorder(stream);
-    const chunks: BlobPart[] = [];
-    mediaRecorder.ondataavailable = (e: BlobEvent) => chunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "video/webm" });
-      setVideoBlob(blob);
+    const recorder = new MediaRecorder(stream);
+    mediaRecorderRef.current = recorder;
+    recordedChunksRef.current = [];
 
-      stream.getTracks().forEach((track) => track.stop());
+    recorder.ondataavailable = (event: BlobEvent) => {
+      if (event.data.size > 0) recordedChunksRef.current.push(event.data);
     };
 
-    mediaRecorder.start();
-    mediaRecorderRef.current = mediaRecorder;
+    recorder.onstop = () => {
+      const chunks = [...recordedChunksRef.current];
+      const blob = new Blob(chunks, { type: "video/webm" });
+      const url = URL.createObjectURL(blob);
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+        videoRef.current.src = url;
+        videoRef.current.controls = true;
+        videoRef.current.muted = false;
+        videoRef.current.play();
+      }
+
+      setVideoURL(url);
+    };
+
+    recorder.start();
     setRecording(true);
   };
 
   const stopRecording = () => {
     mediaRecorderRef.current?.stop();
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
     setRecording(false);
   };
 
-  const saveChanges = () => {
-    console.log("Video saved", videoBlob);
-    console.log("Caption:", caption);
+  const handleTrim = async () => {
+    if (!videoURL) return;
+    if (!ffmpeg.loaded) await ffmpeg.load();
+
+    setIsTrimming(true);
+    setTrimmedURL(null);
+
+    const res = await fetch(videoURL);
+    const blob = await res.blob();
+    const file = new File([blob], "input.webm", { type: "video/webm" });
+
+    await ffmpeg.writeFile("input.webm", await fetchFile(file));
+
+    await ffmpeg.exec([
+      "-i",
+      "input.webm",
+      "-ss",
+      `${startTime}`,
+      "-to",
+      `${endTime}`,
+      "-c:v",
+      "libvpx",
+      "-c:a",
+      "libvorbis",
+      "output.webm",
+    ]);
+
+    const data = await ffmpeg.readFile("output.webm");
+    const trimmedBlob = new Blob([data.buffer], { type: "video/webm" });
+    const url = URL.createObjectURL(trimmedBlob);
+
+    setTrimmedURL(url);
+    setIsTrimming(false);
   };
 
-  // When videoBlob is ready, set the srcObject to null and use src instead
-  useEffect(() => {
-    if (videoRef.current) {
-      if (videoBlob) {
-        videoRef.current.srcObject = null;
-        videoRef.current.src = URL.createObjectURL(videoBlob);
-      }
-    }
-  }, [videoBlob]);
-
   return (
-    <div className="flex flex-col items-center gap-6 p-4">
-      {/* Video Preview - Always show one video tag */}
-      <div className="relative w-full max-w-md">
-        {recording && (
-          <div className="absolute top-2 left-2 flex items-center gap-2 z-10">
-            <div className="w-3 h-3 bg-red-600 rounded-full animate-ping"></div>
-            <span className="text-red-600 font-semibold text-sm">
-              Recording...
-            </span>
-          </div>
+    <div className="p-4 space-y-4 max-w-xl mx-auto">
+      <h2 className="text-2xl font-bold">🎥 Video Trimmer (TypeScript)</h2>
+
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        className="w-full border rounded"
+      />
+
+      <div className="flex gap-2">
+        {!recording ? (
+          <button
+            onClick={startRecording}
+            className="px-4 py-2 bg-green-600 text-white rounded"
+          >
+            Start Recording
+          </button>
+        ) : (
+          <button
+            onClick={stopRecording}
+            className="px-4 py-2 bg-red-600 text-white rounded"
+          >
+            Stop Recording
+          </button>
         )}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted={recording}
-          controls={!recording && videoBlob !== null}
-          playsInline
-          className="w-full rounded-lg shadow-md bg-black"
-        />
       </div>
 
-      {/* Start/Stop Button */}
-      {!videoBlob && (
-        <Button
-          onClick={recording ? stopRecording : startRecording}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 font-semibold h-12"
-        >
-          <Video className="w-6 h-6" />
-          {recording ? "Stop Recording" : "Record Your Invite"}
-        </Button>
-      )}
+      {videoURL && (
+        <>
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">🎛️ Trim Range</h3>
 
-      {/* After Recording */}
-      {videoBlob && (
-        <div className="w-full max-w-md p-4 rounded-xl shadow-md bg-white">
-          <h2 className="text-xl font-bold mb-4">Preview, Trim</h2>
+            <label>Start: {startTime.toFixed(2)}s</label>
+            <input
+              type="range"
+              min={0}
+              max={endTime - 0.5}
+              step={0.1}
+              value={startTime}
+              onChange={(e) =>
+                setStartTime(Math.min(Number(e.target.value), endTime - 0.1))
+              }
+              className="w-full"
+            />
 
-          <input
-            type="text"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            placeholder="Join us for a celebration!"
-            className="w-full p-2 border rounded mb-4"
-          />
+            <label>End: {endTime.toFixed(2)}s</label>
+            <input
+              type="range"
+              min={startTime + 0.1}
+              max={duration}
+              step={0.1}
+              value={endTime}
+              onChange={(e) =>
+                setEndTime(Math.max(Number(e.target.value), startTime + 0.1))
+              }
+              className="w-full"
+            />
 
-          <div className="flex flex-col gap-2 mb-4">
-            <button className="text-left w-full p-3 border rounded">
-              Caption
-            </button>
-            <button className="text-left w-full p-3 border rounded">
-              Thumbnail
-            </button>
-            <button className="text-left w-full p-3 border rounded">
-              Background Music
+            <button
+              onClick={handleTrim}
+              disabled={isTrimming}
+              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              {isTrimming ? "Trimming..." : "✂️ Trim Video"}
             </button>
           </div>
+        </>
+      )}
 
-          <Button
-            onClick={saveChanges}
-            className="w-full bg-blue-700 text-white hover:bg-blue-800 h-12 font-semibold"
-          >
-            Save Changes
-          </Button>
+      {trimmedURL && (
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">🎬 Trimmed Output</h3>
+          <video src={trimmedURL} controls className="w-full border" />
         </div>
       )}
     </div>
   );
 };
 
-export default RecordVideo;
+export default VideoTrimmerApp;
