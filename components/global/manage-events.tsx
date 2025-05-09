@@ -12,6 +12,12 @@ import api from "@/utils/axiosInstance";
 import { toast } from "sonner";
 import convertTime from "@/utils/convertTime";
 import dateFormatter from "@/utils/dateFormatter";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 export default function ManageEvents({ title }: { title: string }) {
   const { events, isEventsLoading, user, statusCountsData, refetchEvents } =
@@ -201,14 +207,6 @@ function EventCard({
   refetchEvents,
   userEmail,
 }: EventCardProps) {
-  console.log({ startTime });
-  // const isVideoPending = video?.status === 'Pending';
-
-  // const path =
-  //   !isAdmin && isVideoPending
-  //     ? `/video-preview?id=${id}`
-  //     : `/event-details?id=${id}`;
-
   const statusCountsData = useMemo(() => statusCounts(rsvps), [rsvps]);
 
   const handleDelete = async () => {
@@ -334,33 +332,61 @@ function EventCard({
               >
                 View Event
               </Button>
-              <Button
-                href={`/share/${id}`}
-                variant="outline"
-                size="icon"
-                className="flex-grow md:flex-grow-0"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      href={`/share/${id}`}
+                      variant="outline"
+                      size="icon"
+                      className="flex-grow md:flex-grow-0"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Share Event</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </>
           )}
 
-          <Button
-            href={`/event-details?id=${id}`}
-            variant="outline"
-            size="icon"
-            className="flex-grow md:flex-grow-0"
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="flex-grow md:flex-grow-0"
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4 text-red-500" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  href={`/event-details?id=${id}`}
+                  variant="outline"
+                  size="icon"
+                  className="flex-grow md:flex-grow-0"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit Event</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="flex-grow md:flex-grow-0"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Delete Event</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </div>

@@ -428,14 +428,14 @@ export default function Event({ className }: any) {
                         locationType === "in-person" && (
                           <div className="space-y-1">
                             <div
-                              className="flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold"
+                              className="flex sm:flex-row flex-col items-center sm:items-start justify- gap-2 text-lg text-gray-700 font-semibold"
                               style={{
                                 color: textColour,
                                 fontFamily: dateTimeLocationFont,
                               }}
                             >
                               <MapPin
-                                className="w-5 h-5"
+                                className="w-6 h-6"
                                 style={{ color: textColour || "blue" }}
                               />
                               <span className="hidden md:inline">
