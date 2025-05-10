@@ -235,9 +235,9 @@ export function AddGuestModal() {
               onChange={(e) => handleChange("message", e.target.value)}
             />
           </div>
-          {allowAdditionalAttendees && (
-            <RsvpGuests guests={guests} setGuests={setGuests} />
-          )}
+          {/* {allowAdditionalAttendees && ( */}
+          <RsvpGuests guests={guests} setGuests={setGuests} />
+          {/* )} */}
         </div>
         <DialogFooter>
           <Button
