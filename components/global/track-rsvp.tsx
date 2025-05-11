@@ -28,7 +28,7 @@ import GuestsTable from "./guests-table";
 import dateFormatter from "@/utils/dateFormatter";
 
 const TrackRsvp = () => {
-  const { event, isEventLoading } = useAppContext();
+  const { event, isEventLoading, user } = useAppContext();
   // console.log({ event });
 
   const eventData = event?.eventDetails;
@@ -58,6 +58,7 @@ const TrackRsvp = () => {
         startDate={startDate}
         startTime={startTime}
         eventId={eventId}
+        user={user}
       />
 
       {isEventLoading ? (
@@ -73,11 +74,21 @@ const TrackRsvp = () => {
 
 export default TrackRsvp;
 
-function Heading({ title, daysLeft, startDate, startTime, eventId }: any) {
+function Heading({
+  title,
+  daysLeft,
+  startDate,
+  startTime,
+  eventId,
+  user,
+}: any) {
   return (
     <div className="">
       <div className="flex items-center text-sm text-muted-foreground mb-2">
-        <Link href="/events" className="hover:underline">
+        <Link
+          href={user?.role === "admin" ? "/manage-events" : "/events"}
+          className="hover:underline"
+        >
           My Events
         </Link>
         <ChevronRight className="h-4 w-4 mx-1" />

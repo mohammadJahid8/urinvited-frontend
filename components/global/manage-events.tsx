@@ -18,10 +18,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import useStore from "@/app/store/useStore";
 
 export default function ManageEvents({ title }: { title: string }) {
   const { events, isEventsLoading, user, statusCountsData, refetchEvents } =
     useAppContext();
+  const { updateFormData } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
 
@@ -54,8 +56,6 @@ export default function ManageEvents({ title }: { title: string }) {
     );
   });
 
-  console.log({ events });
-
   const eventsToDisplay =
     activeTab === "upcoming"
       ? upcomingEvents
@@ -72,6 +72,7 @@ export default function ManageEvents({ title }: { title: string }) {
           {title} ({events?.length || 0})
         </h1>
         <Button
+          onClick={() => updateFormData({})}
           href="/event-details"
           className="bg-primary text-white w-full md:w-auto"
         >
@@ -82,15 +83,6 @@ export default function ManageEvents({ title }: { title: string }) {
       {/* Tabs and Search Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          {/* <Button
-            variant='outline'
-            className={`${
-              activeTab === 'all' ? 'bg-primary/10 text-primary' : ''
-            } border-primary flex-grow md:flex-grow-0`}
-            onClick={() => setActiveTab('all')}
-          >
-            All Events ({events?.length || 0})
-          </Button> */}
           <Button
             variant="outline"
             className={`${
@@ -164,6 +156,7 @@ export default function ManageEvents({ title }: { title: string }) {
               isAdmin={user?.role === "admin"}
               refetchEvents={refetchEvents}
               userEmail={event?.userEmail}
+              user={user}
             />
           ))
         ) : (
@@ -189,6 +182,7 @@ interface EventCardProps {
   rsvps: any;
   refetchEvents: any;
   userEmail: string;
+  user: any;
 }
 
 function EventCard({
@@ -206,6 +200,7 @@ function EventCard({
   rsvps,
   refetchEvents,
   userEmail,
+  user,
 }: EventCardProps) {
   const statusCountsData = useMemo(() => statusCounts(rsvps), [rsvps]);
 
@@ -309,7 +304,11 @@ function EventCard({
           {hasEvent && (
             <>
               <Button
-                href={`/events/track-rsvp/${id}`}
+                href={
+                  user?.role === "admin"
+                    ? `/manage-events/track-rsvp/${id}`
+                    : `/events/track-rsvp/${id}`
+                }
                 className="bg-primary text-white flex-grow md:flex-grow-0"
               >
                 Track RSVP

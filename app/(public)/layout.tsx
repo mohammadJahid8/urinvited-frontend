@@ -14,11 +14,11 @@ const PublicLayout = ({ children }: any) => {
   const preview = searchParams.get("preview");
   return (
     <div className="">
-      {user && <Navbar />}
+      {/* {user && <Navbar />} */}
       {preview && (
         <Button
           variant="special"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 mt-16"
           onClick={() => router.back()}
         >
           <ArrowLeft />

@@ -15,11 +15,13 @@ const Home: React.FC = () => {
     return redirect(`/manage-events${querySuffix}`);
   }
 
-  if (user?.role === "user") {
-    return redirect(`/events${querySuffix}`);
-  }
+  return redirect(`/${querySuffix}`);
 
-  return redirect(`/login${querySuffix}`);
+  // if (user?.role === "user") {
+  //   return redirect(`/events${querySuffix}`);
+  // }
+
+  // return redirect(`/login${querySuffix}`);
 };
 
 export default Home;
