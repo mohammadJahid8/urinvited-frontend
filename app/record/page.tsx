@@ -1,7 +1,9 @@
 "use client";
 
+import NoSsrWrapper from "@/components/global/no-ssr-wrapper";
 import VideoRecorder from "@/components/global/recorder/video-recorder";
 import VideoTrimmer from "@/components/global/recorder/video-trimmer";
+
 import { useState } from "react";
 
 export default function Home() {
@@ -36,7 +38,9 @@ export default function Home() {
             onStartRecording={handleStartRecording}
           />
         ) : (
-          <VideoTrimmer videoUrl={recordedVideo} onReset={handleReset} />
+          <NoSsrWrapper>
+            <VideoTrimmer videoUrl={recordedVideo} onReset={handleReset} />
+          </NoSsrWrapper>
         )}
       </div>
     </main>
