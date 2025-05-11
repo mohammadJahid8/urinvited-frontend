@@ -9,13 +9,15 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useAppContext } from "@/lib/context";
 import { useRouter } from "next/navigation";
-const ffmpeg = new FFmpeg();
+// const ffmpeg = new FFmpeg();
 interface VideoTrimmerProps {
   videoUrl: string;
   onReset: () => void;
 }
 
 export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
+  const ffmpegRef = useRef(new FFmpeg());
+  const ffmpeg = ffmpegRef.current;
   const { user, handleUploadVideo } = useAppContext();
   const router = useRouter();
 
