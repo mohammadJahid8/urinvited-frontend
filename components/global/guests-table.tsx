@@ -152,6 +152,13 @@ const columns: ColumnDef<Guest>[] = [
     },
   },
   {
+    accessorKey: "reaction",
+    header: "Reaction",
+    cell: ({ row }) => (
+      <div className="truncate max-w-[150px]">{row.getValue("reaction")}</div>
+    ),
+  },
+  {
     accessorKey: "message",
     header: "Message",
     cell: ({ row }) => (
