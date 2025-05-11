@@ -6,7 +6,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw, Save, Play, Pause } from "lucide-react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile } from "@ffmpeg/util";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useAppContext } from "@/lib/context";
 import { useRouter } from "next/navigation";
 const ffmpeg = new FFmpeg();
@@ -549,7 +549,20 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
   // Save trimmed video
   const handleTrim = async () => {
     if (!videoUrl) return;
-    if (!ffmpeg.loaded) await ffmpeg.load();
+    if (!ffmpeg.loaded) {
+      const baseURL = `https://unpkg.com/@ffmpeg/core@0.12.5/dist/umd`;
+
+      await ffmpeg.load({
+        coreURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.js`,
+          "text/javascript"
+        ),
+        wasmURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.wasm`,
+          "application/wasm"
+        ),
+      });
+    }
 
     setIsTrimming(true);
     setTrimmedURL(null);
