@@ -12,10 +12,12 @@ import api from "@/utils/axiosInstance";
 import { toast } from "sonner";
 import convertTime from "@/utils/convertTime";
 import dateFormatter from "@/utils/dateFormatter";
+import useStore from "@/app/store/useStore";
 
 export default function ManageEvents({ title }: { title: string }) {
   const { events, isEventsLoading, user, statusCountsData, refetchEvents } =
     useAppContext();
+  const { updateFormData } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
 
@@ -64,6 +66,7 @@ export default function ManageEvents({ title }: { title: string }) {
           {title} ({events?.length || 0})
         </h1>
         <Button
+          onClick={() => updateFormData({})}
           href="/event-details"
           className="bg-primary text-white w-full md:w-auto"
         >

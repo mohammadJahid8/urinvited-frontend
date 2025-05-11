@@ -7,9 +7,16 @@ import {
   redirect,
   useParams,
   usePathname,
+  useRouter,
   useSearchParams,
 } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { toast } from "sonner";
 
 export const UserContext = createContext<any>({});
@@ -32,6 +39,7 @@ const ContextProvider = ({ children }: any) => {
   const id = paramsId || urlId;
   const queryString = searchParams.toString();
   const querySuffix = queryString ? `?${queryString}` : "";
+  const router = useRouter();
 
   const [guests, setGuests] = useState<any[]>([]);
 
@@ -127,6 +135,63 @@ const ContextProvider = ({ children }: any) => {
     },
   });
 
+  const handleUploadVideo = useCallback(
+    async (videoUrl: string, userData: any) => {
+      const blob = await fetch(videoUrl).then((res) => res.blob());
+
+      const file = new File([blob], "video.mp4", { type: blob.type });
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "event-upload");
+        const response = await axios.post(
+          `https://api.cloudinary.com/v1_1/ddvrxtfbc/video/upload`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const videourl = response?.data?.secure_url;
+
+        const payload = {
+          userEmail: userData?.email,
+          uploadedBy: userData?._id,
+          url: videourl,
+        };
+
+        const newFormData = new FormData();
+
+        for (const key in payload) {
+          if (Object.prototype.hasOwnProperty.call(payload, key)) {
+            newFormData.append(key, payload[key as keyof typeof payload]);
+          }
+        }
+
+        if (videourl) {
+          const promise = await api.post(`/video/upload`, newFormData);
+          if (promise.status === 200) {
+            router.push(`/event-details?id=${promise.data.data.eventId}`);
+
+            toast.success(`Video uploaded successfully!`);
+          }
+        }
+      } catch (error: any) {
+        console.log(error);
+        return toast.error(
+          error.response.data.message || `Something went wrong!`,
+          {
+            position: "top-center",
+          }
+        );
+      }
+    },
+    [user, router]
+  );
+
   const hasMaximumCapacity =
     event?.eventDetails?.isMaximumCapacitySet &&
     event?.eventDetails?.maximumCapacity;
@@ -152,6 +217,7 @@ const ContextProvider = ({ children }: any) => {
     "/reset-password",
     "/verify-otp",
     "/",
+    "/record",
   ];
 
   if (
@@ -253,6 +319,7 @@ const ContextProvider = ({ children }: any) => {
     allowAdditionalAttendees,
     additionalAttendees,
     id,
+    handleUploadVideo,
   };
 
   return (

@@ -34,7 +34,7 @@ const timeZones = [
   // North America
   { value: "EST", label: "Eastern Standard Time" },
   { value: "EDT", label: "Eastern Daylight Time" },
-  { value: "CST", label: "Central Standard Time" },
+  { value: "CST-NA", label: "Central Standard Time (North America)" },
   { value: "CDT", label: "Central Daylight Time" },
   { value: "MST", label: "Mountain Standard Time" },
   { value: "MDT", label: "Mountain Daylight Time" },
@@ -44,7 +44,7 @@ const timeZones = [
   { value: "AKDT", label: "Alaska Daylight Time" },
   { value: "HST", label: "Hawaii-Aleutian Standard Time" },
   { value: "HDT", label: "Hawaii-Aleutian Daylight Time" },
-  { value: "AST", label: "Atlantic Standard Time" },
+  { value: "AST-NA", label: "Atlantic Standard Time (North America)" },
   { value: "ADT", label: "Atlantic Daylight Time" },
   { value: "NST", label: "Newfoundland Standard Time" },
   { value: "NDT", label: "Newfoundland Daylight Time" },
@@ -64,7 +64,7 @@ const timeZones = [
   { value: "CEST", label: "Central European Summer Time" },
   { value: "EET", label: "Eastern European Time" },
   { value: "EEST", label: "Eastern European Summer Time" },
-  { value: "BST", label: "British Summer Time" },
+  { value: "BST-EU", label: "British Summer Time" },
   { value: "WET", label: "Western European Time" },
   { value: "WEST", label: "Western European Summer Time" },
   { value: "MSK", label: "Moscow Standard Time" },
@@ -78,10 +78,9 @@ const timeZones = [
   // Asia
   { value: "IST", label: "Indian Standard Time" },
   { value: "PKT", label: "Pakistan Standard Time" },
-  { value: "BST", label: "Bangladesh Standard Time" },
-  { value: "MST", label: "Myanmar Standard Time" },
+  { value: "BST-AS", label: "Bangladesh Standard Time" },
   { value: "ICT", label: "Indochina Time" },
-  { value: "CST", label: "China Standard Time" },
+  { value: "CST-AS", label: "China Standard Time" },
   { value: "SGT", label: "Singapore Time" },
   { value: "HKT", label: "Hong Kong Time" },
   { value: "JST", label: "Japan Standard Time" },
@@ -113,7 +112,7 @@ const timeZones = [
 
   // Middle East
   { value: "IRST", label: "Iran Standard Time" },
-  { value: "AST", label: "Arabia Standard Time" },
+  { value: "ARST", label: "Arabia Standard Time" },
   { value: "GST", label: "Gulf Standard Time" },
   { value: "AFT", label: "Afghanistan Time" },
 ];

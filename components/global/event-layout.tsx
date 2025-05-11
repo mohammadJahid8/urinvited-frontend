@@ -18,7 +18,7 @@ const EventLayout = ({ children }: any) => {
             <div className="px-4">{children}</div>
           </div>
           <div className="hidden lg:block h-screen overflow-y-auto bg-gray-100">
-            <Event className="" />
+            <Event className="mt-28" />
           </div>
         </div>
       ) : (

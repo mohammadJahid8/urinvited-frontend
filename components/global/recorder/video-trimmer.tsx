@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { RefreshCcw, Save, Play, Pause } from "lucide-react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
-
+import { useAppContext } from "@/lib/context";
+import { useRouter } from "next/navigation";
 const ffmpeg = new FFmpeg();
 interface VideoTrimmerProps {
   videoUrl: string;
@@ -15,6 +16,9 @@ interface VideoTrimmerProps {
 }
 
 export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
+  const { user, handleUploadVideo } = useAppContext();
+  const router = useRouter();
+
   const [timelineWidth, setTimelineWidth] = useState(600);
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -26,6 +30,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
   const isDraggingRef = useRef<"start" | "end" | "playhead" | null>(null);
 
   // State
+  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -570,7 +575,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
       "output.webm",
     ]);
 
-    const data = await ffmpeg.readFile("output.webm");
+    const data: any = await ffmpeg.readFile("output.webm");
     const trimmedBlob = new Blob([data.buffer], { type: "video/webm" });
     const url = URL.createObjectURL(trimmedBlob);
 
@@ -645,6 +650,16 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
       observer.disconnect();
     };
   }, []);
+
+  const handleUpload = async () => {
+    if (user?.email) {
+      setIsCreatingEvent(true);
+      await handleUploadVideo(trimmedURL ?? videoUrl, user);
+      setIsCreatingEvent(false);
+    } else {
+      return router.push("/login?video=" + (trimmedURL ?? videoUrl));
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -787,15 +802,37 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
           Record New Video
         </Button>
 
-        <Button onClick={handleTrim} className="gap-2" disabled={!!error}>
-          {isTrimming ? "Trimming..." : "✂️ Trim Video"}
-        </Button>
+        {trimStart !== 0 || trimEnd !== duration ? (
+          <Button
+            onClick={handleTrim}
+            className="gap-2"
+            disabled={!!error || isCreatingEvent}
+          >
+            {isTrimming ? "Trimming..." : "✂️ Trim Video"}
+          </Button>
+        ) : (
+          <Button
+            className="gap-2"
+            disabled={!!error || isCreatingEvent}
+            onClick={handleUpload}
+          >
+            {isCreatingEvent ? "Creating Event..." : "Create Event"}
+          </Button>
+        )}
       </div>
 
       {trimmedURL && (
-        <div className="mt-4">
+        <div className="mt-4 flex flex-col items-center gap-4">
           <h3 className="text-lg font-semibold">🎬 Trimmed Output</h3>
-          <video src={trimmedURL} controls className="w-full border" />
+          <video src={trimmedURL} controls className="max-w-96 border" />
+
+          <Button
+            className="gap-2"
+            disabled={!!error || isCreatingEvent}
+            onClick={handleUpload}
+          >
+            {isCreatingEvent ? "Creating Event..." : "Create Event"}
+          </Button>
         </div>
       )}
 

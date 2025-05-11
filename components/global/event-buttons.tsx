@@ -14,24 +14,24 @@ export default function EventButtons() {
       name: "details",
       label: "Event Details",
       path: "event-details",
-      href: `event-details?id=${id}`,
+      href: id ? `event-details?id=${id}` : "event-details",
     },
     {
       name: "customization",
       label: "Customization",
       path: "customization",
-      href: `customization?id=${id}`,
+      href: id ? `customization?id=${id}` : "customization",
     },
     {
       name: "additionalFeatures",
       label: "Additional features",
       path: "additional-features",
-      href: `additional-features?id=${id}`,
+      href: id ? `additional-features?id=${id}` : "additional-features",
     },
   ];
 
   return (
-    <div className="flex w-full sm:gap-2 gap-1 mt-4 p-4 sticky top-14 mb-4 bg-white z-10">
+    <div className="flex w-full sm:gap-2 gap-1 mt-4 p-4 sticky top-14 mb-8 bg-white z-10">
       {buttons.map((button) => (
         <Button
           key={button.name}

@@ -2,7 +2,6 @@ import { Video } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { Button } from "../ui/button";
-import RecordVideo from "./record-video";
 
 const InviteLanding = () => {
   return (
@@ -55,7 +54,10 @@ const InviteLanding = () => {
           Record Your Invite
         </Button>
 
-        <Button className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 font-semibold h-12">
+        <Button
+          href="https://urnotinvited.com/"
+          className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 font-semibold h-12"
+        >
           Browse Designer Templates
         </Button>
       </div>

@@ -20,12 +20,17 @@ export default function VideoRecorder({
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
-      // Clean up stream when component unmounts
+      // Clean up stream and interval when component unmounts
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
       }
     };
   }, []);
@@ -61,6 +66,7 @@ export default function VideoRecorder({
 
     onStartRecording();
     chunksRef.current = [];
+    setRecordingDuration(0);
 
     const mediaRecorder = new MediaRecorder(streamRef.current);
     mediaRecorderRef.current = mediaRecorder;
@@ -75,9 +81,17 @@ export default function VideoRecorder({
       const blob = new Blob(chunksRef.current, { type: "video/webm" });
       const videoUrl = URL.createObjectURL(blob);
       onVideoRecorded(videoUrl);
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
     };
 
     mediaRecorder.start();
+
+    // Start interval to update recording duration
+    recordingIntervalRef.current = setInterval(() => {
+      setRecordingDuration((prev) => prev + 1);
+    }, 1000);
   };
 
   const stopRecording = () => {
@@ -91,6 +105,18 @@ export default function VideoRecorder({
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
     }
+
+    if (recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+    }
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (
@@ -113,7 +139,9 @@ export default function VideoRecorder({
         {isRecording && (
           <div className="absolute top-4 left-4 flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-white text-sm font-medium">Recording</span>
+            <span className="text-white text-sm font-medium">
+              Recording {formatDuration(recordingDuration)}
+            </span>
           </div>
         )}
       </div>

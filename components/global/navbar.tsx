@@ -28,6 +28,11 @@ export default function Navbar() {
 
   const isTrackPage = pathname.includes("track");
   const isEventPage = pathname.includes("event/");
+  const eventDetailsPage = pathname.includes("event-details");
+  const customizationPage = pathname.includes("customization");
+  const additionalFeaturesPage = pathname.includes("additional-features");
+  const loginPage = pathname.includes("login");
+  const isVideoPreviewPage = pathname.includes("video-preview");
 
   const paramsId = searchParams.get("id");
   const preview = searchParams.get("preview");
@@ -35,7 +40,7 @@ export default function Navbar() {
   const queryString = searchParams.toString();
   const querySuffix = queryString ? `?${queryString}` : "";
   const isAdmin = user?.role === "admin";
-  if (isEventPage && !preview) {
+  if ((isEventPage && !preview) || loginPage) {
     return null;
   }
 
@@ -54,20 +59,27 @@ export default function Navbar() {
         </div>
       </div>
 
-      {id && !isTrackPage && (
+      {((id && !isTrackPage) ||
+        eventDetailsPage ||
+        customizationPage ||
+        additionalFeaturesPage) && (
         <>
           {!preview ? (
             <div className="flex h-14 items-center justify-between bg-white px-4 py-2">
               <Link
                 href={
-                  isAdmin
-                    ? "/manage-events"
+                  isAdmin || isVideoPreviewPage
+                    ? isAdmin
+                      ? "/manage-events"
+                      : `/events`
                     : `/video-preview${querySuffix || "?id=" + id}`
                 }
                 className="flex items-center gap-1 text-base font-semibold text-[#2E333B] hover:text-[#4A61FF]"
               >
                 <ChevronLeft className="h-6 w-6" />
-                {isAdmin ? "Back to Dashboard" : "Back to Video"}
+                {isAdmin || isVideoPreviewPage
+                  ? "Back to Dashboard"
+                  : "Back to Video"}
               </Link>
               <Button
                 href={`/event/${id}?preview=true`}

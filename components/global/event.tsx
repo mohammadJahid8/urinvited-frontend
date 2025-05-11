@@ -59,6 +59,8 @@ export default function Event({ className }: any) {
     }
   }, [rsvp]);
 
+  console.log({ formData, event });
+
   const eventDetails = formData?.eventDetails || event?.eventDetails;
   const customization = formData?.customization || event?.customization;
   const additionalFeatures =
@@ -217,12 +219,6 @@ export default function Event({ className }: any) {
   };
   return (
     <>
-      {/* <MetaTags
-        title={eventDetails?.title}
-        description={eventDetails?.description}
-        image={thumbnailImage}
-        id={id}
-      /> */}
       <div
         className={cn("p-4 md:p-10", className)}
         style={{
