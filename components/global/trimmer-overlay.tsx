@@ -1,29 +1,20 @@
 import { LoaderCircle } from "lucide-react";
 import { useEffect } from "react";
 
-function TrimmerOverlay({ onClose }: { onClose: () => void }) {
+function TrimmerOverlay() {
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const overlayElement = document.getElementById("trimmer-overlay");
-      if (overlayElement && !overlayElement.contains(event.target as Node)) {
-        onClose();
-      }
-    };
-
     const disableScroll = (event: Event) => {
       event.preventDefault();
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("wheel", disableScroll, { passive: false });
     document.addEventListener("touchmove", disableScroll, { passive: false });
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("wheel", disableScroll);
       document.removeEventListener("touchmove", disableScroll);
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <div
