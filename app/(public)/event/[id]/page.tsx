@@ -15,22 +15,30 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   const title = eventDetails?.title;
   const startDate = eventDetails?.startDate;
   const startTime = eventDetails?.startTime;
-  // const endDate = eventDetails?.endDate;
-  // const endTime = eventDetails?.endTime;
   const description = eventDetails?.inviteDetails?.replace(/<[^>]*>?/g, "");
   const thumbnailImage =
     event?.video?.videos[event?.video?.videos?.length - 1]?.thumbnail;
   const hostedBy = event?.hostedBy;
 
-  return {
-    title: `${title} - ${hostedBy}`,
-    description: `${dateFormatter(startDate)} @ ${convertTime(startTime)}${
-      description ? ` : ${description}` : ""
-    }`,
-    openGraph: {
+  const metadata: Metadata = {};
+
+  if (title && hostedBy) {
+    metadata.title = `${title} - ${hostedBy}`;
+  }
+
+  if (startDate && startTime) {
+    metadata.description = `${dateFormatter(startDate)} @ ${convertTime(
+      startTime
+    )}${description ? ` : ${description}` : ""}`;
+  }
+
+  if (thumbnailImage) {
+    metadata.openGraph = {
       images: [thumbnailImage],
-    },
-  };
+    };
+  }
+
+  return metadata;
 }
 
 const PublicPreviewPage = () => {

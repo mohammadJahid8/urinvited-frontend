@@ -9,6 +9,7 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useAppContext } from "@/lib/context";
 import { useRouter } from "next/navigation";
+import LoadingOverlay from "../loading-overlay";
 // const ffmpeg = new FFmpeg();
 interface VideoTrimmerProps {
   videoUrl: string;
@@ -50,7 +51,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
   // Use a separate state to force re-render of frames
   const [frameKey, setFrameKey] = useState(0);
 
-  console.log({ timelineWidth });
+  // console.log({ timelineWidth });
 
   // Generate placeholder frames
   const generatePlaceholderFrames = useCallback((count: number) => {
@@ -237,6 +238,8 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
     [extractSingleFrame, generatePlaceholderFrames]
   );
 
+  // console.log({ isLoading });
+
   // Initialize video
   useEffect(() => {
     let mounted = true;
@@ -261,6 +264,8 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
     hiddenVideo.preload = "metadata";
     hiddenVideoRef.current = hiddenVideo;
 
+    // console.log("mounted", mounted);
+
     // Set up timeout to prevent waiting indefinitely
     const timeoutId = setTimeout(() => {
       if (mounted) {
@@ -270,7 +275,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
         }
         setIsLoading(false);
       }
-    }, 8000);
+    }, 1000);
 
     // Load the video and try to determine its properties
     hiddenVideo.addEventListener("loadeddata", async () => {
@@ -288,7 +293,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
           .then((estimatedDuration) => {
             if (!mounted) return;
 
-            console.log("Estimated duration:", estimatedDuration);
+            // console.log("Estimated duration:", estimatedDuration);
             const validDuration =
               isFinite(estimatedDuration) && estimatedDuration > 0
                 ? estimatedDuration
@@ -334,7 +339,6 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
     extractFramesSimple,
     generatePlaceholderFrames,
     handleError,
-    timelineWidth,
   ]);
 
   // Update current time during playback
@@ -550,6 +554,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
 
   // Save trimmed video
   const handleTrim = async () => {
+    setIsTrimming(true);
     if (!videoUrl) return;
     if (!ffmpeg.loaded) {
       const baseURL = `https://unpkg.com/@ffmpeg/core@0.12.5/dist/umd`;
@@ -566,7 +571,6 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
       });
     }
 
-    setIsTrimming(true);
     setTrimmedURL(null);
 
     const startTime = (startPosition / timelineWidth) * duration;
@@ -628,7 +632,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
       <div
         key={`${idx}-${frameKey}`}
         className="h-full relative border-r border-gray-200 last:border-r-0"
-        style={{ width: `${timelineWidth / frames.length}px` }}
+        style={{ width: `100%` }}
       >
         <img
           src={src || "/placeholder.svg"}
@@ -678,6 +682,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
 
   return (
     <div className="flex flex-col">
+      {isTrimming && <LoadingOverlay />}
       <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
         <video
           ref={videoRef}
@@ -716,7 +721,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
         </div>
       </div>
 
-      <div className="mb-6 mx-auto">
+      <div className="mb-6 mx-4 md:mx-auto">
         {/* Timeline Container */}
         <div
           ref={timelineContainerRef}
@@ -839,7 +844,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
       {trimmedURL && (
         <div className="mt-4 flex flex-col items-center gap-4">
           <h3 className="text-lg font-semibold">🎬 Trimmed Output</h3>
-          <video src={trimmedURL} controls className="max-w-96 border" />
+          <video src={trimmedURL} controls className="md:max-w-96 rounded" />
 
           <Button
             className="gap-2"
