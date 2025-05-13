@@ -9,6 +9,7 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useAppContext } from "@/lib/context";
 import { useRouter } from "next/navigation";
+import TrimmerOverlay from "../trimmer-overlay";
 import LoadingOverlay from "../loading-overlay";
 // const ffmpeg = new FFmpeg();
 interface VideoTrimmerProps {
@@ -552,24 +553,44 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
     [positionToTime, timelineWidth]
   );
 
+  useEffect(() => {
+    const loadFFmpeg = async () => {
+      if (!ffmpeg.loaded) {
+        const baseURL = `https://unpkg.com/@ffmpeg/core@0.12.5/dist/umd`;
+        await ffmpeg.load({
+          coreURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.js`,
+            "text/javascript"
+          ),
+          wasmURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.wasm`,
+            "application/wasm"
+          ),
+        });
+        console.log("ffmpeg loaded");
+      }
+    };
+    loadFFmpeg();
+  }, []);
+
   // Save trimmed video
   const handleTrim = async () => {
     setIsTrimming(true);
     if (!videoUrl) return;
-    if (!ffmpeg.loaded) {
-      const baseURL = `https://unpkg.com/@ffmpeg/core@0.12.5/dist/umd`;
+    // if (!ffmpeg.loaded) {
+    //   const baseURL = `https://unpkg.com/@ffmpeg/core@0.12.5/dist/umd`;
 
-      await ffmpeg.load({
-        coreURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.js`,
-          "text/javascript"
-        ),
-        wasmURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.wasm`,
-          "application/wasm"
-        ),
-      });
-    }
+    //   await ffmpeg.load({
+    //     coreURL: await toBlobURL(
+    //       `${baseURL}/ffmpeg-core.js`,
+    //       "text/javascript"
+    //     ),
+    //     wasmURL: await toBlobURL(
+    //       `${baseURL}/ffmpeg-core.wasm`,
+    //       "application/wasm"
+    //     ),
+    //   });
+    // }
 
     setTrimmedURL(null);
 
@@ -580,6 +601,19 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
     const blob = await res.blob();
     await ffmpeg.writeFile("input.webm", await fetchFile(blob));
 
+    // await ffmpeg.exec([
+    //   "-i",
+    //   "input.webm",
+    //   "-ss",
+    //   `${startTime}`,
+    //   "-to",
+    //   `${endTime}`,
+    //   "-c:v",
+    //   "libvpx",
+    //   "-c:a",
+    //   "libvorbis",
+    //   "output.webm",
+    // ]);
     await ffmpeg.exec([
       "-i",
       "input.webm",
@@ -587,6 +621,10 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
       `${startTime}`,
       "-to",
       `${endTime}`,
+      "-vf",
+      "scale=640:-2",
+      "-b:v",
+      "500k",
       "-c:v",
       "libvpx",
       "-c:a",
@@ -598,7 +636,8 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
     const trimmedBlob = new Blob([data.buffer], { type: "video/webm" });
     const url = URL.createObjectURL(trimmedBlob);
 
-    setTrimmedURL(url);
+    router.push("/record/output?video=" + url);
+    // setTrimmedURL(url);
     setIsTrimming(false);
   };
 
@@ -682,8 +721,9 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
 
   return (
     <div className="flex flex-col">
-      {isTrimming && <LoadingOverlay />}
-      <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
+      {isCreatingEvent && <LoadingOverlay />}
+      {isTrimming && <TrimmerOverlay />}
+      <div className="relative w-full bg-black rounded-lg overflow-hidden mb-4">
         <video
           ref={videoRef}
           className="w-full h-full"
@@ -841,7 +881,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
         )}
       </div>
 
-      {trimmedURL && (
+      {/* {trimmedURL && (
         <div className="mt-4 flex flex-col items-center gap-4">
           <h3 className="text-lg font-semibold">🎬 Trimmed Output</h3>
           <video src={trimmedURL} controls className="md:max-w-96 rounded" />
@@ -854,7 +894,7 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
             {isCreatingEvent ? "Creating Event..." : "Create Event"}
           </Button>
         </div>
-      )}
+      )} */}
 
       {/* Hidden canvas for frame extraction */}
       <canvas ref={canvasRef} className="hidden" />

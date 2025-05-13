@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 
 const InviteLanding = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 p-8 space-y-10 md:mt-28 mt-20">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 p-8 space-y-10 mt-20  3xl:mt-0">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-gray-800">
           Every Great Event Deserves a Story.

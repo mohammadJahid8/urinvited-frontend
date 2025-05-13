@@ -2,7 +2,8 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, StopCircle } from "lucide-react";
+import { Camera, StopCircle, AlertCircle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface VideoRecorderProps {
   onVideoRecorded: (videoUrl: string) => void;
@@ -22,6 +23,7 @@ export default function VideoRecorder({
   const [error, setError] = useState<string | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     return () => {
@@ -38,6 +40,8 @@ export default function VideoRecorder({
   const startCamera = async () => {
     try {
       setError(null);
+      setIsLoading(true);
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -48,9 +52,11 @@ export default function VideoRecorder({
       }
 
       streamRef.current = stream;
+      setIsLoading(false);
     } catch (err) {
       console.error("Error accessing camera:", err);
       setError("Could not access camera. Please check permissions.");
+      setIsLoading(false);
     }
   };
 
@@ -120,27 +126,50 @@ export default function VideoRecorder({
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
-        {error ? (
-          <div className="absolute inset-0 flex items-center justify-center text-white bg-red-500/20">
-            <p>{error}</p>
+    <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
+      <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden mb-6 shadow-lg">
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+            <Loader2 className="w-8 h-8 text-white animate-spin" />
+            <span className="sr-only">Loading camera...</span>
+          </div>
+        ) : error ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gray-900 text-white">
+            <AlertCircle className="w-10 h-10 text-red-500 mb-2" />
+            <p className="text-center font-medium">{error}</p>
+            <Button
+              variant="outline"
+              className="mt-4 text-white border-white hover:bg-white/10"
+              onClick={startCamera}
+            >
+              Try Again
+            </Button>
           </div>
         ) : (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full h-full"
-          />
+          <>
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full"
+            />
+            <div
+              className={cn(
+                "absolute inset-0 pointer-events-none transition-opacity duration-300",
+                isRecording
+                  ? "border-4 border-red-500/70 rounded-xl"
+                  : "opacity-0"
+              )}
+            />
+          </>
         )}
 
         {isRecording && (
-          <div className="absolute top-4 left-4 flex items-center gap-2">
+          <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/60 px-3 py-1.5 rounded-full backdrop-blur-sm">
             <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
             <span className="text-white text-sm font-medium">
-              Recording {formatDuration(recordingDuration)}
+              {formatDuration(recordingDuration)}
             </span>
           </div>
         )}
@@ -148,17 +177,27 @@ export default function VideoRecorder({
 
       <div className="flex justify-center gap-4">
         {!isRecording ? (
-          <Button onClick={startRecording} className="gap-2" disabled={!!error}>
-            <Camera className="h-4 w-4" />
+          <Button
+            onClick={startRecording}
+            className="gap-2 px-6 py-5 text-base font-medium transition-all hover:scale-105"
+            disabled={!!error || isLoading}
+            size="lg"
+          >
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Camera className="h-5 w-5" />
+            )}
             Start Recording
           </Button>
         ) : (
           <Button
             onClick={stopRecording}
             variant="destructive"
-            className="gap-2"
+            className="gap-2 px-6 py-5 text-base font-medium transition-all hover:scale-105 animate-pulse"
+            size="lg"
           >
-            <StopCircle className="h-4 w-4" />
+            <StopCircle className="h-5 w-5" />
             Stop Recording
           </Button>
         )}
