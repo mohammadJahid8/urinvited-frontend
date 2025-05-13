@@ -218,6 +218,7 @@ const ContextProvider = ({ children }: any) => {
     "/verify-otp",
     "/",
     "/record",
+    "/record/output",
   ];
 
   if (
