@@ -79,7 +79,6 @@ export default function VideoTrimmer({ videoUrl, onReset }: VideoTrimmerProps) {
   const estimateVideoDuration = useCallback(
     (video: HTMLVideoElement): Promise<number> => {
       return new Promise((resolve, reject) => {
-        // Set a timeout in case seeking doesn't work
         const timeoutId = setTimeout(() => {
           reject(new Error("Timeout estimating duration"));
         }, 5000);
