@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { redirect, useRouter, useSearchParams } from "next/navigation";
-import { Pencil, Video } from "lucide-react";
+import { Video } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useAppContext } from "@/lib/context";
@@ -20,11 +20,7 @@ const ReactPlayer = dynamic(() => import("react-player/lazy"), {
   ),
 });
 
-interface OutputPageProps {
-  videoUrl?: string;
-}
-
-const OutputPage: React.FC<OutputPageProps> = () => {
+export default function OutputPage() {
   const { user, handleUploadVideo } = useAppContext();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -170,6 +166,4 @@ const OutputPage: React.FC<OutputPageProps> = () => {
       </div>
     </div>
   );
-};
-
-export default OutputPage;
+}
