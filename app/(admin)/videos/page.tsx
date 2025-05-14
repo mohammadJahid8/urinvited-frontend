@@ -8,126 +8,7 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { FeedbackDialog } from "@/components/global/feedback-dialog";
 import { EditVideoDialog } from "@/components/global/edit-video-dialog";
-
-// const videos = [
-//   {
-//     uploadedBy: 'John Doe',
-//     user: 'jahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Admin',
-//     user: 'admin@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'Nahid',
-//     user: 'nahid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-//   {
-//     uploadedBy: 'test',
-//     user: 'nahtestid@gmail.com',
-//     eventDate: '2024-01-01',
-//     status: 'Pending',
-//     comments:
-//       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.',
-//     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-//   },
-// ];
+import { ViewVideoModal } from "@/components/global/view-video-modal";
 
 const VideosPage = () => {
   const {
@@ -207,14 +88,9 @@ const VideosPage = () => {
               feedbacks={video.feedbacks}
               userEmail={video.userEmail}
             />
-            <Button
-              variant="outline"
-              size="sm"
-              href={video?.videos[video?.videos?.length - 1]?.url}
-              target="_blank"
-            >
-              View Video
-            </Button>
+            <ViewVideoModal
+              videoUrl={video?.videos[video?.videos?.length - 1]?.url}
+            />
 
             <EditVideoDialog video={video} refetch={refetch} />
           </div>

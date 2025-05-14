@@ -349,14 +349,17 @@ export default function GuestsTable({
             className="w-full sm:max-w-sm"
           />
         </div>
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table className="w-full">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
+                  {headerGroup.headers.map((header, index) => {
                     return (
-                      <TableHead key={header.id}>
+                      <TableHead
+                        key={header.id}
+                        className={index === 0 ? "sticky left-0 bg-white" : ""}
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -376,8 +379,11 @@ export default function GuestsTable({
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                    {row.getVisibleCells().map((cell, index) => (
+                      <TableCell
+                        key={cell.id}
+                        className={index === 0 ? "sticky left-0 bg-white" : ""}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
