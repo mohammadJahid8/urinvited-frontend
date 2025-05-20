@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import useStore from "@/app/store/useStore";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { format, parse } from "date-fns";
 import { cn } from "@/lib/utils";
 import RSVPSheet from "./rsvp-sheet";
 import api from "@/utils/axiosInstance";
@@ -28,6 +27,7 @@ import { CommentModal } from "./comment-modal";
 import Head from "next/head";
 import dateFormatter from "@/utils/dateFormatter";
 import { formatInTimeZone } from "date-fns-tz";
+import { createImageUrl } from "@/utils/createImageUrl";
 
 export default function Event({ className }: any) {
   const { formData } = useStore();
@@ -151,13 +151,6 @@ export default function Event({ className }: any) {
   if (isEventLoading) {
     return <div>Loading...</div>;
   }
-
-  const createImageUrl = (image: any) =>
-    typeof image === "string"
-      ? image
-      : image
-      ? URL.createObjectURL(image)
-      : null;
 
   const eventLogo = createImageUrl(customization?.eventLogo);
   const themeBackgroundImage = createImageUrl(

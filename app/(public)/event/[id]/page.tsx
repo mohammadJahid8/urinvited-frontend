@@ -1,6 +1,7 @@
 import Event from "@/components/global/event";
 import api from "@/utils/axiosInstance";
 import convertTime from "@/utils/convertTime";
+import { createImageUrl } from "@/utils/createImageUrl";
 import dateFormatter from "@/utils/dateFormatter";
 import { Metadata } from "next";
 import React from "react";
@@ -11,12 +12,15 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   const response = await api.get(`/event/${id}`);
 
   const event = response?.data?.data;
+  const customization = event?.customization;
+  console.log("🚀 ~ generateMetadata ~ customization:", customization);
   const eventDetails = event?.eventDetails?.events?.[0];
   const title = eventDetails?.title;
   const startDate = eventDetails?.startDate;
   const startTime = eventDetails?.startTime;
   const description = eventDetails?.inviteDetails?.replace(/<[^>]*>?/g, "");
   const thumbnailImage =
+    createImageUrl(customization?.thumbnailImage) ||
     event?.video?.videos[event?.video?.videos?.length - 1]?.thumbnail;
   const hostedBy = event?.hostedBy;
 
