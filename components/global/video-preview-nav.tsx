@@ -76,7 +76,7 @@ export default function VideoPreviewNav() {
           Suggest Feedback
         </Button>
 
-        <FeedbackSheet />
+        {/* <FeedbackSheet /> */}
 
         <Button
           href={`/event-details?id=${event?._id}`}

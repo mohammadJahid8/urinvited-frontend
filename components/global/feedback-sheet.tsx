@@ -1,30 +1,30 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Smile, Paperclip, Send, Download, Copy } from 'lucide-react';
-import { useAppContext } from '@/lib/context';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useState } from 'react';
-import CreateTicket from './create-ticket';
-import { cn } from '@/lib/utils';
-import { Card, CardContent } from '../ui/card';
-import { toast } from 'sonner';
-import moment from 'moment';
+import * as React from "react";
+import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Smile, Paperclip, Send, Download, Copy } from "lucide-react";
+import { useAppContext } from "@/lib/context";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import CreateTicket from "./create-ticket";
+import { cn } from "@/lib/utils";
+import { Card, CardContent } from "../ui/card";
+import { toast } from "sonner";
+import moment from "moment";
 export function FeedbackSheet() {
   const { openFeedback, setOpenFeedback, event, downloadFile } =
     useAppContext();
-  const [currentTab, setCurrentTab] = useState<'message' | 'history'>(
-    'message'
+  const [currentTab, setCurrentTab] = useState<"message" | "history">(
+    "message"
   );
 
   const feedbacks = event?.video?.feedbacks;
 
   return (
     <Sheet open={openFeedback} onOpenChange={setOpenFeedback}>
-      <SheetContent className='sm:max-w-[480px] w-full p-0'>
-        <div className='h-full overflow-y-auto'>
+      <SheetContent className="sm:max-w-[480px] w-full p-0">
+        <div className="h-full overflow-y-auto">
           <HistoryTab feedbacks={feedbacks} downloadFile={downloadFile} />
           {/* {currentTab === 'message' && <MessageTab feedbacks={feedbacks} />}
           {currentTab === 'history' && (
@@ -39,9 +39,9 @@ export function FeedbackSheet() {
 const HistoryTab = ({ feedbacks, downloadFile }: any) => {
   const [openCreateTicket, setOpenCreateTicket] = useState(false);
   return (
-    <div className='flex flex-col gap-2 p-4 mb-16'>
-      <div className='flex flex-col gap-2 bg-gray-50 p-4'>
-        <p className='text-sm text-muted-foreground'>
+    <div className="flex flex-col gap-2 p-4 mb-16">
+      <div className="flex flex-col gap-2 bg-gray-50 p-4">
+        <p className="text-sm text-muted-foreground">
           Submit up to 3 tickets for revisions and feedback ({feedbacks.length}
           /3)
         </p>
@@ -49,16 +49,16 @@ const HistoryTab = ({ feedbacks, downloadFile }: any) => {
           onClick={() => {
             if (feedbacks.length >= 3) {
               return toast.error(
-                'You have reached the maximum number of tickets',
+                "You have reached the maximum number of tickets",
                 {
-                  position: 'top-center',
+                  position: "top-center",
                 }
               );
             }
             setOpenCreateTicket(true);
           }}
-          size='sm'
-          className='bg-primary text-white w-max'
+          size="sm"
+          className="bg-primary text-white w-max"
         >
           Create Ticket
         </Button>
@@ -67,14 +67,15 @@ const HistoryTab = ({ feedbacks, downloadFile }: any) => {
           onOpenChange={setOpenCreateTicket}
         />
       </div>
-      <div className='flex flex-col gap-2'>
-        {feedbacks.map((feedback: any, index: any) => (
-          <FeedbackTicket
-            key={index}
-            {...feedback}
-            downloadFile={downloadFile}
-          />
-        ))}
+      <div className="flex flex-col gap-2">
+        {feedbacks.length > 0 &&
+          feedbacks.map((feedback: any, index: any) => (
+            <FeedbackTicket
+              key={index}
+              {...feedback}
+              downloadFile={downloadFile}
+            />
+          ))}
       </div>
     </div>
   );
@@ -89,62 +90,62 @@ export default function FeedbackTicket({
   downloadFile,
 }: any) {
   return (
-    <Card className=''>
-      <CardContent className='p-6'>
-        <div className='flex items-start justify-between'>
-          <div className='space-y-4 flex-1'>
-            <div className='grid grid-cols-[120px,1fr] gap-2 items-center'>
-              <span className='text-sm text-muted-foreground'>Ticket ID:</span>
-              <div className='flex items-center gap-2'>
-                <span className='uppercase'>{_id.slice(-6)}...</span>
+    <Card className="">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="space-y-4 flex-1">
+            <div className="grid grid-cols-[120px,1fr] gap-2 items-center">
+              <span className="text-sm text-muted-foreground">Ticket ID:</span>
+              <div className="flex items-center gap-2">
+                <span className="uppercase">{_id?.slice(-6)}...</span>
                 <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-6 w-6'
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
                   onClick={() => {
                     navigator.clipboard.writeText(_id);
-                    toast.success('Copied to clipboard');
+                    toast.success("Copied to clipboard");
                   }}
                 >
-                  <Copy className='h-4 w-4 text-blue-500' />
+                  <Copy className="h-4 w-4 text-blue-500" />
                 </Button>
               </div>
             </div>
 
-            <div className='grid grid-cols-[120px,1fr] gap-2 items-center'>
-              <span className='text-sm text-muted-foreground'>
+            <div className="grid grid-cols-[120px,1fr] gap-2 items-center">
+              <span className="text-sm text-muted-foreground">
                 Feedback Type:
               </span>
               <span>{feedbackType}</span>
             </div>
 
-            <div className='grid grid-cols-[120px,1fr] gap-2 items-center'>
-              <span className='text-sm text-muted-foreground'>Logged On</span>
-              <span>{moment(createdAt).format('DD-MM-YYYY')}</span>
+            <div className="grid grid-cols-[120px,1fr] gap-2 items-center">
+              <span className="text-sm text-muted-foreground">Logged On</span>
+              <span>{moment(createdAt).format("DD-MM-YYYY")}</span>
             </div>
 
-            <div className='grid grid-cols-[120px,1fr] gap-2'>
-              <span className='text-sm text-muted-foreground'>Feedback</span>
+            <div className="grid grid-cols-[120px,1fr] gap-2">
+              <span className="text-sm text-muted-foreground">Feedback</span>
               <div
-                className='text-sm'
+                className="text-sm"
                 dangerouslySetInnerHTML={{ __html: feedback }}
               />
             </div>
 
             {attachment && (
-              <div className='grid grid-cols-[120px,1fr] gap-2'>
-                <span className='text-sm text-muted-foreground'>
+              <div className="grid grid-cols-[120px,1fr] gap-2">
+                <span className="text-sm text-muted-foreground">
                   Attachment :
                 </span>
-                <div className='flex items-center gap-2 bg-blue-50 rounded-md p-2 w-max'>
-                  <span className='text-sm text-blue-500'>file</span>
+                <div className="flex items-center gap-2 bg-blue-50 rounded-md p-2 w-max">
+                  <span className="text-sm text-blue-500">file</span>
                   <Button
-                    variant='ghost'
-                    size='icon'
-                    className='h-6 w-6'
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
                     onClick={() => downloadFile(attachment, attachment)}
                   >
-                    <Download className='h-4 w-4' />
+                    <Download className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -236,13 +237,13 @@ interface ChatContainerProps {
 }
 function ChatContainer({ children }: ChatContainerProps) {
   return (
-    <div className='flex flex-col p-4'>
-      <h2 className='text-base font-medium'>Chat</h2>
-      <p className='text-sm text-muted-foreground'>
+    <div className="flex flex-col p-4">
+      <h2 className="text-base font-medium">Chat</h2>
+      <p className="text-sm text-muted-foreground">
         Chat here for quick queries and resolutions. Expect a response within 24
         working hours.
       </p>
-      <div className='mt-4 space-y-4'>{children}</div>
+      <div className="mt-4 space-y-4">{children}</div>
     </div>
   );
 }
@@ -259,24 +260,24 @@ function ChatMessage({
   isAdmin = false,
   message,
   timestamp,
-  avatarSrc = '/placeholder.svg',
+  avatarSrc = "/placeholder.svg",
   avatarFallback,
 }: ChatMessageProps) {
   if (isAdmin) {
     return (
-      <div className='flex flex-col gap-2'>
-        <div className='flex items-center gap-2'>
-          <Avatar className='h-8 w-8'>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8">
             <AvatarImage src={avatarSrc} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
-          <span className='text-xs font-medium'>Admin</span>
+          <span className="text-xs font-medium">Admin</span>
         </div>
         <div>
-          <div className='flex flex-col border rounded-lg p-3'>
-            <p className='text-sm'>{message}</p>
+          <div className="flex flex-col border rounded-lg p-3">
+            <p className="text-sm">{message}</p>
           </div>
-          <span className='mt-1 text-xs text-muted-foreground'>
+          <span className="mt-1 text-xs text-muted-foreground">
             {timestamp}
           </span>
         </div>
@@ -285,14 +286,14 @@ function ChatMessage({
   }
 
   return (
-    <div className='flex justify-end gap-2'>
+    <div className="flex justify-end gap-2">
       <div>
-        <div className='flex flex-col border rounded-lg p-3'>
-          <p className='text-sm'>{message}</p>
+        <div className="flex flex-col border rounded-lg p-3">
+          <p className="text-sm">{message}</p>
         </div>
-        <span className='mt-1 text-xs text-muted-foreground'>{timestamp}</span>
+        <span className="mt-1 text-xs text-muted-foreground">{timestamp}</span>
       </div>
-      <Avatar className='h-8 w-8'>
+      <Avatar className="h-8 w-8">
         <AvatarImage src={avatarSrc} />
         <AvatarFallback>{avatarFallback}</AvatarFallback>
       </Avatar>

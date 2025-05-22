@@ -17,15 +17,17 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ChevronLeft } from "lucide-react";
 import { Button } from "../ui/button";
+import { FeedbackSheet } from "./feedback-sheet";
 
 export default function Navbar() {
-  const { user, logout, event } = useAppContext();
+  const { user, logout, event, downloadFile, setOpenFeedback } =
+    useAppContext();
   const router = useRouter();
   const { id: urlId } = useParams();
   const searchParams = useSearchParams();
 
   const pathname = usePathname();
-
+  const videoData = event?.video?.videos[event?.video?.videos?.length - 1];
   const isTrackPage = pathname.includes("track");
   const isEventPage = pathname.includes("event/");
   const eventDetailsPage = pathname.includes("event-details");
@@ -81,12 +83,39 @@ export default function Navbar() {
                   ? "Back to Dashboard"
                   : "Back to Video"}
               </Link>
-              <Button
-                href={`/event/${id}?preview=true`}
-                className="bg-[#4A61FF] hover:bg-[#4338CA] px-6"
-              >
-                Preview
-              </Button>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => downloadFile(videoData?.url, "download")}
+                  variant="outline"
+                  className="flex items-center gap-2 border-primary text-primary sm:text-sm text-xs px-2 sm:px-4"
+                >
+                  Download
+                </Button>
+
+                <Button
+                  onClick={() => setOpenFeedback(true)}
+                  variant="outline"
+                  className="text-primary border-primary sm:text-sm text-xs px-2 sm:px-4"
+                >
+                  Suggest Feedback
+                </Button>
+
+                <FeedbackSheet />
+
+                <Button
+                  href={`/event-details?id=${event?._id}`}
+                  className="bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4"
+                >
+                  Event Details
+                </Button>
+                <Button
+                  href={`/event/${id}?preview=true`}
+                  className="bg-[#4A61FF] hover:bg-[#4338CA] px-6"
+                >
+                  Preview
+                </Button>
+              </div>
             </div>
           ) : (
             <Button

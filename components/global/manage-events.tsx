@@ -1,5 +1,5 @@
 "use client";
-import { Edit, Search, Share2, Trash2 } from "lucide-react";
+import { Edit, Search, Share2, Trash2, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,13 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import useStore from "@/app/store/useStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ManageEvents({ title }: { title: string }) {
   const { events, isEventsLoading, user, statusCountsData, refetchEvents } =
@@ -26,35 +33,81 @@ export default function ManageEvents({ title }: { title: string }) {
   const { updateFormData } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [sortBy, setSortBy] = useState("date_asc");
 
-  const filteredEvents = events?.filter((event: any) => {
-    const eventTitle = event?.eventDetails?.events?.[0]?.title?.toLowerCase();
-    const eventDate = moment(
-      event?.eventDetails?.events?.[0]?.startDate
-    ).format("MM/DD/YYYY");
-    return (
-      eventTitle?.includes(searchTerm.toLowerCase()) ||
-      eventDate.includes(searchTerm) ||
-      event?.userEmail?.toLowerCase()?.includes(searchTerm.toLowerCase())
-    );
-  });
+  // Memoize filtered events to prevent unnecessary recalculations
+  const filteredEvents = useMemo(() => {
+    if (!events) return [];
 
-  const upcomingEvents = filteredEvents?.filter((event: any) => {
-    const eventDate = moment(event?.eventDetails?.events?.[0]?.startDate);
-    return eventDate.isAfter(moment());
-  });
+    return events.filter((event: any) => {
+      const eventTitle = event?.eventDetails?.events?.[0]?.title?.toLowerCase();
+      const eventDate = moment(
+        event?.eventDetails?.events?.[0]?.startDate
+      ).format("MM/DD/YYYY");
+      return (
+        eventTitle?.includes(searchTerm.toLowerCase()) ||
+        eventDate.includes(searchTerm) ||
+        event?.userEmail?.toLowerCase()?.includes(searchTerm.toLowerCase())
+      );
+    });
+  }, [events, searchTerm]);
 
-  const pastEvents = filteredEvents?.filter((event: any) => {
-    const eventDate = moment(event?.eventDetails?.events?.[0]?.startDate);
-    return eventDate.isBefore(moment());
-  });
+  // Memoize sorted events
+  const sortedEvents = useMemo(() => {
+    if (!filteredEvents) return [];
 
-  const tbdEvents = events?.filter((event: any) => {
-    return (
-      event?.eventDetails?.events?.[0]?.when === "tbd" ||
-      event?.eventDetails?.events?.length === 0
-    );
-  });
+    return [...filteredEvents].sort((a: any, b: any) => {
+      switch (sortBy) {
+        case "date_asc":
+          return (
+            moment(a?.eventDetails?.events?.[0]?.startDate).valueOf() -
+            moment(b?.eventDetails?.events?.[0]?.startDate).valueOf()
+          );
+        case "date_desc":
+          return (
+            moment(b?.eventDetails?.events?.[0]?.startDate).valueOf() -
+            moment(a?.eventDetails?.events?.[0]?.startDate).valueOf()
+          );
+        case "title_asc":
+          return (a?.eventDetails?.events?.[0]?.title || "").localeCompare(
+            b?.eventDetails?.events?.[0]?.title || ""
+          );
+        case "title_desc":
+          return (b?.eventDetails?.events?.[0]?.title || "").localeCompare(
+            a?.eventDetails?.events?.[0]?.title || ""
+          );
+        case "rsvp_asc":
+          return (a?.rsvps?.length || 0) - (b?.rsvps?.length || 0);
+        case "rsvp_desc":
+          return (b?.rsvps?.length || 0) - (a?.rsvps?.length || 0);
+        default:
+          return 0;
+      }
+    });
+  }, [filteredEvents, sortBy]);
+
+  const upcomingEvents = useMemo(() => {
+    return sortedEvents?.filter((event: any) => {
+      const eventDate = moment(event?.eventDetails?.events?.[0]?.startDate);
+      return eventDate.isAfter(moment());
+    });
+  }, [sortedEvents]);
+
+  const pastEvents = useMemo(() => {
+    return sortedEvents?.filter((event: any) => {
+      const eventDate = moment(event?.eventDetails?.events?.[0]?.startDate);
+      return eventDate.isBefore(moment());
+    });
+  }, [sortedEvents]);
+
+  const tbdEvents = useMemo(() => {
+    return sortedEvents?.filter((event: any) => {
+      return (
+        event?.eventDetails?.events?.[0]?.when === "tbd" ||
+        event?.eventDetails?.events?.length === 0
+      );
+    });
+  }, [sortedEvents]);
 
   const eventsToDisplay =
     activeTab === "upcoming"
@@ -63,7 +116,7 @@ export default function ManageEvents({ title }: { title: string }) {
       ? pastEvents
       : activeTab === "tbd"
       ? tbdEvents
-      : filteredEvents;
+      : sortedEvents;
 
   return (
     <div className="">
@@ -80,7 +133,7 @@ export default function ManageEvents({ title }: { title: string }) {
         </Button>
       </div>
 
-      {/* Tabs and Search Section */}
+      {/* Tabs, Search and Sort Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <Button
@@ -111,14 +164,29 @@ export default function ManageEvents({ title }: { title: string }) {
             TBD Events ({tbdEvents?.length || 0})
           </Button>
         </div>
-        <div className="relative w-full md:w-[300px]">
-          <Input
-            placeholder="Search event by title or email..."
-            className="pl-8 pr-4 py-2 w-full border rounded-md"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Search className="absolute left-2.5 top-2.5 h-5 w-5 text-gray-400" />
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          <div className="relative w-full md:w-[300px]">
+            <Input
+              placeholder="Search event by title or email..."
+              className="pl-8 pr-4 py-2 w-full border rounded-md"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="absolute left-2.5 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date_asc">Date (Oldest First)</SelectItem>
+              <SelectItem value="date_desc">Date (Newest First)</SelectItem>
+              <SelectItem value="title_asc">Title (A-Z)</SelectItem>
+              <SelectItem value="title_desc">Title (Z-A)</SelectItem>
+              <SelectItem value="rsvp_asc">RSVPs (Low to High)</SelectItem>
+              <SelectItem value="rsvp_desc">RSVPs (High to Low)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

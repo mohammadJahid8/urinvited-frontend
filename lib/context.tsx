@@ -122,6 +122,7 @@ const ContextProvider = ({ children }: any) => {
         const response = await api.get(`/event/${id}`);
         return response?.data?.data;
       }
+      return null; // Ensure a value other than undefined is returned
     },
   });
 
@@ -132,6 +133,7 @@ const ContextProvider = ({ children }: any) => {
         const response = await api.get(`/share/${id}`);
         return response?.data?.data;
       }
+      return null; // Ensure a value other than undefined is returned
     },
   });
 
