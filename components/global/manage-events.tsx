@@ -76,10 +76,6 @@ export default function ManageEvents({ title }: { title: string }) {
           return (b?.eventDetails?.events?.[0]?.title || "").localeCompare(
             a?.eventDetails?.events?.[0]?.title || ""
           );
-        case "rsvp_asc":
-          return (a?.rsvps?.length || 0) - (b?.rsvps?.length || 0);
-        case "rsvp_desc":
-          return (b?.rsvps?.length || 0) - (a?.rsvps?.length || 0);
         default:
           return 0;
       }
@@ -183,8 +179,6 @@ export default function ManageEvents({ title }: { title: string }) {
               <SelectItem value="date_desc">Date (Newest First)</SelectItem>
               <SelectItem value="title_asc">Title (A-Z)</SelectItem>
               <SelectItem value="title_desc">Title (Z-A)</SelectItem>
-              <SelectItem value="rsvp_asc">RSVPs (Low to High)</SelectItem>
-              <SelectItem value="rsvp_desc">RSVPs (High to Low)</SelectItem>
             </SelectContent>
           </Select>
         </div>

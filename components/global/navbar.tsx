@@ -85,30 +85,34 @@ export default function Navbar() {
               </Link>
 
               <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => downloadFile(videoData?.url, "download")}
-                  variant="outline"
-                  className="flex items-center gap-2 border-primary text-primary sm:text-sm text-xs px-2 sm:px-4"
-                >
-                  Download
-                </Button>
+                {isVideoPreviewPage && (
+                  <>
+                    <Button
+                      onClick={() => downloadFile(videoData?.url, "download")}
+                      variant="outline"
+                      className="flex items-center gap-2 border-primary text-primary sm:text-sm text-xs px-2 sm:px-4"
+                    >
+                      Download
+                    </Button>
 
-                <Button
-                  onClick={() => setOpenFeedback(true)}
-                  variant="outline"
-                  className="text-primary border-primary sm:text-sm text-xs px-2 sm:px-4"
-                >
-                  Suggest Feedback
-                </Button>
+                    <Button
+                      onClick={() => setOpenFeedback(true)}
+                      variant="outline"
+                      className="text-primary border-primary sm:text-sm text-xs px-2 sm:px-4"
+                    >
+                      Suggest Feedback
+                    </Button>
 
-                <FeedbackSheet />
+                    <FeedbackSheet />
 
-                <Button
-                  href={`/event-details?id=${event?._id}`}
-                  className="bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4"
-                >
-                  Event Details
-                </Button>
+                    <Button
+                      href={`/event-details?id=${event?._id}`}
+                      className="bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4"
+                    >
+                      Event Details
+                    </Button>
+                  </>
+                )}
                 <Button
                   href={`/event/${id}?preview=true`}
                   className="bg-[#4A61FF] hover:bg-[#4338CA] px-6"
