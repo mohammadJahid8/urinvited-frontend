@@ -111,7 +111,7 @@ export function EditVideoDialog({ video, refetch }: any) {
             {/* previous video */}
             <p className="text-sm font-medium">Previous Video</p>
             <video
-              className="w-80 h-[200px] object-cover rounded-lg"
+              className="max-w-80 rounded-lg"
               poster={video?.videos[video?.videos?.length - 1]?.thumbnail || ""}
               loop
               playsInline
