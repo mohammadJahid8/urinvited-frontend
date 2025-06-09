@@ -31,6 +31,7 @@ const DateInput = ({ field, label }: { field: any; label: string }) => (
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Calendar
+          className="min-h-[350px]"
           mode="single"
           selected={
             field.value ? new Date(dateFormatter(field.value)) : undefined
