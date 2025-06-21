@@ -2,6 +2,7 @@
 import { useAppContext } from "@/lib/context";
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
+import { Separator } from "../ui/separator";
 
 const VideoPreview = () => {
   const { event, isEventLoading } = useAppContext();
@@ -37,6 +38,15 @@ const VideoPreview = () => {
       ) : (
         <Video url={currentVideo?.url} thumbnail={currentVideo?.thumbnail} />
       )}
+      {/* Divider and Banner */}
+      <div className="my-4">
+        <Separator />
+        <div className="mt-3 text-center text-sm text-muted-foreground bg-muted rounded-md py-2 px-3">
+          <div>Want to change event details?</div>
+          <div>Use the ‘Edit Event Info’ button above.</div>
+          <div>For changes to the video, click ‘Video Feedback.’</div>
+        </div>
+      </div>
     </div>
   );
 };

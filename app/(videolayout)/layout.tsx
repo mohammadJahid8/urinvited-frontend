@@ -10,13 +10,13 @@ const VideoLayout = ({ children }: any) => {
   const id = searchParams.get("id");
 
   return (
-    <div className="">
+    <div className="mt-32">
       {/* <Navbar /> */}
-      <div className="mt-16">
+      {/* <div className="mt-16">
         <VideoPreviewNav />
-      </div>
+      </div> */}
 
-      <div className="h-[calc(100vh-120px)] overflow-y-auto p-10">
+      <div className=" h-[calc(100vh-120px)] overflow-y-auto p-10">
         {children}
       </div>
     </div>

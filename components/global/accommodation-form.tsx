@@ -44,7 +44,7 @@ const AccommodationForm = ({
         }
       >
         <Plus className="w-4 h-4" />
-        Add Another Registry
+        Add Another Accommodation
       </div>
     </div>
   );
@@ -89,6 +89,32 @@ const EachAccommodation = ({ form, index, remove }: any) => {
             <FormLabel className="font-bold">Location</FormLabel>
             <FormControl>
               <Input type="text" placeholder="Select Address" {...field} />
+            </FormControl>
+            <FormMessage className="mt-0" />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`accommodation.${index}.url`}
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2 space-y-0">
+            <FormLabel className="font-bold">URL</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="Enter URL" {...field} />
+            </FormControl>
+            <FormMessage className="mt-0" />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`accommodation.${index}.buttonText`}
+        render={({ field }) => (
+          <FormItem className="flex flex-col gap-2 space-y-0">
+            <FormLabel className="font-bold">Button Text</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="Enter Button Text" {...field} />
             </FormControl>
             <FormMessage className="mt-0" />
           </FormItem>

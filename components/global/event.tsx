@@ -655,10 +655,27 @@ export default function Event({ className }: any) {
                             </div>
 
                             <div
-                              className="text-sm text-gray-700"
+                              className="text-sm text-gray-700 text-center"
                               style={{ color: textColour }}
                               dangerouslySetInnerHTML={{ __html: item.note }}
                             />
+
+                            {item.url && (
+                              <Button
+                                href={item.url}
+                                target="_blank"
+                                style={{
+                                  fontFamily: buttonFont,
+                                }}
+                                variant="outline"
+                                className={cn(
+                                  "w-max py-2 px-4 mt-2 border rounded-lg text-blue-600 border-blue-600 hover:bg-blue-100",
+                                  buttonFormat === "rounded" && "rounded-full"
+                                )}
+                              >
+                                {item.buttonText || "View"}
+                              </Button>
+                            )}
                           </div>
                         </>
                       )

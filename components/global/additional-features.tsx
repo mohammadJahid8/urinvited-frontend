@@ -1,22 +1,22 @@
-'use client';
-import * as z from 'zod';
-import { Form } from '@/components/ui/form';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { EventAccordion } from './event-accordion';
-import BottomButtons from './bottom-buttons';
-import useStore from '@/app/store/useStore';
-import { useCallback, useEffect, useState } from 'react';
-import GiftRegistryForm from './gift-registry-form';
-import CustomInputForm from './custom-input-form';
-import AccommodationForm from './accommodation-form';
-import TravelForm from './travel-form';
-import { toast } from 'sonner';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAppContext } from '@/lib/context';
-import api from '@/utils/axiosInstance';
-import { useQuery } from '@tanstack/react-query';
-import LoadingOverlay from './loading-overlay';
+"use client";
+import * as z from "zod";
+import { Form } from "@/components/ui/form";
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { EventAccordion } from "./event-accordion";
+import BottomButtons from "./bottom-buttons";
+import useStore from "@/app/store/useStore";
+import { useCallback, useEffect, useState } from "react";
+import GiftRegistryForm from "./gift-registry-form";
+import CustomInputForm from "./custom-input-form";
+import AccommodationForm from "./accommodation-form";
+import TravelForm from "./travel-form";
+import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAppContext } from "@/lib/context";
+import api from "@/utils/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
+import LoadingOverlay from "./loading-overlay";
 
 const AdditionalFeatures = () => {
   const { updateFormData, formData } = useStore();
@@ -24,7 +24,7 @@ const AdditionalFeatures = () => {
   const { refetchEvents, user, event, isEventLoading, refetchEvent } =
     useAppContext();
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const id = searchParams.get("id");
   const router = useRouter();
 
   const additionalFeatures = event?.additionalFeatures;
@@ -42,6 +42,8 @@ const AdditionalFeatures = () => {
       z.object({
         accommodationName: z.string().optional(),
         location: z.string().optional(),
+        url: z.string().optional(),
+        buttonText: z.string().optional(),
         note: z.string().optional(),
       })
     ),
@@ -67,10 +69,10 @@ const AdditionalFeatures = () => {
         ? additionalFeatures?.registry
         : [
             {
-              title: '',
-              description: '',
-              url: '',
-              buttonText: '',
+              title: "",
+              description: "",
+              url: "",
+              buttonText: "",
             },
           ],
     // customFields:
@@ -91,13 +93,15 @@ const AdditionalFeatures = () => {
         ? additionalFeatures?.accommodation
         : [
             {
-              accommodationName: '',
-              location: '',
-              note: '',
+              accommodationName: "",
+              location: "",
+              url: "",
+              buttonText: "",
+              note: "",
             },
           ],
-    travelSource: additionalFeatures?.travelSource || '',
-    travelSourceLink: additionalFeatures?.travelSourceLink || '',
+    travelSource: additionalFeatures?.travelSource || "",
+    travelSourceLink: additionalFeatures?.travelSourceLink || "",
   };
 
   const form = useForm({
@@ -111,7 +115,7 @@ const AdditionalFeatures = () => {
     remove: removeCustomFields,
   } = useFieldArray({
     control: form.control,
-    name: 'customFields',
+    name: "customFields",
   });
   const {
     fields: accommodationFields,
@@ -119,16 +123,16 @@ const AdditionalFeatures = () => {
     remove: removeAccommodationFields,
   } = useFieldArray({
     control: form.control,
-    name: 'accommodation',
+    name: "accommodation",
   });
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'registry',
+    name: "registry",
   });
 
   const giftRegistry = [
     {
-      trigger: 'Gift Registry',
+      trigger: "Gift Registry",
       content: (
         <GiftRegistryForm
           form={form}
@@ -156,7 +160,7 @@ const AdditionalFeatures = () => {
 
   const accommodation = [
     {
-      trigger: 'Accommodation',
+      trigger: "Accommodation",
       content: (
         <AccommodationForm
           form={form}
@@ -169,7 +173,7 @@ const AdditionalFeatures = () => {
   ];
   const travel = [
     {
-      trigger: 'Travel',
+      trigger: "Travel",
       content: <TravelForm form={form} />,
     },
   ];
@@ -183,18 +187,18 @@ const AdditionalFeatures = () => {
     [updateFormData, formData]
   );
 
-  console.log('form.formState.isDirty', form.formState.isDirty);
+  console.log("form.formState.isDirty", form.formState.isDirty);
 
   const handleSubmit = async (data: any) => {
-    const path = user?.role === 'admin' ? '/manage-events' : `/share/${id}`;
+    const path = user?.role === "admin" ? "/manage-events" : `/share/${id}`;
 
     // if (!form.formState.isDirty) {
     //   return router.push(path);
     // }
 
-    if (user?.role === 'admin') {
+    if (user?.role === "admin") {
       const isUserConfirmed = window.confirm(
-        'Are you sure? User will be notified.'
+        "Are you sure? User will be notified."
       );
       if (!isUserConfirmed) {
         return;
@@ -215,7 +219,7 @@ const AdditionalFeatures = () => {
       const promise = await api.patch(`/event/create`, payload);
       if (promise?.status === 200) {
         const isUserNotified = promise?.data?.data?.isUserNotified;
-        const isAdmin = user?.role === 'admin';
+        const isAdmin = user?.role === "admin";
         if (!isUserNotified && isAdmin) {
           await api.post(`/event/send-invite`, {
             eventId: id,
@@ -223,7 +227,7 @@ const AdditionalFeatures = () => {
           });
         }
         toast.success(`Event additional features updated`, {
-          position: 'top-center',
+          position: "top-center",
         });
         refetchEvents();
         refetchEvent();
@@ -237,7 +241,7 @@ const AdditionalFeatures = () => {
         error?.response?.data?.message ||
           `Event additional features failed to update`,
         {
-          position: 'top-center',
+          position: "top-center",
         }
       );
     }
@@ -267,12 +271,12 @@ const AdditionalFeatures = () => {
     <Form {...form}>
       {isSubmitting && <LoadingOverlay />}
       <form onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className='flex flex-col gap-6'>
+        <div className="flex flex-col gap-6">
           <EventAccordion items={giftRegistry} />
           {/* <EventAccordion items={customField} /> */}
           <EventAccordion items={accommodation} />
           <EventAccordion items={travel} />
-          <BottomButtons label='Save & Share' />
+          <BottomButtons label="Save & Share" />
         </div>
       </form>
     </Form>

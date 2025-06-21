@@ -15,9 +15,15 @@ import Logo from "./logo";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, ChevronLeft } from "lucide-react";
+import { ArrowLeft, ChevronLeft, MoreVertical } from "lucide-react";
 import { Button } from "../ui/button";
 import { FeedbackSheet } from "./feedback-sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Navbar() {
   const { user, logout, event, downloadFile, setOpenFeedback } =
@@ -51,12 +57,35 @@ export default function Navbar() {
       <div className="flex items-center justify-between h-16 gap-2 border-b px-4 py-2">
         <Logo />
         <div className="flex items-center gap-2">
+          {/* Mobile: Dropdown */}
           {user?.role ? (
-            <UserDropdown user={user} logout={logout} />
+            <div className="block sm:hidden">
+              <UserDropdown user={user} logout={logout} />
+            </div>
           ) : (
             <Button href="/login" variant="special">
               Login
             </Button>
+          )}
+
+          {/* Desktop: Flexed user info/actions */}
+          {user?.role && (
+            <div className="hidden sm:flex items-center gap-2">
+              <Link
+                href={user?.role === "admin" ? "/manage-events" : "/events"}
+              >
+                <Button variant="link" className="px-2 text-black">
+                  Manage Events
+                </Button>
+              </Link>
+              <Button
+                variant="link"
+                onClick={logout}
+                className="px-2 text-black"
+              >
+                Logout
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -67,7 +96,7 @@ export default function Navbar() {
         additionalFeaturesPage) && (
         <>
           {!preview ? (
-            <div className="flex h-14 items-center justify-between bg-white px-4 py-2">
+            <div className="flex h-max items-center flex-wrap justify-between bg-white px-4 py-2">
               <Link
                 href={
                   isAdmin || isVideoPreviewPage
@@ -79,12 +108,11 @@ export default function Navbar() {
                 className="flex items-center gap-1 text-base font-semibold text-[#2E333B] hover:text-[#4A61FF]"
               >
                 <ChevronLeft className="h-6 w-6" />
-                {isAdmin || isVideoPreviewPage
-                  ? "Back to Dashboard"
-                  : "Back to Video"}
+                {isAdmin || isVideoPreviewPage ? "Back" : "Back"}
               </Link>
 
-              <div className="flex items-center gap-2">
+              {/* Desktop Buttons */}
+              <div className="hidden sm:flex items-center flex-wrap gap-2">
                 {isVideoPreviewPage && (
                   <>
                     <Button
@@ -95,13 +123,22 @@ export default function Navbar() {
                       Download
                     </Button>
 
-                    <Button
-                      onClick={() => setOpenFeedback(true)}
-                      variant="outline"
-                      className="text-primary border-primary sm:text-sm text-xs px-2 sm:px-4"
-                    >
-                      Suggest Feedback
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            onClick={() => setOpenFeedback(true)}
+                            variant="outline"
+                            className="text-primary border-primary sm:text-sm text-xs px-2 sm:px-4"
+                          >
+                            Video Feedback
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Send feedback only for the video invitation
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
 
                     <FeedbackSheet />
 
@@ -109,7 +146,7 @@ export default function Navbar() {
                       href={`/event-details?id=${event?._id}`}
                       className="bg-[#4A61FF] text-white hover:bg-[#4338CA] sm:text-sm text-xs px-2 sm:px-4"
                     >
-                      Event Details
+                      Edit Event Info
                     </Button>
                   </>
                 )}
@@ -119,6 +156,55 @@ export default function Navbar() {
                 >
                   Preview
                 </Button>
+              </div>
+
+              {/* Mobile: Dropdown for bottom navbar buttons */}
+              <div className="flex sm:hidden items-center">
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger>
+                    <Button variant="outline" size="icon" className="ml-2">
+                      <MoreVertical className="w-5 h-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {isVideoPreviewPage && (
+                      <>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            downloadFile(videoData?.url, "download")
+                          }
+                          className="flex items-center gap-2"
+                        >
+                          Download
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setOpenFeedback(true)}
+                          className="flex items-center gap-2"
+                        >
+                          Video Feedback
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href={`/event-details?id=${event?._id}`}
+                            className="flex items-center gap-2"
+                          >
+                            Event Details
+                          </Link>
+                        </DropdownMenuItem>
+                        <FeedbackSheet />
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`/event/${id}?preview=true`}
+                        className="flex items-center gap-2"
+                      >
+                        Preview
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           ) : (
