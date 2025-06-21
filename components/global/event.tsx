@@ -356,61 +356,58 @@ export default function Event({ className }: any) {
                     address ||
                     locationName) && (
                     <div className="space-y-4 text-center">
-                      <Border />
-
-                      {(startDate ||
-                        startTime ||
-                        timeZone ||
-                        endDate ||
-                        endTime) &&
+                      {(startDate || startTime || endDate || endTime) &&
                         when !== "tbd" && (
-                          <div className="space-y-1">
-                            <div
-                              className="flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold"
-                              style={{
-                                color: textColour,
-                                fontFamily: dateTimeLocationFont,
-                              }}
-                            >
-                              <Calendar
-                                className="w-5 h-5"
-                                style={{ color: textColour || "blue" }}
-                              />
-
-                              <span>
-                                {startDate && dateFormatter(startDate)}{" "}
-                                {startTime && `| ${convertTime(startTime)}`}
-                                {/* Only show 'to' + endTime if endTime exists */}
-                                {endTime && ` to ${convertTime(endTime)}`}
-                                {/* Only show endDate if it's different from startDate */}
-                                {endDate &&
-                                  dateFormatter(endDate) !==
-                                    dateFormatter(startDate) &&
-                                  ` to ${dateFormatter(endDate)}`}
-                                {timeZone && ` ${timeZone}`}
-                              </span>
-                            </div>
-                            {isAddToCalendar && (
-                              <a
-                                href={handleCalendarLink(
-                                  title,
-                                  startDate,
-                                  startTime,
-                                  endDate,
-                                  endTime,
-                                  inviteDetails,
-                                  locationName
-                                )}
-                                target="_blank"
-                                className="text-blue-500 text-base"
+                          <>
+                            <Border />
+                            <div className="space-y-1">
+                              <div
+                                className="flex sm:flex-row flex-col items-center justify-center gap-2 text-lg text-gray-700 font-semibold"
                                 style={{
+                                  color: textColour,
                                   fontFamily: dateTimeLocationFont,
                                 }}
                               >
-                                Add to Calendar
-                              </a>
-                            )}
-                          </div>
+                                <Calendar
+                                  className="w-5 h-5"
+                                  style={{ color: textColour || "blue" }}
+                                />
+
+                                <span>
+                                  {startDate && dateFormatter(startDate)}{" "}
+                                  {startTime && `| ${convertTime(startTime)}`}
+                                  {/* Only show 'to' + endTime if endTime exists */}
+                                  {endTime && ` to ${convertTime(endTime)}`}
+                                  {/* Only show endDate if it's different from startDate */}
+                                  {endDate &&
+                                    dateFormatter(endDate) !==
+                                      dateFormatter(startDate) &&
+                                    ` to ${dateFormatter(endDate)}`}
+                                  {timeZone && ` ${timeZone}`}
+                                </span>
+                              </div>
+                              {isAddToCalendar && (
+                                <a
+                                  href={handleCalendarLink(
+                                    title,
+                                    startDate,
+                                    startTime,
+                                    endDate,
+                                    endTime,
+                                    inviteDetails,
+                                    locationName
+                                  )}
+                                  target="_blank"
+                                  className="text-blue-500 text-base"
+                                  style={{
+                                    fontFamily: dateTimeLocationFont,
+                                  }}
+                                >
+                                  Add to Calendar
+                                </a>
+                              )}
+                            </div>
+                          </>
                         )}
 
                       {(address || locationName) &&
@@ -644,13 +641,19 @@ export default function Event({ className }: any) {
                               fontFamily: descriptionFont,
                             }}
                           >
-                            <div className="flex sm:flex-row flex-col items-center justify-center gap-1 text-center">
+                            <div className="flex flex-col items-center justify-center gap-1 text-center">
                               <Hotel className="w-6 h-6 text-blue-600" />
                               <span
                                 className="text-sm text-gray-700"
                                 style={{ color: textColour }}
                               >
-                                {item.accommodationName}, {item.location}
+                                {item.accommodationName}
+                              </span>
+                              <span
+                                className="text-sm text-gray-700"
+                                style={{ color: textColour }}
+                              >
+                                {item.location}
                               </span>
                             </div>
 
